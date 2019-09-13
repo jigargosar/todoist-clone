@@ -1,4 +1,11 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { render } from 'react-dom'
 import 'tachyons'
 import './index.css'
@@ -60,8 +67,7 @@ function update(msg: Msg, model: Model): Model {
   return exhaustiveCheck(msg)
 }
 
-const DispatcherContext = createContext((_: Msg) => {
-})
+const DispatcherContext = createContext((_: Msg) => {})
 const ModelContext = createContext(initialModel)
 
 function App() {
@@ -80,7 +86,7 @@ function App() {
         <div className="lh-copy" style={{ maxWidth: 500 }}>
           <div className="f4 pv1">TodoList</div>
           {model.todoList.map(todo => (
-            <TodoItem key={todo.id} todo={todo}/>
+            <TodoItem key={todo.id} todo={todo} />
           ))}
         </div>
       </ModelContext.Provider>
@@ -136,7 +142,7 @@ function TodoItem({ todo }: { todo: Todo }) {
         >
           ...
         </div>
-        <TodoMenu todoId={todo.id}/>
+        <TodoMenu todoId={todo.id} />
       </div>
     </div>
   )
@@ -148,61 +154,27 @@ function isTodoPopupOpenFor(todoId: TodoId, todoPopup: TodoPopup) {
 
 function TodoMenu({ todoId }: { todoId: string }) {
   const model = useContext(ModelContext)
-  const dispatch = useContext(DispatcherContext)
 
-  const firstFocusableRef: React.Ref<HTMLDivElement> = useRef(null)
-  const rootRef: React.Ref<HTMLDivElement> = useRef(null)
+  const isOpen = isTodoPopupOpenFor(todoId, model.todoPopup)
 
-  const isOpen =
-    isTodoPopupOpenFor(todoId, model.todoPopup)
+  return isOpen ? <OpenedTodoMenu /> : null
+}
 
+function useFocusOnMount(ref: React.RefObject<HTMLElement>) {
   useEffect(() => {
-    if (isOpen && firstFocusableRef.current) {
-      firstFocusableRef.current.focus()
+    if (ref.current) {
+      ref.current.focus()
     }
-  }, [isOpen, firstFocusableRef.current])
-
-  if (isOpen) {
-    return (
-      <div
-        ref={rootRef}
-        className="absolute right-0 top-2 bg-white shadow-1 z-1"
-        style={{ width: 200 }}
-        onBlur={() => {
-          setTimeout(() => {
-            if (
-              rootRef.current &&
-              !rootRef.current.contains(document.activeElement)
-            ) {
-              dispatch({ tag: 'CloseTodoMenu' })
-            }
-          }, 0)
-        }}
-      >
-        <div className="ph2 pv1" tabIndex={0} ref={firstFocusableRef}>
-          MI1
-        </div>
-        <div className="ph2 pv1" tabIndex={0}>
-          MI2
-        </div>
-      </div>
-    )
-  }
-  return null
+  }, [ref, ref.current])
 }
 
 function OpenedTodoMenu() {
   const dispatch = useContext(DispatcherContext)
 
-  const firstFocusableRef: React.Ref<HTMLDivElement> = useRef(null)
-  const rootRef: React.Ref<HTMLDivElement> = useRef(null)
+  const firstFocusableRef: React.RefObject<HTMLDivElement> = useRef(null)
+  const rootRef: React.RefObject<HTMLDivElement> = useRef(null)
 
-  useEffect(() => {
-    if (firstFocusableRef.current) {
-      firstFocusableRef.current.focus()
-    }
-  }, [firstFocusableRef.current])
-
+  useFocusOnMount(firstFocusableRef)
 
   return (
     <div
@@ -228,7 +200,6 @@ function OpenedTodoMenu() {
       </div>
     </div>
   )
-
 }
 
-render(<App/>, document.getElementById('root'))
+render(<App />, document.getElementById('root'))
