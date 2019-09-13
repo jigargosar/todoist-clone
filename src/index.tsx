@@ -1,4 +1,11 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { render } from 'react-dom'
 import 'tachyons'
 import './index.css'
@@ -63,7 +70,9 @@ function update(msg: Msg, model: Model): Model {
 const DispatcherContext = createContext((_: Msg) => {})
 const ModelContext = createContext(initialModel)
 
-function useDispatchCallback(setModel:React.Dispatch<React.SetStateAction<Model>>) {
+function useDispatchCallback(
+  setModel: React.Dispatch<React.SetStateAction<Model>>,
+) {
   return useCallback(
     (msg: Msg) => {
       setModel(model => {
@@ -74,7 +83,7 @@ function useDispatchCallback(setModel:React.Dispatch<React.SetStateAction<Model>
   )
 }
 
-const AppModelDispatchProvider: React.FC = ({children}) => {
+const AppProvider: React.FC = ({ children }) => {
   const [model, setModel] = useState(initialModel)
   const dispatch = useDispatchCallback(setModel)
   return (
@@ -87,22 +96,21 @@ const AppModelDispatchProvider: React.FC = ({children}) => {
 }
 
 function App() {
-
   return (
-    <AppModelDispatchProvider >
-
-        <AppContent/>
-
-    </AppModelDispatchProvider>
+    <AppProvider>
+      <AppContent />
+    </AppProvider>
   )
 }
 
 function AppContent() {
   const model = useContext(ModelContext)
-  return <div className="lh-copy" style={{ maxWidth: 500 }}>
-    <div className="f4 pv1">TodoList</div>
-    <ViewTodoList todoList={model.todoList} />
-  </div>
+  return (
+    <div className="lh-copy" style={{ maxWidth: 500 }}>
+      <div className="f4 pv1">TodoList</div>
+      <ViewTodoList todoList={model.todoList} />
+    </div>
+  )
 }
 
 function isTodoPopupOpenFor(todoId: TodoId, todoPopup: TodoPopup) {
@@ -112,12 +120,14 @@ function isTodoPopupOpenFor(todoId: TodoId, todoPopup: TodoPopup) {
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
   const model = useContext(ModelContext)
 
-  return <>{todoList.map(todo => {
-    const menuOpen = isTodoPopupOpenFor(todo.id, model.todoPopup)
-    return (
-      <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen}/>
-    )
-  })}</>
+  return (
+    <>
+      {todoList.map(todo => {
+        const menuOpen = isTodoPopupOpenFor(todo.id, model.todoPopup)
+        return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen} />
+      })}
+    </>
+  )
 }
 
 function useOpenTodoMenuCallback(todoId: TodoId) {
@@ -134,46 +144,51 @@ function useOpenTodoMenuCallback(todoId: TodoId) {
   )
 }
 
-const TodoItem = React.memo(function TodoItem ({ todo, menuOpen }: { todo: Todo, menuOpen: boolean }) {
-    const dispatch = useContext(DispatcherContext)
-    const openTodoMenuCallback = useOpenTodoMenuCallback(todo.id)
-    return (
-      <div className="flex">
-        <div className="ph1 pv2">
-          <input
-            type="checkbox"
-            className=""
-            checked={todo.isDone}
-            style={{ width: 24, height: 24 }}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              dispatch({
-                tag: 'SetDone',
-                todoId: todo.id,
-                isChecked: e.target.checked,
-              })
-            }}
-          />
-        </div>
-        <div className="ph1 pv1 flex-grow-1 lh-title ">{todo.title}</div>
-        <div className="relative">
-          <div
-            className="ph1 b pointer"
-            onClick={openTodoMenuCallback}
-            tabIndex={0}
-            onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-              if (isHK(['enter', 'space'], e.nativeEvent)) {
-                openTodoMenuCallback(e)
-              }
-            }}
-          >
-            ...
-          </div>
-          {menuOpen && <OpenedTodoMenu/>}
-        </div>
+const TodoItem = React.memo(function TodoItem({
+  todo,
+  menuOpen,
+}: {
+  todo: Todo
+  menuOpen: boolean
+}) {
+  const dispatch = useContext(DispatcherContext)
+  const openTodoMenuCallback = useOpenTodoMenuCallback(todo.id)
+  return (
+    <div className="flex">
+      <div className="ph1 pv2">
+        <input
+          type="checkbox"
+          className=""
+          checked={todo.isDone}
+          style={{ width: 24, height: 24 }}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            dispatch({
+              tag: 'SetDone',
+              todoId: todo.id,
+              isChecked: e.target.checked,
+            })
+          }}
+        />
       </div>
-    )
-  },
-)
+      <div className="ph1 pv1 flex-grow-1 lh-title ">{todo.title}</div>
+      <div className="relative">
+        <div
+          className="ph1 b pointer"
+          onClick={openTodoMenuCallback}
+          tabIndex={0}
+          onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+            if (isHK(['enter', 'space'], e.nativeEvent)) {
+              openTodoMenuCallback(e)
+            }
+          }}
+        >
+          ...
+        </div>
+        {menuOpen && <OpenedTodoMenu />}
+      </div>
+    </div>
+  )
+})
 
 function useFocusOnMount(ref: React.RefObject<HTMLElement>) {
   useEffect(() => {
