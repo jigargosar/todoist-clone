@@ -99,8 +99,6 @@ function isTodoPopupOpenFor(todoId: TodoId, todoPopup: TodoPopup) {
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
   const model = useContext(ModelContext)
 
-
-
   return <>{todoList.map(todo => {
     const menuOpen = isTodoPopupOpenFor(todo.id, model.todoPopup)
     return (
