@@ -26,7 +26,7 @@ type Todo = {
 type TodoPopup = { tag: 'Closed' } | { tag: 'Open'; todoId: string }
 type Model = {
   todoPopup: TodoPopup
-  todoList: ReadonlyArray<Todo>
+  todoList: Todo[]
 }
 
 function createFakeTodo(): Todo {
@@ -85,13 +85,28 @@ function App() {
       <ModelContext.Provider value={model}>
         <div className="lh-copy" style={{ maxWidth: 500 }}>
           <div className="f4 pv1">TodoList</div>
-          {model.todoList.map(todo => (
-            <TodoItem key={todo.id} todo={todo} />
-          ))}
+          <ViewTodoList todoList={model.todoList} />
         </div>
       </ModelContext.Provider>
     </DispatcherContext.Provider>
   )
+}
+
+function isTodoPopupOpenFor(todoId: TodoId, todoPopup: TodoPopup) {
+  return todoPopup.tag === 'Open' && todoPopup.todoId === todoId
+}
+
+function ViewTodoList({ todoList }: { todoList: Todo[] }) {
+  const model = useContext(ModelContext)
+
+
+
+  return <>{todoList.map(todo => {
+    const menuOpen = isTodoPopupOpenFor(todo.id, model.todoPopup)
+    return (
+      <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen}/>
+    )
+  })}</>
 }
 
 function useOpenTodoMenuCallback(todoId: TodoId) {
@@ -108,7 +123,7 @@ function useOpenTodoMenuCallback(todoId: TodoId) {
   )
 }
 
-function TodoItem({ todo }: { todo: Todo }) {
+function TodoItem({ todo , menuOpen}: { todo: Todo , menuOpen:boolean}) {
   const dispatch = useContext(DispatcherContext)
   const openTodoMenuCallback = useOpenTodoMenuCallback(todo.id)
   return (
@@ -142,23 +157,13 @@ function TodoItem({ todo }: { todo: Todo }) {
         >
           ...
         </div>
-        <TodoMenu todoId={todo.id} />
+        {menuOpen && <OpenedTodoMenu  />}
       </div>
     </div>
   )
 }
 
-function isTodoPopupOpenFor(todoId: TodoId, todoPopup: TodoPopup) {
-  return todoPopup.tag === 'Open' && todoPopup.todoId === todoId
-}
 
-function TodoMenu({ todoId }: { todoId: string }) {
-  const model = useContext(ModelContext)
-
-  const isOpen = isTodoPopupOpenFor(todoId, model.todoPopup)
-
-  return isOpen ? <OpenedTodoMenu /> : null
-}
 
 function useFocusOnMount(ref: React.RefObject<HTMLElement>) {
   useEffect(() => {
