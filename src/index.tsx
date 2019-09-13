@@ -148,10 +148,12 @@ function isTodoPopupOpenFor(todoId:TodoId, todoPopup:TodoPopup) {
 function TodoMenu({ todoId }: { todoId: string }) {
   const model = useContext(ModelContext)
   const dispatch = useContext(DispatcherContext)
-  const isOpen =
-    isTodoPopupOpenFor(todoId, model.todoPopup)
+
   const firstFocusableRef: React.Ref<HTMLDivElement> = useRef(null)
   const rootRef: React.Ref<HTMLDivElement> = useRef(null)
+
+  const isOpen =
+    isTodoPopupOpenFor(todoId, model.todoPopup)
 
   useEffect(() => {
     if (isOpen && firstFocusableRef.current) {
