@@ -1,11 +1,4 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { render } from 'react-dom'
 import 'tachyons'
 import './index.css'
@@ -70,9 +63,8 @@ function update(msg: Msg, model: Model): Model {
 const DispatcherContext = createContext((_: Msg) => {})
 const ModelContext = createContext(initialModel)
 
-function App() {
-  const [model, setModel] = useState(initialModel)
-  const dispatch = useCallback(
+function useDispatchCallback(setModel:React.Dispatch<React.SetStateAction<Model>>) {
+  return useCallback(
     (msg: Msg) => {
       setModel(model => {
         return produce(model, draft => update(msg, draft))
@@ -80,16 +72,37 @@ function App() {
     },
     [setModel],
   )
+}
+
+const AppModelDispatchProvider: React.FC = ({children}) => {
+  const [model, setModel] = useState(initialModel)
+  const dispatch = useDispatchCallback(setModel)
   return (
     <DispatcherContext.Provider value={dispatch}>
       <ModelContext.Provider value={model}>
-        <div className="lh-copy" style={{ maxWidth: 500 }}>
-          <div className="f4 pv1">TodoList</div>
-          <ViewTodoList todoList={model.todoList} />
-        </div>
+        {children}
       </ModelContext.Provider>
     </DispatcherContext.Provider>
   )
+}
+
+function App() {
+
+  return (
+    <AppModelDispatchProvider >
+
+        <AppContent/>
+
+    </AppModelDispatchProvider>
+  )
+}
+
+function AppContent() {
+  const model = useContext(ModelContext)
+  return <div className="lh-copy" style={{ maxWidth: 500 }}>
+    <div className="f4 pv1">TodoList</div>
+    <ViewTodoList todoList={model.todoList} />
+  </div>
 }
 
 function isTodoPopupOpenFor(todoId: TodoId, todoPopup: TodoPopup) {
