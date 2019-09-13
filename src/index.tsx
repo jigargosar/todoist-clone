@@ -121,7 +121,7 @@ function useOpenTodoMenuCallback(todoId: TodoId) {
   )
 }
 
-function TodoItem({ todo , menuOpen}: { todo: Todo , menuOpen:boolean}) {
+const TodoItem = React.memo(({ todo , menuOpen}: { todo: Todo , menuOpen:boolean}) => {
   const dispatch = useContext(DispatcherContext)
   const openTodoMenuCallback = useOpenTodoMenuCallback(todo.id)
   return (
@@ -160,8 +160,7 @@ function TodoItem({ todo , menuOpen}: { todo: Todo , menuOpen:boolean}) {
     </div>
   )
 }
-
-
+)
 
 function useFocusOnMount(ref: React.RefObject<HTMLElement>) {
   useEffect(() => {
