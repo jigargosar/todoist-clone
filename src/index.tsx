@@ -121,45 +121,45 @@ function useOpenTodoMenuCallback(todoId: TodoId) {
   )
 }
 
-const TodoItem = React.memo(({ todo , menuOpen}: { todo: Todo , menuOpen:boolean}) => {
-  const dispatch = useContext(DispatcherContext)
-  const openTodoMenuCallback = useOpenTodoMenuCallback(todo.id)
-  return (
-    <div className="flex">
-      <div className="ph1 pv2">
-        <input
-          type="checkbox"
-          className=""
-          checked={todo.isDone}
-          style={{ width: 24, height: 24 }}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            dispatch({
-              tag: 'SetDone',
-              todoId: todo.id,
-              isChecked: e.target.checked,
-            })
-          }}
-        />
-      </div>
-      <div className="ph1 pv1 flex-grow-1 lh-title ">{todo.title}</div>
-      <div className="relative">
-        <div
-          className="ph1 b pointer"
-          onClick={openTodoMenuCallback}
-          tabIndex={0}
-          onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-            if (isHK(['enter', 'space'], e.nativeEvent)) {
-              openTodoMenuCallback(e)
-            }
-          }}
-        >
-          ...
+const TodoItem = React.memo(function TodoItem ({ todo, menuOpen }: { todo: Todo, menuOpen: boolean }) {
+    const dispatch = useContext(DispatcherContext)
+    const openTodoMenuCallback = useOpenTodoMenuCallback(todo.id)
+    return (
+      <div className="flex">
+        <div className="ph1 pv2">
+          <input
+            type="checkbox"
+            className=""
+            checked={todo.isDone}
+            style={{ width: 24, height: 24 }}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              dispatch({
+                tag: 'SetDone',
+                todoId: todo.id,
+                isChecked: e.target.checked,
+              })
+            }}
+          />
         </div>
-        {menuOpen && <OpenedTodoMenu  />}
+        <div className="ph1 pv1 flex-grow-1 lh-title ">{todo.title}</div>
+        <div className="relative">
+          <div
+            className="ph1 b pointer"
+            onClick={openTodoMenuCallback}
+            tabIndex={0}
+            onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+              if (isHK(['enter', 'space'], e.nativeEvent)) {
+                openTodoMenuCallback(e)
+              }
+            }}
+          >
+            ...
+          </div>
+          {menuOpen && <OpenedTodoMenu/>}
+        </div>
       </div>
-    </div>
-  )
-}
+    )
+  },
 )
 
 function useFocusOnMount(ref: React.RefObject<HTMLElement>) {
