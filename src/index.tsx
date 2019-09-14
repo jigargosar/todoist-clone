@@ -241,7 +241,7 @@ const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
       })
     }
 
-    function setDone(isDone:boolean) {
+    function setDone(isDone: boolean) {
       dispatch({
         tag: 'SetDone',
         todoId: todo.id,
@@ -287,7 +287,6 @@ const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
 function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   const dispatch = useContext(DispatcherContext)
 
-  const firstFocusableRef: RefObject<HTMLButtonElement> = useRef(null)
   const rootRef: RefObject<HTMLDivElement> = useRef(null)
 
   useEffect(() => {
@@ -311,7 +310,6 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
         className="button-reset input-reset bn bg-inherit  ph2 pv1 pointer db w-100 tl"
         tabIndex={0}
         autoFocus={idx === 0}
-        ref={idx === 0 ? firstFocusableRef : null}
         onClick={action}
         onKeyDown={e => {
           if (isHK(['enter', 'space'], e.nativeEvent)) {
