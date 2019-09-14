@@ -279,7 +279,7 @@ const TodoItem = memo(function TodoItem({
           className="ph1 b pointer"
           onClick={openTodoMenuCallback}
           tabIndex={0}
-          onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => {
+          onKeyDown={(e: KeyboardEvent) => {
             if (isHK(['enter', 'space'], e.nativeEvent)) {
               openTodoMenuCallback(e)
             }
