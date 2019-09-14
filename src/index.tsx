@@ -54,6 +54,7 @@ type Msg =
   | { tag: 'DeleteTodo'; todoId: string }
   | { tag: 'EditTodo'; todoId: string }
   | { tag: 'SaveEditingTodo' }
+  | { tag: 'CancelEditingTodo' }
 
 function update(msg: Msg, model: Model): Model {
   if (msg.tag === 'OpenTodoMenu') {
@@ -73,7 +74,7 @@ function update(msg: Msg, model: Model): Model {
     const maybeIdx = model.todoList.findIndex(
       todo => todo.id === msg.todoId,
     )
-    if (maybeIdx > 0) {
+    if (maybeIdx > -1) {
       model.todoList.splice(maybeIdx, 1)
     }
     return model
@@ -84,12 +85,24 @@ function update(msg: Msg, model: Model): Model {
     }
     return model
   } else if (msg.tag === 'SaveEditingTodo') {
+
+    const editingTodo = model.editingTodo
+    if(!editingTodo) return model
+    const maybeTodo = model.todoList.find(todo => todo.id === editingTodo.id)
+    if (maybeTodo) {
+      maybeTodo.title = editingTodo.title
+    }
+    model.editingTodo = null
+    return model
+  } else if (msg.tag === 'CancelEditingTodo') {
+    model.editingTodo = null
     return model
   }
   return exhaustiveCheck(msg)
 }
 
-const DispatcherContext = createContext((_: Msg) => {})
+const DispatcherContext = createContext((_: Msg) => {
+})
 const ModelContext = createContext(initialModel)
 
 function useDispatchCallback(
@@ -120,7 +133,7 @@ const AppProvider: React.FC = ({ children }) => {
 function App() {
   return (
     <AppProvider>
-      <AppContent />
+      <AppContent/>
     </AppProvider>
   )
 }
@@ -130,7 +143,7 @@ function AppContent() {
   return (
     <div className="lh-copy" style={{ maxWidth: 500 }}>
       <div className="f4 pv1">TodoList</div>
-      <ViewTodoList todoList={model.todoList} />
+      <ViewTodoList todoList={model.todoList}/>
     </div>
   )
 }
@@ -146,10 +159,10 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
     <>
       {todoList.map(todo => {
         if (model.editingTodo && model.editingTodo.id === todo.id) {
-          return <TodoEditItem key={todo.id} todo={todo} />
+          return <TodoEditItem key={todo.id} todo={todo}/>
         }
         const menuOpen = isTodoPopupOpenFor(todo.id, model.todoPopup)
-        return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen} />
+        return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen}/>
       })}
     </>
   )
@@ -178,11 +191,15 @@ function TodoEditItem({ todo }: { todo: Todo }) {
           type="text"
           className="ph1 pv1 w-100 "
           value={todo.title}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {}}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+          }}
         />
-        <div>
+        <div className="flex pv1">
           <Button action={() => dispatch({ tag: 'SaveEditingTodo' })}>
             Save
+          </Button>
+          <Button action={() => dispatch({ tag: 'CancelEditingTodo' })}>
+            Cancel
           </Button>
         </div>
       </div>
@@ -192,9 +209,9 @@ function TodoEditItem({ todo }: { todo: Todo }) {
 }
 
 const TodoItem = React.memo(function TodoItem({
-  todo,
-  menuOpen,
-}: {
+                                                todo,
+                                                menuOpen,
+                                              }: {
   todo: Todo
   menuOpen: boolean
 }) {
@@ -231,7 +248,7 @@ const TodoItem = React.memo(function TodoItem({
         >
           ...
         </div>
-        {menuOpen && <OpenedTodoMenu todoId={todo.id} />}
+        {menuOpen && <OpenedTodoMenu todoId={todo.id}/>}
       </div>
     </div>
   )
@@ -292,9 +309,9 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   )
 }
 
-const Button: FC<{ action: () => void , className?:string}> = ({ action, className, children}) => (
+const Button: FC<{ action: () => void, className?: string }> = ({ action, className, children }) => (
   <div
-    className={`ph2 pv1 pointer${className ? className : ""}`}
+    className={`ph2 pv1 pointer${className ? className : ''}`}
     tabIndex={0}
     onClick={action}
     onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -317,4 +334,4 @@ function useFocusOnMountEffect(ref: React.RefObject<HTMLElement>) {
   }, [ref, ref.current])
 }
 
-render(<App />, document.getElementById('root'))
+render(<App/>, document.getElementById('root'))
