@@ -31,7 +31,14 @@ textarea {
   /*transition: height 1ms;*/
   /*height: 100px;*/
 }
-
+/*.button-reset{
+  -webkit-appearance: none; -moz-appearance: none;
+  text-align: unset;
+  background: inherit;
+  border: unset;
+  margin: unset;
+  padding: unset;
+}*/
 svg {
   shape-rendering: auto;
 }

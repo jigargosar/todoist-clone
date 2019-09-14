@@ -256,10 +256,10 @@ const TodoItem = React.memo(function TodoItem({
 function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   const dispatch = useContext(DispatcherContext)
 
-  const firstFocusableRef: React.RefObject<HTMLDivElement> = useRef(null)
+  const firstFocusableRef: React.RefObject<HTMLButtonElement> = useRef(null)
   const rootRef: React.RefObject<HTMLDivElement> = useRef(null)
 
-  useFocusOnMountEffect(firstFocusableRef)
+  // useFocusOnMountEffect(firstFocusableRef)
   useEffect(()=>{
     return () => dispatch({ tag: 'CloseTodoMenu' })
   })
@@ -277,12 +277,13 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
 
   function viewItem([action, label]: [() => void, string], idx: number) {
     return (
-      <div
-        className="ph2 pv1 pointer"
+      <button
+        className="button-reset input-reset bn bg-inherit  ph2 pv1 pointer db w-100 tl"
         tabIndex={0}
+        autoFocus={idx===0}
         ref={idx === 0 ? firstFocusableRef : null}
         onClick={action}
-        onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+        onKeyDown={(e: React.KeyboardEvent<HTMLButtonElement>) => {
           if (isHK(['enter', 'space'], e.nativeEvent)) {
             action()
           }
@@ -290,7 +291,7 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
         key={label}
       >
         {label}
-      </div>
+      </button>
     )
   }
 
@@ -317,7 +318,7 @@ const Button: FC<{ action: () => void; className?: string }> = ({
   children,
 }) => (
   <div
-    className={`ph2 pv1 pointer${className ? className : ''}`}
+    className={`button-reset input-reset bn bg-inherit ph2 pv1 pointer${className ? className : ''}`}
     tabIndex={0}
     onClick={action}
     onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
