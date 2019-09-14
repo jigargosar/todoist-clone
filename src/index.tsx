@@ -205,6 +205,7 @@ function OpenedTodoMenu() {
   const rootRef: React.RefObject<HTMLDivElement> = useRef(null)
 
   useFocusOnMount(firstFocusableRef)
+
   const onBlurCallback = useCallback(() => {
     setTimeout(() => {
       if (
