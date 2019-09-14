@@ -259,6 +259,9 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   const rootRef: React.RefObject<HTMLDivElement> = useRef(null)
 
   useFocusOnMountEffect(firstFocusableRef)
+  useEffect(()=>{
+    return () => dispatch({ tag: 'CloseTodoMenu' })
+  })
 
   const onBlurCallback = useCallback(() => {
     setTimeout(() => {
