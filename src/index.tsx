@@ -1,5 +1,4 @@
 import React, {
-  ChangeEvent,
   createContext,
   Dispatch,
   FC,
@@ -7,7 +6,6 @@ import React, {
   RefObject,
   SetStateAction,
   SyntheticEvent,
-  KeyboardEvent,
   useCallback,
   useContext,
   useEffect,
@@ -203,20 +201,6 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
   )
 }
 
-function useOpenTodoMenuCallback(todoId: TodoId) {
-  const dispatch = useContext(DispatcherContext)
-  return useCallback(
-    (e: SyntheticEvent) => {
-      e.preventDefault()
-      dispatch({
-        tag: 'OpenTodoMenu',
-        todoId: todoId,
-      })
-    },
-    [todoId, dispatch],
-  )
-}
-
 function TodoEditItem({ editingTodo }: { editingTodo: EditingTodo }) {
   const dispatch = useContext(DispatcherContext)
   return (
@@ -255,7 +239,7 @@ const TodoItem = memo(function TodoItem({
   menuOpen: boolean
 }) {
   const dispatch = useContext(DispatcherContext)
-  const openTodoMenuCallback = useOpenTodoMenuCallback(todo.id)
+
   return (
     <div className="flex">
       <div className="ph1 pv2">
@@ -277,11 +261,20 @@ const TodoItem = memo(function TodoItem({
       <div className="relative">
         <div
           className="ph1 b pointer"
-          onClick={openTodoMenuCallback}
+          onClick={(e: SyntheticEvent) => {
+            e.preventDefault()
+            dispatch({
+              tag: 'OpenTodoMenu',
+              todoId: todo.id,
+            })
+          }}
           tabIndex={0}
           onKeyDown={e => {
             if (isHK(['enter', 'space'], e.nativeEvent)) {
-              openTodoMenuCallback(e)
+              dispatch({
+                tag: 'OpenTodoMenu',
+                todoId: todo.id,
+              })
             }
           }}
         >
