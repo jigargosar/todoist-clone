@@ -48,6 +48,7 @@ type Msg =
   | { tag: 'OpenTodoMenu'; todoId: string }
   | { tag: 'CloseTodoMenu' }
   | { tag: 'SetDone'; todoId: string; isDone: boolean }
+  | { tag: 'DeleteTodo'; todoId: string}
 
 function update(msg: Msg, model: Model): Model {
   if (msg.tag === 'OpenTodoMenu') {
@@ -61,6 +62,12 @@ function update(msg: Msg, model: Model): Model {
     const maybeTodo = model.todoList.find(todo => todo.id === msg.todoId)
     if (maybeTodo) {
       maybeTodo.isDone = msg.isDone
+    }
+    return model
+  }else if(msg.tag === 'DeleteTodo'){
+    const maybeIdx = model.todoList.findIndex(todo => todo.id === msg.todoId)
+    if(maybeIdx > 0){
+      delete model.todoList[maybeIdx]
     }
     return model
   }
