@@ -317,18 +317,18 @@ const Button: FC<{ action: () => void; className?: string }> = ({
   className,
   children,
 }) => (
-  <div
+  <button
     className={`button-reset input-reset bn bg-inherit ph2 pv1 pointer${className ? className : ''}`}
     tabIndex={0}
     onClick={action}
-    onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+    onKeyDown={(e: React.KeyboardEvent<HTMLButtonElement>) => {
       if (isHK(['enter', 'space'], e.nativeEvent)) {
         action()
       }
     }}
   >
     {children}
-  </div>
+  </button>
 )
 
 // Hooks
