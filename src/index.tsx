@@ -239,6 +239,13 @@ const TodoItem = memo(function TodoItem({
 }) {
   const dispatch = useContext(DispatcherContext)
 
+  function openTodoMenu() {
+    dispatch({
+      tag: 'OpenTodoMenu',
+      todoId: todo.id,
+    })
+  }
+
   return (
     <div className="flex">
       <div className="ph1 pv2">
@@ -262,18 +269,12 @@ const TodoItem = memo(function TodoItem({
           className="ph1 b pointer"
           onClick={e => {
             e.preventDefault()
-            dispatch({
-              tag: 'OpenTodoMenu',
-              todoId: todo.id,
-            })
+            openTodoMenu()
           }}
           tabIndex={0}
           onKeyDown={e => {
             if (isHK(['enter', 'space'], e.nativeEvent)) {
-              dispatch({
-                tag: 'OpenTodoMenu',
-                todoId: todo.id,
-              })
+              openTodoMenu()
             }
           }}
         >
