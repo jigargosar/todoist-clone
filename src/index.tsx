@@ -1,6 +1,8 @@
 import React, {
-  createContext,
-  FC,
+  ChangeEvent,
+  createContext, Dispatch,
+  FC, memo, RefObject, SetStateAction, SyntheticEvent,
+  KeyboardEvent,
   useCallback,
   useContext,
   useEffect,
@@ -133,7 +135,7 @@ const DispatcherContext = createContext((_: Msg) => {})
 const ModelContext = createContext(initialModel)
 
 function useDispatchCallback(
-  setModel: React.Dispatch<React.SetStateAction<Model>>,
+  setModel: Dispatch<SetStateAction<Model>>,
 ) {
   return useCallback(
     (msg: Msg) => {
@@ -145,7 +147,7 @@ function useDispatchCallback(
   )
 }
 
-const AppProvider: React.FC = ({ children }) => {
+const AppProvider: FC = ({ children }) => {
   const [model, setModel] = useState(initialModel)
   const dispatch = useDispatchCallback(setModel)
   return (
@@ -201,7 +203,7 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
 function useOpenTodoMenuCallback(todoId: TodoId) {
   const dispatch = useContext(DispatcherContext)
   return useCallback(
-    (e: React.SyntheticEvent) => {
+    (e: SyntheticEvent) => {
       e.preventDefault()
       dispatch({
         tag: 'OpenTodoMenu',
@@ -222,7 +224,7 @@ function TodoEditItem({ editingTodo }: { editingTodo: EditingTodo }) {
           type="text"
           className="ph1 pv1 w-100 "
           value={editingTodo.title}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
             dispatch({
               tag: 'MergeEditingTodo',
               editingTodo: { title: e.target.value },
@@ -242,7 +244,7 @@ function TodoEditItem({ editingTodo }: { editingTodo: EditingTodo }) {
   )
 }
 
-const TodoItem = React.memo(function TodoItem({
+const TodoItem = memo(function TodoItem({
   todo,
   menuOpen,
 }: {
@@ -259,7 +261,7 @@ const TodoItem = React.memo(function TodoItem({
           className=""
           checked={todo.isDone}
           style={{ width: 24, height: 24 }}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
             dispatch({
               tag: 'SetDone',
               todoId: todo.id,
@@ -274,7 +276,7 @@ const TodoItem = React.memo(function TodoItem({
           className="ph1 b pointer"
           onClick={openTodoMenuCallback}
           tabIndex={0}
-          onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+          onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => {
             if (isHK(['enter', 'space'], e.nativeEvent)) {
               openTodoMenuCallback(e)
             }
@@ -291,10 +293,10 @@ const TodoItem = React.memo(function TodoItem({
 function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   const dispatch = useContext(DispatcherContext)
 
-  const firstFocusableRef: React.RefObject<HTMLButtonElement> = useRef(
+  const firstFocusableRef: RefObject<HTMLButtonElement> = useRef(
     null,
   )
-  const rootRef: React.RefObject<HTMLDivElement> = useRef(null)
+  const rootRef: RefObject<HTMLDivElement> = useRef(null)
 
   // useFocusOnMountEffect(firstFocusableRef)
   useEffect(() => {
@@ -320,7 +322,7 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
         autoFocus={idx === 0}
         ref={idx === 0 ? firstFocusableRef : null}
         onClick={action}
-        onKeyDown={(e: React.KeyboardEvent<HTMLButtonElement>) => {
+        onKeyDown={(e: KeyboardEvent<HTMLButtonElement>) => {
           if (isHK(['enter', 'space'], e.nativeEvent)) {
             action()
           }
@@ -360,7 +362,7 @@ const Button: FC<{ action: () => void; className?: string }> = ({
     }`}
     tabIndex={0}
     onClick={action}
-    onKeyDown={(e: React.KeyboardEvent<HTMLButtonElement>) => {
+    onKeyDown={(e: KeyboardEvent<HTMLButtonElement>) => {
       if (isHK(['enter', 'space'], e.nativeEvent)) {
         action()
       }
