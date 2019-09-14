@@ -31,12 +31,12 @@ type Todo = {
 }
 type EditingTodo = { id: TodoId; title: string }
 
-type TodoPopup = { tag: 'Closed' } | { tag: 'Open'; todoId: string }
+type TodoPopup = { todoId: string }
 
 type Model = {
-  todoPopup: TodoPopup
+  todoPopup: TodoPopup | null
   todoList: Todo[]
-  editingTodo?: EditingTodo | null
+  editingTodo: EditingTodo | null
 }
 
 function createFakeTodo(): Todo {
@@ -46,7 +46,7 @@ function createFakeTodo(): Todo {
 const initialTodos: Todo[] = times(createFakeTodo, 10)
 
 const defaultModel: Model = {
-  todoPopup: { tag: 'Closed' },
+  todoPopup: null,
   todoList: initialTodos,
   editingTodo: null,
 }
@@ -92,9 +92,9 @@ type Msg =
 
 function update(msg: Msg, model: Model): void {
   if (msg.tag === 'OpenTodoMenu') {
-    model.todoPopup = { tag: 'Open', todoId: msg.todoId }
+    model.todoPopup = {  todoId: msg.todoId }
   } else if (msg.tag === 'CloseTodoMenu') {
-    model.todoPopup = { tag: 'Closed' }
+    model.todoPopup = null
   } else if (msg.tag === 'SetDone') {
     const maybeTodo = model.todoList.find(todo => todo.id === msg.todoId)
     if (maybeTodo) {
@@ -179,7 +179,7 @@ function AppContent() {
 }
 
 function isTodoPopupOpenFor(todoId: TodoId, todoPopup: TodoPopup) {
-  return todoPopup.tag === 'Open' && todoPopup.todoId === todoId
+  return todoPopup && todoPopup.todoId === todoId
 }
 
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
