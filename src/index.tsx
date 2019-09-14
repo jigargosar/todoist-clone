@@ -188,6 +188,7 @@ function TodoEditItem({ todo }: { todo: Todo }) {
     <div className="flex">
       <div className="ph1 pv2 flex-grow-1">
         <input
+          autoFocus={true}
           type="text"
           className="ph1 pv1 w-100 "
           value={todo.title}
