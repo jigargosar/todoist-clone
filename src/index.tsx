@@ -67,7 +67,7 @@ function update(msg: Msg, model: Model): Model {
   }else if(msg.tag === 'DeleteTodo'){
     const maybeIdx = model.todoList.findIndex(todo => todo.id === msg.todoId)
     if(maybeIdx > 0){
-      delete model.todoList[maybeIdx]
+      model.todoList.splice(maybeIdx,1)
     }
     return model
   }
@@ -191,14 +191,14 @@ const TodoItem = React.memo(function TodoItem({
         >
           ...
         </div>
-        {menuOpen && <OpenedTodoMenu />}
+        {menuOpen && <OpenedTodoMenu todoId={todo.id}/>}
       </div>
     </div>
   )
 })
 
 
-function OpenedTodoMenu() {
+function OpenedTodoMenu({todoId}:{todoId:TodoId}) {
   const dispatch = useContext(DispatcherContext)
 
   const firstFocusableRef: React.RefObject<HTMLDivElement> = useRef(null)
@@ -224,8 +224,12 @@ function OpenedTodoMenu() {
       style={{ width: 200 }}
       onBlur={onBlurCallback}
     >
-      <div className="ph2 pv1" tabIndex={0} ref={firstFocusableRef}>
-        MI1
+      <div className="ph2 pv1" tabIndex={0} ref={firstFocusableRef}
+           onClick={()=>{
+             dispatch({tag:'DeleteTodo', todoId})
+           }}
+      >
+        Delete
       </div>
       <div className="ph2 pv1" tabIndex={0}>
         MI2
