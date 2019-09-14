@@ -90,7 +90,6 @@ function update(msg: Msg, model: Model): Model {
     if (model.editingTodo) {
       model.editingTodo = { ...model.editingTodo, ...msg.editingTodo }
     }
-
     return model
   } else if (msg.tag === 'SaveEditingTodo') {
     const editingTodo = model.editingTodo
