@@ -1,5 +1,6 @@
 import React, {
-  createContext, FC,
+  createContext,
+  FC,
   useCallback,
   useContext,
   useEffect,
@@ -27,7 +28,7 @@ type TodoPopup = { tag: 'Closed' } | { tag: 'Open'; todoId: string }
 type Model = {
   todoPopup: TodoPopup
   todoList: Todo[]
-  editingTodo?: { id: TodoId, title: string } | null
+  editingTodo?: { id: TodoId; title: string } | null
 }
 
 function createFakeTodo(): Todo {
@@ -83,14 +84,12 @@ function update(msg: Msg, model: Model): Model {
     }
     return model
   } else if (msg.tag === 'SaveEditingTodo') {
-
     return model
   }
   return exhaustiveCheck(msg)
 }
 
-const DispatcherContext = createContext((_: Msg) => {
-})
+const DispatcherContext = createContext((_: Msg) => {})
 const ModelContext = createContext(initialModel)
 
 function useDispatchCallback(
@@ -121,7 +120,7 @@ const AppProvider: React.FC = ({ children }) => {
 function App() {
   return (
     <AppProvider>
-      <AppContent/>
+      <AppContent />
     </AppProvider>
   )
 }
@@ -131,7 +130,7 @@ function AppContent() {
   return (
     <div className="lh-copy" style={{ maxWidth: 500 }}>
       <div className="f4 pv1">TodoList</div>
-      <ViewTodoList todoList={model.todoList}/>
+      <ViewTodoList todoList={model.todoList} />
     </div>
   )
 }
@@ -147,10 +146,10 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
     <>
       {todoList.map(todo => {
         if (model.editingTodo && model.editingTodo.id === todo.id) {
-          return <TodoEditItem key={todo.id} todo={todo}/>
+          return <TodoEditItem key={todo.id} todo={todo} />
         }
         const menuOpen = isTodoPopupOpenFor(todo.id, model.todoPopup)
-        return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen}/>
+        return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen} />
       })}
     </>
   )
@@ -179,9 +178,7 @@ function TodoEditItem({ todo }: { todo: Todo }) {
           type="text"
           className="ph1 pv1 w-100 "
           value={todo.title}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-
-          }}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {}}
         />
       </div>
       <div>
@@ -189,16 +186,14 @@ function TodoEditItem({ todo }: { todo: Todo }) {
           Save
         </Button>
       </div>
-
-
     </div>
   )
 }
 
 const TodoItem = React.memo(function TodoItem({
-                                                todo,
-                                                menuOpen,
-                                              }: {
+  todo,
+  menuOpen,
+}: {
   todo: Todo
   menuOpen: boolean
 }) {
@@ -235,7 +230,7 @@ const TodoItem = React.memo(function TodoItem({
         >
           ...
         </div>
-        {menuOpen && <OpenedTodoMenu todoId={todo.id}/>}
+        {menuOpen && <OpenedTodoMenu todoId={todo.id} />}
       </div>
     </div>
   )
@@ -296,7 +291,6 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   )
 }
 
-
 const Button: FC<{ action: () => void }> = ({ action, children }) => (
   <div
     className="ph2 pv1 pointer"
@@ -322,4 +316,4 @@ function useFocusOnMountEffect(ref: React.RefObject<HTMLElement>) {
   }, [ref, ref.current])
 }
 
-render(<App/>, document.getElementById('root'))
+render(<App />, document.getElementById('root'))
