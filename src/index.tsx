@@ -227,10 +227,15 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   function viewItem([action, label]: [() => void, string], idx: number) {
     return (
       <div
-        className="ph2 pv1"
+        className="ph2 pv1 pointer"
         tabIndex={0}
         ref={idx === 0 ? firstFocusableRef : null}
         onClick={action}
+        onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+          if (isHK(['enter', 'space'], e.nativeEvent)) {
+            action()
+          }
+        }}
         key={label}
       >
         {label}
