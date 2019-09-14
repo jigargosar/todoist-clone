@@ -227,7 +227,7 @@ function TodoEditItem({ editingTodo }: { editingTodo: EditingTodo }) {
           type="text"
           className="ph1 pv1 w-100 "
           value={editingTodo.title}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+          onChange={e => {
             dispatch({
               tag: 'MergeEditingTodo',
               editingTodo: { title: e.target.value },
@@ -264,7 +264,7 @@ const TodoItem = memo(function TodoItem({
           className=""
           checked={todo.isDone}
           style={{ width: 24, height: 24 }}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+          onChange={e => {
             dispatch({
               tag: 'SetDone',
               todoId: todo.id,
