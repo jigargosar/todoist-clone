@@ -224,6 +224,24 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
     }, 0)
   }, [rootRef.current])
 
+  function viewItem([action, label]: [() => void, string], idx: number) {
+    return (
+      <div
+        className="ph2 pv1"
+        tabIndex={0}
+        ref={idx === 0 ? firstFocusableRef : null}
+        onClick={action}
+      >
+        {label}
+      </div>
+    )
+  }
+
+  const items: [() => void, string][] = [
+    [() => dispatch({ tag: 'EditTodo', todoId }), 'Edit'],
+    [() => dispatch({ tag: 'DeleteTodo', todoId }), 'Delete'],
+  ]
+
   return (
     <div
       ref={rootRef}
@@ -231,25 +249,7 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
       style={{ width: 200 }}
       onBlur={onBlurCallback}
     >
-      <div
-        className="ph2 pv1"
-        tabIndex={0}
-        onClick={() => {
-          dispatch({ tag: 'EditTodo', todoId })
-        }}
-      >
-        Edit
-      </div>
-      <div
-        className="ph2 pv1"
-        tabIndex={0}
-        ref={firstFocusableRef}
-        onClick={() => {
-          dispatch({ tag: 'DeleteTodo', todoId })
-        }}
-      >
-        Delete
-      </div>
+      {items.map(viewItem)}
     </div>
   )
 }
