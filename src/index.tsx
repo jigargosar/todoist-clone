@@ -5,7 +5,6 @@ import React, {
   memo,
   RefObject,
   SetStateAction,
-  SyntheticEvent,
   useCallback,
   useContext,
   useEffect,
@@ -261,7 +260,7 @@ const TodoItem = memo(function TodoItem({
       <div className="relative">
         <div
           className="ph1 b pointer"
-          onClick={(e: SyntheticEvent) => {
+          onClick={e => {
             e.preventDefault()
             dispatch({
               tag: 'OpenTodoMenu',
