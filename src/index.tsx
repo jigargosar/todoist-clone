@@ -47,7 +47,7 @@ function exhaustiveCheck(never: never) {
 type Msg =
   | { tag: 'OpenTodoMenu'; todoId: string }
   | { tag: 'CloseTodoMenu' }
-  | { tag: 'SetDone'; todoId: string; isChecked: boolean }
+  | { tag: 'SetDone'; todoId: string; isDone: boolean }
 
 function update(msg: Msg, model: Model): Model {
   if (msg.tag === 'OpenTodoMenu') {
@@ -60,7 +60,7 @@ function update(msg: Msg, model: Model): Model {
   } else if (msg.tag === 'SetDone') {
     const maybeTodo = model.todoList.find(todo => todo.id === msg.todoId)
     if (maybeTodo) {
-      maybeTodo.isDone = msg.isChecked
+      maybeTodo.isDone = msg.isDone
     }
     return model
   }
@@ -165,7 +165,7 @@ const TodoItem = React.memo(function TodoItem({
             dispatch({
               tag: 'SetDone',
               todoId: todo.id,
-              isChecked: e.target.checked,
+              isDone: e.target.checked,
             })
           }}
         />
@@ -190,13 +190,6 @@ const TodoItem = React.memo(function TodoItem({
   )
 })
 
-function useFocusOnMountEffect(ref: React.RefObject<HTMLElement>) {
-  useEffect(() => {
-    if (ref.current) {
-      ref.current.focus()
-    }
-  }, [ref, ref.current])
-}
 
 function OpenedTodoMenu() {
   const dispatch = useContext(DispatcherContext)
@@ -233,5 +226,16 @@ function OpenedTodoMenu() {
     </div>
   )
 }
+
+// Hooks
+
+function useFocusOnMountEffect(ref: React.RefObject<HTMLElement>) {
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.focus()
+    }
+  }, [ref, ref.current])
+}
+
 
 render(<App />, document.getElementById('root'))
