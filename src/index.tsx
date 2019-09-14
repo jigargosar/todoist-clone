@@ -1,7 +1,12 @@
 import React, {
   ChangeEvent,
-  createContext, Dispatch,
-  FC, memo, RefObject, SetStateAction, SyntheticEvent,
+  createContext,
+  Dispatch,
+  FC,
+  memo,
+  RefObject,
+  SetStateAction,
+  SyntheticEvent,
   KeyboardEvent,
   useCallback,
   useContext,
@@ -134,9 +139,7 @@ function update(msg: Msg, model: Model): void {
 const DispatcherContext = createContext((_: Msg) => {})
 const ModelContext = createContext(initialModel)
 
-function useDispatchCallback(
-  setModel: Dispatch<SetStateAction<Model>>,
-) {
+function useDispatchCallback(setModel: Dispatch<SetStateAction<Model>>) {
   return useCallback(
     (msg: Msg) => {
       setModel(model => {
@@ -293,9 +296,7 @@ const TodoItem = memo(function TodoItem({
 function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   const dispatch = useContext(DispatcherContext)
 
-  const firstFocusableRef: RefObject<HTMLButtonElement> = useRef(
-    null,
-  )
+  const firstFocusableRef: RefObject<HTMLButtonElement> = useRef(null)
   const rootRef: RefObject<HTMLDivElement> = useRef(null)
 
   // useFocusOnMountEffect(firstFocusableRef)
@@ -322,7 +323,7 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
         autoFocus={idx === 0}
         ref={idx === 0 ? firstFocusableRef : null}
         onClick={action}
-        onKeyDown={(e: KeyboardEvent<HTMLButtonElement>) => {
+        onKeyDown={(e: KeyboardEvent) => {
           if (isHK(['enter', 'space'], e.nativeEvent)) {
             action()
           }
@@ -362,7 +363,7 @@ const Button: FC<{ action: () => void; className?: string }> = ({
     }`}
     tabIndex={0}
     onClick={action}
-    onKeyDown={(e: KeyboardEvent<HTMLButtonElement>) => {
+    onKeyDown={(e: KeyboardEvent) => {
       if (isHK(['enter', 'space'], e.nativeEvent)) {
         action()
       }
