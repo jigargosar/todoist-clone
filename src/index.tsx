@@ -27,6 +27,7 @@ type TodoPopup = { tag: 'Closed' } | { tag: 'Open'; todoId: string }
 type Model = {
   todoPopup: TodoPopup
   todoList: Todo[]
+  editingTodoId?: TodoId | null
 }
 
 function createFakeTodo(): Todo {
@@ -38,6 +39,7 @@ const initialTodos: Todo[] = times(createFakeTodo, 10)
 const initialModel: Model = {
   todoPopup: { tag: 'Closed' },
   todoList: initialTodos,
+  editingTodoId: null,
 }
 
 function exhaustiveCheck(never: never) {
@@ -48,7 +50,8 @@ type Msg =
   | { tag: 'OpenTodoMenu'; todoId: string }
   | { tag: 'CloseTodoMenu' }
   | { tag: 'SetDone'; todoId: string; isDone: boolean }
-  | { tag: 'DeleteTodo'; todoId: string}
+  | { tag: 'DeleteTodo'; todoId: string }
+  | { tag: 'EditTodo'; todoId: string }
 
 function update(msg: Msg, model: Model): Model {
   if (msg.tag === 'OpenTodoMenu') {
@@ -64,11 +67,16 @@ function update(msg: Msg, model: Model): Model {
       maybeTodo.isDone = msg.isDone
     }
     return model
-  }else if(msg.tag === 'DeleteTodo'){
-    const maybeIdx = model.todoList.findIndex(todo => todo.id === msg.todoId)
-    if(maybeIdx > 0){
-      model.todoList.splice(maybeIdx,1)
+  } else if (msg.tag === 'DeleteTodo') {
+    const maybeIdx = model.todoList.findIndex(
+      todo => todo.id === msg.todoId,
+    )
+    if (maybeIdx > 0) {
+      model.todoList.splice(maybeIdx, 1)
     }
+    return model
+  } else if (msg.tag === 'EditTodo') {
+    model.editingTodoId = msg.todoId
     return model
   }
   return exhaustiveCheck(msg)
@@ -191,14 +199,13 @@ const TodoItem = React.memo(function TodoItem({
         >
           ...
         </div>
-        {menuOpen && <OpenedTodoMenu todoId={todo.id}/>}
+        {menuOpen && <OpenedTodoMenu todoId={todo.id} />}
       </div>
     </div>
   )
 })
 
-
-function OpenedTodoMenu({todoId}:{todoId:TodoId}) {
+function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   const dispatch = useContext(DispatcherContext)
 
   const firstFocusableRef: React.RefObject<HTMLDivElement> = useRef(null)
@@ -215,7 +222,7 @@ function OpenedTodoMenu({todoId}:{todoId:TodoId}) {
         dispatch({ tag: 'CloseTodoMenu' })
       }
     }, 0)
-  },[rootRef.current])
+  }, [rootRef.current])
 
   return (
     <div
@@ -224,10 +231,13 @@ function OpenedTodoMenu({todoId}:{todoId:TodoId}) {
       style={{ width: 200 }}
       onBlur={onBlurCallback}
     >
-      <div className="ph2 pv1" tabIndex={0} ref={firstFocusableRef}
-           onClick={()=>{
-             dispatch({tag:'DeleteTodo', todoId})
-           }}
+      <div
+        className="ph2 pv1"
+        tabIndex={0}
+        ref={firstFocusableRef}
+        onClick={() => {
+          dispatch({ tag: 'DeleteTodo', todoId })
+        }}
       >
         Delete
       </div>
@@ -247,6 +257,5 @@ function useFocusOnMountEffect(ref: React.RefObject<HTMLElement>) {
     }
   }, [ref, ref.current])
 }
-
 
 render(<App />, document.getElementById('root'))
