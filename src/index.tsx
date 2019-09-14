@@ -180,12 +180,13 @@ function TodoEditItem({ todo }: { todo: Todo }) {
           value={todo.title}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {}}
         />
+        <div>
+          <Button action={() => dispatch({ tag: 'SaveEditingTodo' })}>
+            Save
+          </Button>
+        </div>
       </div>
-      <div>
-        <Button action={() => dispatch({ tag: 'SaveEditingTodo' })}>
-          Save
-        </Button>
-      </div>
+
     </div>
   )
 }
@@ -291,9 +292,9 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   )
 }
 
-const Button: FC<{ action: () => void }> = ({ action, children }) => (
+const Button: FC<{ action: () => void , className?:string}> = ({ action, className, children}) => (
   <div
-    className="ph2 pv1 pointer"
+    className={`ph2 pv1 pointer${className ? className : ""}`}
     tabIndex={0}
     onClick={action}
     onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
