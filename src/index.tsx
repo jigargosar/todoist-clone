@@ -15,7 +15,7 @@ import faker from 'faker'
 import times from 'ramda/es/times'
 import produce from 'immer'
 import isHK from 'is-hotkey'
-import { mergeDeepRight, mergeRight } from 'ramda'
+import { mergeRight } from 'ramda'
 import debounce from 'lodash.debounce'
 
 type TodoId = string
@@ -64,9 +64,7 @@ function useCacheModelEffect() {
 }
 
 function getCachedModel() {
-  return JSON.parse(
-    localStorage.getItem('todoist-clone-model') || '{}',
-  )
+  return JSON.parse(localStorage.getItem('todoist-clone-model') || '{}')
 }
 
 const cachedModel = getCachedModel()
@@ -131,8 +129,7 @@ function update(msg: Msg, model: Model): void {
   }
 }
 
-const DispatcherContext = createContext((_: Msg) => {
-})
+const DispatcherContext = createContext((_: Msg) => {})
 const ModelContext = createContext(initialModel)
 
 function useDispatchCallback(
@@ -163,7 +160,7 @@ const AppProvider: React.FC = ({ children }) => {
 function App() {
   return (
     <AppProvider>
-      <AppContent/>
+      <AppContent />
     </AppProvider>
   )
 }
@@ -174,7 +171,7 @@ function AppContent() {
   return (
     <div className="lh-copy" style={{ maxWidth: 500 }}>
       <div className="f4 pv1">TodoList</div>
-      <ViewTodoList todoList={model.todoList}/>
+      <ViewTodoList todoList={model.todoList} />
     </div>
   )
 }
@@ -191,11 +188,11 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
       {todoList.map(todo => {
         if (model.editingTodo && model.editingTodo.id === todo.id) {
           return (
-            <TodoEditItem key={todo.id} editingTodo={model.editingTodo}/>
+            <TodoEditItem key={todo.id} editingTodo={model.editingTodo} />
           )
         }
         const menuOpen = isTodoPopupOpenFor(todo.id, model.todoPopup)
-        return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen}/>
+        return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen} />
       })}
     </>
   )
@@ -246,9 +243,9 @@ function TodoEditItem({ editingTodo }: { editingTodo: EditingTodo }) {
 }
 
 const TodoItem = React.memo(function TodoItem({
-                                                todo,
-                                                menuOpen,
-                                              }: {
+  todo,
+  menuOpen,
+}: {
   todo: Todo
   menuOpen: boolean
 }) {
@@ -285,7 +282,7 @@ const TodoItem = React.memo(function TodoItem({
         >
           ...
         </div>
-        {menuOpen && <OpenedTodoMenu todoId={todo.id}/>}
+        {menuOpen && <OpenedTodoMenu todoId={todo.id} />}
       </div>
     </div>
   )
@@ -353,10 +350,10 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
 }
 
 const Button: FC<{ action: () => void; className?: string }> = ({
-                                                                  action,
-                                                                  className,
-                                                                  children,
-                                                                }) => (
+  action,
+  className,
+  children,
+}) => (
   <button
     className={`button-reset input-reset bn bg-inherit ph2 pv1 pointer${
       className ? className : ''
@@ -373,4 +370,4 @@ const Button: FC<{ action: () => void; className?: string }> = ({
   </button>
 )
 
-render(<App/>, document.getElementById('root'))
+render(<App />, document.getElementById('root'))
