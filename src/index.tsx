@@ -205,22 +205,23 @@ function OpenedTodoMenu() {
   const rootRef: React.RefObject<HTMLDivElement> = useRef(null)
 
   useFocusOnMount(firstFocusableRef)
+  const onBlurCallback = useCallback(() => {
+    setTimeout(() => {
+      if (
+        rootRef.current &&
+        !rootRef.current.contains(document.activeElement)
+      ) {
+        dispatch({ tag: 'CloseTodoMenu' })
+      }
+    }, 0)
+  },[rootRef.current])
 
   return (
     <div
       ref={rootRef}
       className="absolute right-0 top-2 bg-white shadow-1 z-1"
       style={{ width: 200 }}
-      onBlur={() => {
-        setTimeout(() => {
-          if (
-            rootRef.current &&
-            !rootRef.current.contains(document.activeElement)
-          ) {
-            dispatch({ tag: 'CloseTodoMenu' })
-          }
-        }, 0)
-      }}
+      onBlur={onBlurCallback}
     >
       <div className="ph2 pv1" tabIndex={0} ref={firstFocusableRef}>
         MI1
