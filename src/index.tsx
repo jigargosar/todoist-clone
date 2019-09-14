@@ -15,6 +15,7 @@ import faker from 'faker'
 import times from 'ramda/es/times'
 import produce from 'immer'
 import isHK from 'is-hotkey'
+import { mergeDeepRight, mergeRight } from 'ramda'
 
 type TodoId = string
 
@@ -45,7 +46,16 @@ const defaultModel: Model = {
   editingTodo: null,
 }
 
-const initialModel = defaultModel
+const cachedModel = JSON.parse(
+  localStorage.getItem('todoist-clone-model') || '{}',
+)
+function cacheModel(model: Model) {
+  const serializedModel = JSON.stringify(model)
+  if (serializedModel) {
+    localStorage.setItem('todoist-clone-model', serializedModel)
+  }
+}
+const initialModel = mergeRight(defaultModel, cachedModel)
 
 function exhaustiveCheck(never: never) {
   return never
