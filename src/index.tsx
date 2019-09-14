@@ -58,20 +58,16 @@ type Msg =
   | { tag: 'SaveEditingTodo' }
   | { tag: 'CancelEditingTodo' }
 
-function update(msg: Msg, model: Model): Model {
+function update(msg: Msg, model: Model): void {
   if (msg.tag === 'OpenTodoMenu') {
     model.todoPopup = { tag: 'Open', todoId: msg.todoId }
-    return model
-  }
-  if (msg.tag === 'CloseTodoMenu') {
+  } else if (msg.tag === 'CloseTodoMenu') {
     model.todoPopup = { tag: 'Closed' }
-    return model
   } else if (msg.tag === 'SetDone') {
     const maybeTodo = model.todoList.find(todo => todo.id === msg.todoId)
     if (maybeTodo) {
       maybeTodo.isDone = msg.isDone
     }
-    return model
   } else if (msg.tag === 'DeleteTodo') {
     const maybeIdx = model.todoList.findIndex(
       todo => todo.id === msg.todoId,
@@ -79,21 +75,18 @@ function update(msg: Msg, model: Model): Model {
     if (maybeIdx > -1) {
       model.todoList.splice(maybeIdx, 1)
     }
-    return model
   } else if (msg.tag === 'EditTodo') {
     const maybeTodo = model.todoList.find(todo => todo.id === msg.todoId)
     if (maybeTodo) {
       model.editingTodo = { id: maybeTodo.id, title: maybeTodo.title }
     }
-    return model
   } else if (msg.tag === 'MergeEditingTodo') {
     if (model.editingTodo) {
       model.editingTodo = { ...model.editingTodo, ...msg.editingTodo }
     }
-    return model
   } else if (msg.tag === 'SaveEditingTodo') {
     const editingTodo = model.editingTodo
-    if (!editingTodo) return model
+    if (!editingTodo) return
     const maybeTodo = model.todoList.find(
       todo => todo.id === editingTodo.id,
     )
@@ -101,12 +94,11 @@ function update(msg: Msg, model: Model): Model {
       maybeTodo.title = editingTodo.title
     }
     model.editingTodo = null
-    return model
   } else if (msg.tag === 'CancelEditingTodo') {
     model.editingTodo = null
-    return model
+  } else {
+    return exhaustiveCheck(msg)
   }
-  return exhaustiveCheck(msg)
 }
 
 const DispatcherContext = createContext((_: Msg) => {})
@@ -348,15 +340,5 @@ const Button: FC<{ action: () => void; className?: string }> = ({
     {children}
   </button>
 )
-
-// Hooks
-
-function useFocusOnMountEffect(ref: React.RefObject<HTMLElement>) {
-  useEffect(() => {
-    if (ref.current) {
-      ref.current.focus()
-    }
-  }, [ref, ref.current])
-}
 
 render(<App />, document.getElementById('root'))
