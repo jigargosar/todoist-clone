@@ -231,6 +231,13 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
       style={{ width: 200 }}
       onBlur={onBlurCallback}
     >
+      <div className="ph2 pv1" tabIndex={0}
+           onClick={() => {
+             dispatch({ tag: 'EditTodo', todoId })
+           }}
+      >
+        Edit
+      </div>
       <div
         className="ph2 pv1"
         tabIndex={0}
@@ -240,9 +247,6 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
         }}
       >
         Delete
-      </div>
-      <div className="ph2 pv1" tabIndex={0}>
-        MI2
       </div>
     </div>
   )
