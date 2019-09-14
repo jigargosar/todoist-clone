@@ -231,6 +231,7 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
         tabIndex={0}
         ref={idx === 0 ? firstFocusableRef : null}
         onClick={action}
+        key={label}
       >
         {label}
       </div>
