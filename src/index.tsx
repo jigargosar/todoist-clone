@@ -46,15 +46,21 @@ const defaultModel: Model = {
   editingTodo: null,
 }
 
-const cachedModel = JSON.parse(
-  localStorage.getItem('todoist-clone-model') || '{}',
-)
 function cacheModel(model: Model) {
   const serializedModel = JSON.stringify(model)
   if (serializedModel) {
     localStorage.setItem('todoist-clone-model', serializedModel)
   }
 }
+
+function getCachedModel() {
+  return JSON.parse(
+    localStorage.getItem('todoist-clone-model') || '{}',
+  )
+}
+
+const cachedModel = getCachedModel()
+
 const initialModel = mergeRight(defaultModel, cachedModel)
 
 function exhaustiveCheck(never: never) {
