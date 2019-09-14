@@ -230,61 +230,59 @@ function TodoEditItem({ editingTodo }: { editingTodo: EditingTodo }) {
   )
 }
 
-const TodoItem = memo(function TodoItem({
-  todo,
-  menuOpen,
-}: {
-  todo: Todo
-  menuOpen: boolean
-}) {
-  const dispatch = useContext(DispatcherContext)
+const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
+  function TodoItem({ todo, menuOpen }) {
+    const dispatch = useContext(DispatcherContext)
 
-  function openTodoMenu() {
-    dispatch({
-      tag: 'OpenTodoMenu',
-      todoId: todo.id,
-    })
-  }
+    function openTodoMenu() {
+      dispatch({
+        tag: 'OpenTodoMenu',
+        todoId: todo.id,
+      })
+    }
 
-  return (
-    <div className="flex">
-      <div className="ph1 pv2">
-        <input
-          type="checkbox"
-          className=""
-          checked={todo.isDone}
-          style={{ width: 24, height: 24 }}
-          onChange={e => {
-            dispatch({
-              tag: 'SetDone',
-              todoId: todo.id,
-              isDone: e.target.checked,
-            })
-          }}
-        />
-      </div>
-      <div className="ph1 pv1 flex-grow-1 lh-title ">{todo.title}</div>
-      <div className="relative">
-        <div
-          className="ph1 b pointer"
-          onClick={e => {
-            e.preventDefault()
-            openTodoMenu()
-          }}
-          tabIndex={0}
-          onKeyDown={e => {
-            if (isHK(['enter', 'space'], e.nativeEvent)) {
-              openTodoMenu()
-            }
-          }}
-        >
-          ...
+    function setDone(isDone:boolean) {
+      dispatch({
+        tag: 'SetDone',
+        todoId: todo.id,
+        isDone,
+      })
+    }
+
+    return (
+      <div className="flex">
+        <div className="ph1 pv2">
+          <input
+            type="checkbox"
+            className=""
+            checked={todo.isDone}
+            style={{ width: 24, height: 24 }}
+            onChange={e => setDone(e.target.checked)}
+          />
         </div>
-        {menuOpen && <OpenedTodoMenu todoId={todo.id} />}
+        <div className="ph1 pv1 flex-grow-1 lh-title ">{todo.title}</div>
+        <div className="relative">
+          <div
+            className="ph1 b pointer"
+            onClick={e => {
+              e.preventDefault()
+              openTodoMenu()
+            }}
+            tabIndex={0}
+            onKeyDown={e => {
+              if (isHK(['enter', 'space'], e.nativeEvent)) {
+                openTodoMenu()
+              }
+            }}
+          >
+            ...
+          </div>
+          {menuOpen && <OpenedTodoMenu todoId={todo.id} />}
+        </div>
       </div>
-    </div>
-  )
-})
+    )
+  },
+)
 
 function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   const dispatch = useContext(DispatcherContext)
