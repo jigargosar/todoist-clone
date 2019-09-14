@@ -190,7 +190,7 @@ const TodoItem = React.memo(function TodoItem({
   )
 })
 
-function useFocusOnMount(ref: React.RefObject<HTMLElement>) {
+function useFocusOnMountEffect(ref: React.RefObject<HTMLElement>) {
   useEffect(() => {
     if (ref.current) {
       ref.current.focus()
@@ -204,7 +204,7 @@ function OpenedTodoMenu() {
   const firstFocusableRef: React.RefObject<HTMLDivElement> = useRef(null)
   const rootRef: React.RefObject<HTMLDivElement> = useRef(null)
 
-  useFocusOnMount(firstFocusableRef)
+  useFocusOnMountEffect(firstFocusableRef)
 
   const onBlurCallback = useCallback(() => {
     setTimeout(() => {
