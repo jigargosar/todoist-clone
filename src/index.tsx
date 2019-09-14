@@ -26,6 +26,7 @@ type Todo = {
 type EditingTodo = { id: TodoId; title: string }
 
 type TodoPopup = { tag: 'Closed' } | { tag: 'Open'; todoId: string }
+
 type Model = {
   todoPopup: TodoPopup
   todoList: Todo[]
