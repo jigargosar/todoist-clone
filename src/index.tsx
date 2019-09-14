@@ -1,5 +1,5 @@
 import React, {
-  createContext,
+  createContext, FC,
   useCallback,
   useContext,
   useEffect,
@@ -27,7 +27,7 @@ type TodoPopup = { tag: 'Closed' } | { tag: 'Open'; todoId: string }
 type Model = {
   todoPopup: TodoPopup
   todoList: Todo[]
-  editingTodoId?: TodoId | null
+  editingTodo?: { id: TodoId, title: string } | null
 }
 
 function createFakeTodo(): Todo {
@@ -39,7 +39,7 @@ const initialTodos: Todo[] = times(createFakeTodo, 10)
 const initialModel: Model = {
   todoPopup: { tag: 'Closed' },
   todoList: initialTodos,
-  editingTodoId: null,
+  editingTodo: null,
 }
 
 function exhaustiveCheck(never: never) {
@@ -52,6 +52,7 @@ type Msg =
   | { tag: 'SetDone'; todoId: string; isDone: boolean }
   | { tag: 'DeleteTodo'; todoId: string }
   | { tag: 'EditTodo'; todoId: string }
+  | { tag: 'SaveEditingTodo' }
 
 function update(msg: Msg, model: Model): Model {
   if (msg.tag === 'OpenTodoMenu') {
@@ -76,13 +77,20 @@ function update(msg: Msg, model: Model): Model {
     }
     return model
   } else if (msg.tag === 'EditTodo') {
-    model.editingTodoId = msg.todoId
+    const maybeTodo = model.todoList.find(todo => todo.id === msg.todoId)
+    if (maybeTodo) {
+      model.editingTodo = { id: maybeTodo.id, title: maybeTodo.title }
+    }
+    return model
+  } else if (msg.tag === 'SaveEditingTodo') {
+
     return model
   }
   return exhaustiveCheck(msg)
 }
 
-const DispatcherContext = createContext((_: Msg) => {})
+const DispatcherContext = createContext((_: Msg) => {
+})
 const ModelContext = createContext(initialModel)
 
 function useDispatchCallback(
@@ -113,7 +121,7 @@ const AppProvider: React.FC = ({ children }) => {
 function App() {
   return (
     <AppProvider>
-      <AppContent />
+      <AppContent/>
     </AppProvider>
   )
 }
@@ -123,7 +131,7 @@ function AppContent() {
   return (
     <div className="lh-copy" style={{ maxWidth: 500 }}>
       <div className="f4 pv1">TodoList</div>
-      <ViewTodoList todoList={model.todoList} />
+      <ViewTodoList todoList={model.todoList}/>
     </div>
   )
 }
@@ -138,8 +146,11 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
   return (
     <>
       {todoList.map(todo => {
+        if (model.editingTodo && model.editingTodo.id === todo.id) {
+          return <TodoEditItem key={todo.id} todo={todo}/>
+        }
         const menuOpen = isTodoPopupOpenFor(todo.id, model.todoPopup)
-        return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen} />
+        return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen}/>
       })}
     </>
   )
@@ -159,10 +170,35 @@ function useOpenTodoMenuCallback(todoId: TodoId) {
   )
 }
 
+function TodoEditItem({ todo }: { todo: Todo }) {
+  const dispatch = useContext(DispatcherContext)
+  return (
+    <div className="flex">
+      <div className="ph1 pv2 flex-grow-1">
+        <input
+          type="text"
+          className="ph1 pv1 w-100 "
+          value={todo.title}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+
+          }}
+        />
+      </div>
+      <div>
+        <Button action={() => dispatch({ tag: 'SaveEditingTodo' })}>
+          Save
+        </Button>
+      </div>
+
+
+    </div>
+  )
+}
+
 const TodoItem = React.memo(function TodoItem({
-  todo,
-  menuOpen,
-}: {
+                                                todo,
+                                                menuOpen,
+                                              }: {
   todo: Todo
   menuOpen: boolean
 }) {
@@ -199,7 +235,7 @@ const TodoItem = React.memo(function TodoItem({
         >
           ...
         </div>
-        {menuOpen && <OpenedTodoMenu todoId={todo.id} />}
+        {menuOpen && <OpenedTodoMenu todoId={todo.id}/>}
       </div>
     </div>
   )
@@ -260,6 +296,22 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   )
 }
 
+
+const Button: FC<{ action: () => void }> = ({ action, children }) => (
+  <div
+    className="ph2 pv1 pointer"
+    tabIndex={0}
+    onClick={action}
+    onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (isHK(['enter', 'space'], e.nativeEvent)) {
+        action()
+      }
+    }}
+  >
+    {children}
+  </div>
+)
+
 // Hooks
 
 function useFocusOnMountEffect(ref: React.RefObject<HTMLElement>) {
@@ -270,4 +322,4 @@ function useFocusOnMountEffect(ref: React.RefObject<HTMLElement>) {
   }, [ref, ref.current])
 }
 
-render(<App />, document.getElementById('root'))
+render(<App/>, document.getElementById('root'))
