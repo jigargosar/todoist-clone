@@ -292,7 +292,6 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   const firstFocusableRef: RefObject<HTMLButtonElement> = useRef(null)
   const rootRef: RefObject<HTMLDivElement> = useRef(null)
 
-  // useFocusOnMountEffect(firstFocusableRef)
   useEffect(() => {
     return () => dispatch({ tag: 'CloseTodoMenu' })
   })
