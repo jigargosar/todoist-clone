@@ -39,11 +39,13 @@ function createFakeTodo(): Todo {
 
 const initialTodos: Todo[] = times(createFakeTodo, 10)
 
-const initialModel: Model = {
+const defaultModel: Model = {
   todoPopup: { tag: 'Closed' },
   todoList: initialTodos,
   editingTodo: null,
 }
+
+const initialModel = defaultModel
 
 function exhaustiveCheck(never: never) {
   return never
