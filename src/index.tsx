@@ -279,7 +279,7 @@ const TodoItem = memo(function TodoItem({
           className="ph1 b pointer"
           onClick={openTodoMenuCallback}
           tabIndex={0}
-          onKeyDown={(e: KeyboardEvent) => {
+          onKeyDown={e => {
             if (isHK(['enter', 'space'], e.nativeEvent)) {
               openTodoMenuCallback(e)
             }
@@ -323,7 +323,7 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
         autoFocus={idx === 0}
         ref={idx === 0 ? firstFocusableRef : null}
         onClick={action}
-        onKeyDown={(e: KeyboardEvent) => {
+        onKeyDown={e => {
           if (isHK(['enter', 'space'], e.nativeEvent)) {
             action()
           }
@@ -363,7 +363,7 @@ const Button: FC<{ action: () => void; className?: string }> = ({
     }`}
     tabIndex={0}
     onClick={action}
-    onKeyDown={(e: KeyboardEvent) => {
+    onKeyDown={e => {
       if (isHK(['enter', 'space'], e.nativeEvent)) {
         action()
       }
