@@ -208,7 +208,7 @@ function TodoEditItem({ editingTodo }: { editingTodo: EditingTodo }) {
         <input
           autoFocus={true}
           type="text"
-          className="ph1 pv1 w-100 "
+          className="ph1 pv1 lh-copy w-100 "
           value={editingTodo.title}
           onChange={e => {
             dispatch({
