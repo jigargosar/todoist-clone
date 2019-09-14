@@ -23,12 +23,13 @@ type Todo = {
   title: string
   isDone: boolean
 }
+type EditingTodo = { id: TodoId; title: string }
 
 type TodoPopup = { tag: 'Closed' } | { tag: 'Open'; todoId: string }
 type Model = {
   todoPopup: TodoPopup
   todoList: Todo[]
-  editingTodo?: { id: TodoId; title: string } | null
+  editingTodo?: EditingTodo | null
 }
 
 function createFakeTodo(): Todo {
@@ -46,13 +47,14 @@ const initialModel: Model = {
 function exhaustiveCheck(never: never) {
   return never
 }
-
+type EditingTodoPartial = Partial<Omit<EditingTodo, 'id'>>
 type Msg =
   | { tag: 'OpenTodoMenu'; todoId: string }
   | { tag: 'CloseTodoMenu' }
   | { tag: 'SetDone'; todoId: string; isDone: boolean }
   | { tag: 'DeleteTodo'; todoId: string }
   | { tag: 'EditTodo'; todoId: string }
+  | { tag: 'MergeEditingTodo'; editingTodo: EditingTodoPartial }
   | { tag: 'SaveEditingTodo' }
   | { tag: 'CancelEditingTodo' }
 
@@ -83,6 +85,12 @@ function update(msg: Msg, model: Model): Model {
     if (maybeTodo) {
       model.editingTodo = { id: maybeTodo.id, title: maybeTodo.title }
     }
+    return model
+  } else if (msg.tag === 'MergeEditingTodo') {
+    if (model.editingTodo) {
+      model.editingTodo = { ...model.editingTodo, ...msg.editingTodo }
+    }
+
     return model
   } else if (msg.tag === 'SaveEditingTodo') {
     const editingTodo = model.editingTodo
@@ -159,7 +167,9 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
     <>
       {todoList.map(todo => {
         if (model.editingTodo && model.editingTodo.id === todo.id) {
-          return <TodoEditItem key={todo.id} todo={todo} />
+          return (
+            <TodoEditItem key={todo.id} editingTodo={model.editingTodo} />
+          )
         }
         const menuOpen = isTodoPopupOpenFor(todo.id, model.todoPopup)
         return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen} />
@@ -182,7 +192,7 @@ function useOpenTodoMenuCallback(todoId: TodoId) {
   )
 }
 
-function TodoEditItem({ todo }: { todo: Todo }) {
+function TodoEditItem({ editingTodo }: { editingTodo: EditingTodo }) {
   const dispatch = useContext(DispatcherContext)
   return (
     <div className="flex">
@@ -191,8 +201,13 @@ function TodoEditItem({ todo }: { todo: Todo }) {
           autoFocus={true}
           type="text"
           className="ph1 pv1 w-100 "
-          value={todo.title}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {}}
+          value={editingTodo.title}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            dispatch({
+              tag: 'MergeEditingTodo',
+              editingTodo: { title: e.target.value },
+            })
+          }}
         />
         <div className="flex pv1">
           <Button action={() => dispatch({ tag: 'SaveEditingTodo' })}>
@@ -256,11 +271,13 @@ const TodoItem = React.memo(function TodoItem({
 function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   const dispatch = useContext(DispatcherContext)
 
-  const firstFocusableRef: React.RefObject<HTMLButtonElement> = useRef(null)
+  const firstFocusableRef: React.RefObject<HTMLButtonElement> = useRef(
+    null,
+  )
   const rootRef: React.RefObject<HTMLDivElement> = useRef(null)
 
   // useFocusOnMountEffect(firstFocusableRef)
-  useEffect(()=>{
+  useEffect(() => {
     return () => dispatch({ tag: 'CloseTodoMenu' })
   })
 
@@ -280,7 +297,7 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
       <button
         className="button-reset input-reset bn bg-inherit  ph2 pv1 pointer db w-100 tl"
         tabIndex={0}
-        autoFocus={idx===0}
+        autoFocus={idx === 0}
         ref={idx === 0 ? firstFocusableRef : null}
         onClick={action}
         onKeyDown={(e: React.KeyboardEvent<HTMLButtonElement>) => {
@@ -318,7 +335,9 @@ const Button: FC<{ action: () => void; className?: string }> = ({
   children,
 }) => (
   <button
-    className={`button-reset input-reset bn bg-inherit ph2 pv1 pointer${className ? className : ''}`}
+    className={`button-reset input-reset bn bg-inherit ph2 pv1 pointer${
+      className ? className : ''
+    }`}
     tabIndex={0}
     onClick={action}
     onKeyDown={(e: React.KeyboardEvent<HTMLButtonElement>) => {
