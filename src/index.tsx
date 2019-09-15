@@ -8,6 +8,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react'
@@ -19,7 +20,7 @@ import faker from 'faker'
 import times from 'ramda/es/times'
 import produce from 'immer'
 import isHK from 'is-hotkey'
-import { mergeRight } from 'ramda'
+import { mergeRight, mapObjIndexed } from 'ramda'
 import debounce from 'lodash.debounce'
 
 type TodoId = string
@@ -133,11 +134,11 @@ function update(msg: Msg, model: Model): void {
   }
 }
 
-const DispatcherContext = createContext((_: Msg) => {
-})
+const DispatcherContext = createContext((_: Msg) => {})
+const ActionsContext = createContext({})
 const ModelContext = createContext(initialModel)
 
-function useDispatchCallback(model: Model, setModel: Dispatch<SetStateAction<Model>>) {
+function useDispatchCallback(setModel: Dispatch<SetStateAction<Model>>) {
   return useCallback(
     (msg: Msg) => {
       setModel(model => {
@@ -147,25 +148,42 @@ function useDispatchCallback(model: Model, setModel: Dispatch<SetStateAction<Mod
     [setModel],
   )
 }
-
-function usePrev<S>(currentValue: S): S | undefined {
-  const ref: React.MutableRefObject<S | undefined> = useRef()
-  useEffect(() => {
-    ref.current = currentValue
-  }, [currentValue])
-  return ref.current
+const actionDefs = {
+  openTodoMenu(model: Model, todoId: TodoId) {
+    model.todoPopup = { todoId }
+  },
 }
 
 const AppProvider: FC = ({ children }) => {
   const [model, setModel] = useState(initialModel)
-  const prevModel = usePrev(model)
-  const dispatch = useDispatchCallback(prevModel || initialModel, setModel)
+
+  const dispatch = useDispatchCallback(setModel)
+
+  const prevModelRef = useRef(model)
+  useEffect(() => {
+    prevModelRef.current = model
+  }, [model])
+
+  const actions = useMemo(() => {
+    return mapObjIndexed(
+      <V, R>(fn: (model: Model, value: V) => R): ((value: V) => void) =>
+        function(value: V) {
+          const prevModel: Model = prevModelRef.current
+          const newModel = produce(prevModel, (draft: Model) => {
+            fn(draft, value)
+          })
+          setModel(newModel)
+        },
+    )(actionDefs)
+  }, [prevModelRef, setModel])
 
   return (
     <DispatcherContext.Provider value={dispatch}>
-      <ModelContext.Provider value={model}>
-        {children}
-      </ModelContext.Provider>
+      <ActionsContext.Provider value={actions}>
+        <ModelContext.Provider value={model}>
+          {children}
+        </ModelContext.Provider>
+      </ActionsContext.Provider>
     </DispatcherContext.Provider>
   )
 }
@@ -173,7 +191,7 @@ const AppProvider: FC = ({ children }) => {
 function App() {
   return (
     <AppProvider>
-      <AppContent/>
+      <AppContent />
     </AppProvider>
   )
 }
@@ -184,12 +202,15 @@ function AppContent() {
   return (
     <div className="lh-copy" style={{ maxWidth: 500 }}>
       <div className="f4 pv1">TodoList</div>
-      <ViewTodoList todoList={model.todoList}/>
+      <ViewTodoList todoList={model.todoList} />
     </div>
   )
 }
 
-function isTodoPopupOpenFor(todoId: TodoId, todoPopup: TodoPopup | null): boolean {
+function isTodoPopupOpenFor(
+  todoId: TodoId,
+  todoPopup: TodoPopup | null,
+): boolean {
   return !!todoPopup && todoPopup.todoId === todoId
 }
 
@@ -201,11 +222,11 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
       {todoList.map(todo => {
         if (model.editingTodo && model.editingTodo.id === todo.id) {
           return (
-            <TodoEditItem key={todo.id} editingTodo={model.editingTodo}/>
+            <TodoEditItem key={todo.id} editingTodo={model.editingTodo} />
           )
         }
         const menuOpen = isTodoPopupOpenFor(todo.id, model.todoPopup)
-        return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen}/>
+        return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen} />
       })}
     </>
   )
@@ -285,7 +306,7 @@ const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
           >
             ...
           </div>
-          {menuOpen && <OpenedTodoMenu todoId={todo.id}/>}
+          {menuOpen && <OpenedTodoMenu todoId={todo.id} />}
         </div>
       </div>
     )
@@ -349,10 +370,10 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
 }
 
 const Button: FC<{ action: () => void; className?: string }> = ({
-                                                                  action,
-                                                                  className,
-                                                                  children,
-                                                                }) => (
+  action,
+  className,
+  children,
+}) => (
   <button
     className={`button-reset input-reset bn bg-inherit ph2 pv1 pointer${
       className ? className : ''
@@ -369,4 +390,4 @@ const Button: FC<{ action: () => void; className?: string }> = ({
   </button>
 )
 
-render(<App/>, document.getElementById('root'))
+render(<App />, document.getElementById('root'))
