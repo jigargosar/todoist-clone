@@ -265,7 +265,7 @@ const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
           <div
             className="ph1 b pointer"
             onClick={e => {
-              e.preventDefault()
+
               openTodoMenu()
             }}
             tabIndex={0}
