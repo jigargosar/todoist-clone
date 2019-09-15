@@ -58,7 +58,7 @@ function cacheModel(model: Model) {
   }
 }
 
-const debouncedCacheModel: typeof cachedModel = debounce(cacheModel, 1000)
+const debouncedCacheModel = debounce(cacheModel, 1000)
 
 function useCacheModelEffect() {
   const model = useContext(ModelContext)
@@ -71,9 +71,9 @@ function getCachedModel() {
   return JSON.parse(localStorage.getItem('todoist-clone-model') || '{}')
 }
 
-const cachedModel = getCachedModel()
+const cachedModel: Model = getCachedModel()
 
-const initialModel = mergeRight(defaultModel, cachedModel)
+const initialModel: Model = mergeRight(defaultModel, cachedModel)
 
 function exhaustiveCheck(never: never) {
   return never
@@ -92,7 +92,7 @@ type Msg =
 
 function update(msg: Msg, model: Model): void {
   if (msg.tag === 'OpenTodoMenu') {
-    model.todoPopup = {  todoId: msg.todoId }
+    model.todoPopup = { todoId: msg.todoId }
   } else if (msg.tag === 'CloseTodoMenu') {
     model.todoPopup = null
   } else if (msg.tag === 'SetDone') {
@@ -133,10 +133,11 @@ function update(msg: Msg, model: Model): void {
   }
 }
 
-const DispatcherContext = createContext((_: Msg) => {})
+const DispatcherContext = createContext((_: Msg) => {
+})
 const ModelContext = createContext(initialModel)
 
-function useDispatchCallback(setModel: Dispatch<SetStateAction<Model>>) {
+function useDispatchCallback(model: Model, setModel: Dispatch<SetStateAction<Model>>) {
   return useCallback(
     (msg: Msg) => {
       setModel(model => {
@@ -147,9 +148,19 @@ function useDispatchCallback(setModel: Dispatch<SetStateAction<Model>>) {
   )
 }
 
+function usePrev<S>(currentValue: S): S | undefined {
+  const ref: React.MutableRefObject<S | undefined> = useRef()
+  useEffect(() => {
+    ref.current = currentValue
+  }, [currentValue])
+  return ref.current
+}
+
 const AppProvider: FC = ({ children }) => {
   const [model, setModel] = useState(initialModel)
-  const dispatch = useDispatchCallback(setModel)
+  const prevModel = usePrev(model)
+  const dispatch = useDispatchCallback(prevModel || initialModel, setModel)
+
   return (
     <DispatcherContext.Provider value={dispatch}>
       <ModelContext.Provider value={model}>
@@ -162,7 +173,7 @@ const AppProvider: FC = ({ children }) => {
 function App() {
   return (
     <AppProvider>
-      <AppContent />
+      <AppContent/>
     </AppProvider>
   )
 }
@@ -173,13 +184,13 @@ function AppContent() {
   return (
     <div className="lh-copy" style={{ maxWidth: 500 }}>
       <div className="f4 pv1">TodoList</div>
-      <ViewTodoList todoList={model.todoList} />
+      <ViewTodoList todoList={model.todoList}/>
     </div>
   )
 }
 
-function isTodoPopupOpenFor(todoId: TodoId, todoPopup: TodoPopup) {
-  return todoPopup && todoPopup.todoId === todoId
+function isTodoPopupOpenFor(todoId: TodoId, todoPopup: TodoPopup | null): boolean {
+  return !!todoPopup && todoPopup.todoId === todoId
 }
 
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
@@ -190,11 +201,11 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
       {todoList.map(todo => {
         if (model.editingTodo && model.editingTodo.id === todo.id) {
           return (
-            <TodoEditItem key={todo.id} editingTodo={model.editingTodo} />
+            <TodoEditItem key={todo.id} editingTodo={model.editingTodo}/>
           )
         }
         const menuOpen = isTodoPopupOpenFor(todo.id, model.todoPopup)
-        return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen} />
+        return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen}/>
       })}
     </>
   )
@@ -277,7 +288,7 @@ const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
           >
             ...
           </div>
-          {menuOpen && <OpenedTodoMenu todoId={todo.id} />}
+          {menuOpen && <OpenedTodoMenu todoId={todo.id}/>}
         </div>
       </div>
     )
@@ -341,10 +352,10 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
 }
 
 const Button: FC<{ action: () => void; className?: string }> = ({
-  action,
-  className,
-  children,
-}) => (
+                                                                  action,
+                                                                  className,
+                                                                  children,
+                                                                }) => (
   <button
     className={`button-reset input-reset bn bg-inherit ph2 pv1 pointer${
       className ? className : ''
@@ -361,4 +372,4 @@ const Button: FC<{ action: () => void; className?: string }> = ({
   </button>
 )
 
-render(<App />, document.getElementById('root'))
+render(<App/>, document.getElementById('root'))
