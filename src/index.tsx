@@ -275,10 +275,7 @@ const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
         <div className="relative">
           <div
             className="ph1 b pointer"
-            onClick={e => {
-
-              openTodoMenu()
-            }}
+            onClick={() => openTodoMenu()}
             tabIndex={0}
             onKeyDown={e => {
               if (isHK(['enter', 'space'], e.nativeEvent)) {
