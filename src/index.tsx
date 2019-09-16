@@ -169,6 +169,7 @@ const cancelInlineTodoFormClicked: Action = ({ state }) => {
 const saveInlineTodoFormClicked: Action = ctx => {
   saveEditingTodo(ctx)
   saveAddingTodo(ctx)
+  ctx.state.inlineTodoForm = null
 }
 
 const config = {
@@ -412,7 +413,7 @@ const Button: FC<{ action: () => void; className?: string }> = ({
   children,
 }) => (
   <button
-    className={`button-reset input-reset bn bg-inherit ph2 pv1 pointer${
+    className={`button-reset input-reset bn bg-inherit ph2 pv1 pointer blue${
       className ? className : ''
     }`}
     tabIndex={0}
