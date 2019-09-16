@@ -151,6 +151,11 @@ const addTodoClicked: Action = ctx => {
   state.inlineTodoForm = createAddingTodo()
 }
 
+const addFakeTodoClicked: Action = ({state}) => {
+  const todo = createFakeTodo()
+  state.todoList.push(todo)
+}
+
 const updateTodoForm: Action<Partial<TodoFormFields>> = (
   { state },
   formFields,
@@ -209,10 +214,12 @@ const config = {
     addTodoClicked,
     saveInlineTodoFormClicked,
     deleteProject,
+    addFakeTodoClicked
   },
   effects: {},
 }
 declare module 'overmind' {
+  // noinspection JSUnusedGlobalSymbols
   interface Config extends IConfig<typeof config> {}
 }
 
@@ -220,7 +227,7 @@ const useOvermind = createHook<typeof config>()
 
 const overmind = createOvermind(config)
 
-overmind.addMutationListener((mutation, paths, flushId) => {
+overmind.addMutationListener((_mutation, _paths, _flushId) => {
   debouncedCacheStoreState(overmind.state)
 })
 
@@ -253,7 +260,12 @@ function AppContent() {
       {addingTodo ? (
         <ViewAddTodoForm addingTodo={addingTodo} />
       ) : (
-        <Button action={() => actions.addTodoClicked()}>Add Task</Button>
+        <>
+          <Button action={() => actions.addTodoClicked()}>Add Task</Button>
+          <Button action={() => actions.addTodoClicked()}>
+            Add Fake Task
+          </Button>
+        </>
       )}
     </div>
   )
