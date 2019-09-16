@@ -1,11 +1,4 @@
-import React, {
-  FC,
-  memo,
-  RefObject,
-  useCallback,
-  useEffect,
-  useRef,
-} from 'react'
+import React, { FC, memo, RefObject, useCallback, useEffect, useRef } from 'react'
 import { render } from 'react-dom'
 import 'tachyons'
 import './index.css'
@@ -15,14 +8,7 @@ import times from 'ramda/es/times'
 import isHK from 'is-hotkey'
 import { mergeRight } from 'ramda'
 import debounce from 'lodash.debounce'
-import {
-  createActionsHook,
-  createStateHook,
-  createStore,
-  IAction,
-  Provider,
-} from 'immer-store'
-import { State } from 'immer-store/lib/types'
+import { createActionsHook, createStateHook, createStore, IAction, Provider } from 'immer-store'
 
 type TodoId = string
 
@@ -35,7 +21,7 @@ type EditingTodo = { id: TodoId; title: string }
 
 type TodoPopup = { todoId: string }
 
-type Model = {
+type State = {
   todoPopup: TodoPopup | null
   todoList: Todo[]
   editingTodo: EditingTodo | null
@@ -47,13 +33,13 @@ function createFakeTodo(): Todo {
 
 const initialTodos: Todo[] = times(createFakeTodo, 10)
 
-const defaultModel: Model = {
+const initialState: State = {
   todoPopup: null,
   todoList: initialTodos,
   editingTodo: null,
 }
 
-function cacheStoreState(model: State) {
+function cacheStoreState(model: any) {
   const serializedModel = JSON.stringify(model)
   if (serializedModel) {
     localStorage.setItem('todoist-clone-model', serializedModel)
@@ -66,9 +52,9 @@ function getCachedModel() {
   return JSON.parse(localStorage.getItem('todoist-clone-model') || '{}')
 }
 
-const cachedModel: Model = getCachedModel()
+const cachedModel: State = getCachedModel()
 
-const initialModel: Model = mergeRight(defaultModel, cachedModel)
+const initialModel: State = mergeRight(initialState, cachedModel)
 
 interface Action<Payload = void> extends IAction<Payload, Config> {}
 
