@@ -100,6 +100,7 @@ type Todo = {
   id: TodoId
   title: string
   isDone: boolean
+  projectId: ProjectId | null
 }
 
 const Todo = {
@@ -113,6 +114,7 @@ const Todo = {
       id: TodoId.gen(),
       title: faker.hacker.phrase(),
       isDone: false,
+      projectId : null
     }
   },
 }
