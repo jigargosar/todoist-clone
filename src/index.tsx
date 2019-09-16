@@ -1,11 +1,10 @@
-import React, { FC, memo, RefObject, useEffect, useRef } from 'react'
+import React, { ButtonHTMLAttributes, FC, memo, RefObject, useEffect, useRef } from 'react'
 import { render } from 'react-dom'
 import 'tachyons'
 import './index.css'
 import nanoid from 'nanoid'
 import faker from 'faker'
 import times from 'ramda/es/times'
-import isHK from 'is-hotkey'
 import debounce from 'lodash.debounce'
 import { Action, createOvermind, IConfig } from 'overmind'
 
@@ -51,16 +50,16 @@ const Project = {
 type ProjectList = Project[]
 
 const ProjectList = {
-  findById(projectId: ProjectId) {
-    return function findById(projectList: ProjectList) {
-      return projectList.find(Project.idEq(projectId))
-    }
-  },
-  findIndexById(projectId: ProjectId) {
-    return function findIndexById(projectList: ProjectList) {
-      return projectList.findIndex(Project.idEq(projectId))
-    }
-  },
+  // findById(projectId: ProjectId) {
+  //   return function findById(projectList: ProjectList) {
+  //     return projectList.find(Project.idEq(projectId))
+  //   }
+  // },
+  // findIndexById(projectId: ProjectId) {
+  //   return function findIndexById(projectList: ProjectList) {
+  //     return projectList.findIndex(Project.idEq(projectId))
+  //   }
+  // },
   append(project: Project) {
     return function append(projectList: ProjectList) {
       return [...projectList, project]
@@ -119,11 +118,11 @@ const TodoList = {
       return todoList.find(Todo.idEq(todoId))
     }
   },
-  findIndexById(todoId: TodoId) {
-    return function findIndexById(todoList: TodoList) {
-      return todoList.findIndex(Todo.idEq(todoId))
-    }
-  },
+  // findIndexById(todoId: TodoId) {
+  //   return function findIndexById(todoList: TodoList) {
+  //     return todoList.findIndex(Todo.idEq(todoId))
+  //   }
+  // },
   append(todo: Todo) {
     return function append(todoList: TodoList) {
       return [...todoList, todo]
@@ -374,7 +373,7 @@ function AppContent() {
 }
 
 function ViewProjectList({ projectList }: { projectList: Project[] }) {
-  const { state, actions } = useOvermind()
+  const { } = useOvermind()
 
   return (
     <>
@@ -393,7 +392,7 @@ function ViewProjectList({ projectList }: { projectList: Project[] }) {
 const ProjectItem: FC<{ project: Project }> = memo(function ProjectItem({
   project,
 }) {
-  const { state, actions } = useOvermind()
+  const {  actions } = useOvermind()
   return (
     <div className="flex">
       <div
@@ -414,7 +413,7 @@ const ProjectItem: FC<{ project: Project }> = memo(function ProjectItem({
 })
 
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
-  const { state, actions } = useOvermind()
+  const { state, } = useOvermind()
 
   return (
     <>
@@ -445,7 +444,7 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
 }
 
 function ViewEditTodoForm({ editingTodo }: { editingTodo: EditingTodo }) {
-  const { state, actions } = useOvermind()
+  const {  actions } = useOvermind()
   return (
     <div className="flex">
       <div className="ph1 pv2 flex-grow-1">
@@ -472,7 +471,7 @@ function ViewEditTodoForm({ editingTodo }: { editingTodo: EditingTodo }) {
 const ViewAddTodoForm: FC<{ addingTodo: AddingTodo }> = ({
   addingTodo,
 }) => {
-  const { state, actions } = useOvermind()
+  const {  actions } = useOvermind()
   return (
     <div className="flex">
       <div className="ph1 pv2 flex-grow-1">
@@ -498,7 +497,7 @@ const ViewAddTodoForm: FC<{ addingTodo: AddingTodo }> = ({
 
 const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
   function TodoItem({ todo, menuOpen }) {
-    const { state, actions } = useOvermind()
+    const {  actions } = useOvermind()
 
     function openTodoMenu() {
       actions.openTodoMenu(todo.id)
@@ -542,7 +541,7 @@ const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
 )
 
 function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
-  const { state, actions } = useOvermind()
+  const {  actions } = useOvermind()
 
   const rootRef: RefObject<HTMLDivElement> = useRef(null)
 
@@ -552,20 +551,14 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
 
   function viewItem([action, label]: [() => void, string], idx: number) {
     return (
-      <button
+      <Button
         className="button-reset input-reset bn bg-inherit  ph2 pv1 pointer db w-100 tl"
-        tabIndex={0}
         autoFocus={idx === 0}
-        onClick={action}
-        onKeyDown={e => {
-          if (isHK(['enter', 'space'], e.nativeEvent)) {
-            action()
-          }
-        }}
+        action={action}
         key={label}
       >
         {label}
-      </button>
+      </Button>
     )
   }
 
@@ -594,16 +587,18 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   )
 }
 
-const Button: FC<{ action: () => void; className?: string }> = ({
+const Button: FC<{ action: () => void; className?: string } & ButtonHTMLAttributes<HTMLButtonElement>> = ({
   action,
   className,
   children,
+  ...other
 }) => (
   <button
     className={`button-reset input-reset bn bg-inherit ph2 pv1 pointer blue${
       className ? className : ''
     }`}
     onClick={action}
+    {...other}
   >
     {children}
   </button>
