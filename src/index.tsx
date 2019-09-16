@@ -21,7 +21,7 @@ type Project = {
 function createFakeProject(): Project {
   return {
     id: nanoid(),
-    title: faker.hacker.ingverb() + faker.hacker.noun(),
+    title: faker.hacker.ingverb() + ' ' + faker.hacker.noun(),
   }
 }
 
