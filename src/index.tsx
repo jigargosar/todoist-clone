@@ -7,7 +7,13 @@ import faker from 'faker'
 import times from 'ramda/es/times'
 import isHK from 'is-hotkey'
 import debounce from 'lodash.debounce'
-import { createActionsHook, createStateHook, createStore, IAction, Provider } from 'immer-store'
+import {
+  createActionsHook,
+  createStateHook,
+  createStore,
+  IAction,
+  Provider,
+} from 'immer-store'
 import { Immutable } from 'immer'
 
 type TodoId = string
@@ -22,7 +28,6 @@ function createFakeTodo(): Todo {
   return { id: nanoid(), title: faker.hacker.phrase(), isDone: false }
 }
 
-
 type TodoFormFields = { title: string }
 type EditingTodo = { tag: 'EditingTodo'; id: TodoId } & TodoFormFields
 
@@ -32,20 +37,20 @@ function createEditingTodo(maybeTodo: Todo): EditingTodo {
 
 type AddingTodo = { tag: 'AddingTodo' } & TodoFormFields
 
-function createAddingTodo():AddingTodo {
-  return {tag:'AddingTodo', title:''}
+function createAddingTodo(): AddingTodo {
+  return { tag: 'AddingTodo', title: '' }
 }
 
 type InlineTodoForm = AddingTodo | EditingTodo | null
 
-function maybeEditingTodo(form: InlineTodoForm):EditingTodo | null {
-  return (form && form.tag ==='EditingTodo') ? form : null
+function maybeEditingTodo(form: InlineTodoForm): EditingTodo | null {
+  return form && form.tag === 'EditingTodo' ? form : null
 }
 
 function maybeEditingTodoFor(
   todoId: TodoId,
   form: InlineTodoForm,
-):EditingTodo | null {
+): EditingTodo | null {
   const editingTodo = maybeEditingTodo(form)
   return editingTodo && editingTodo.id === todoId ? editingTodo : null
 }
@@ -58,9 +63,6 @@ function isTodoPopupOpenFor(
 ): boolean {
   return !!todoPopup && todoPopup.todoId === todoId
 }
-
-
-
 
 type State = {
   todoPopup: TodoPopup | null
@@ -118,7 +120,6 @@ const deleteTodo: Action<TodoId> = ({ state }, todoId) => {
   }
 }
 
-
 const editTodoClicked: Action<TodoId> = ({ state }, todoId) => {
   const maybeTodo = state.todoList.find(todo => todo.id === todoId)
   if (maybeTodo) {
@@ -126,17 +127,13 @@ const editTodoClicked: Action<TodoId> = ({ state }, todoId) => {
   }
 }
 
-
-const updateTodoForm: Action<TodoFormFields> = (
-  { state },
-  formFields,
-) => {
+const updateTodoForm: Action<TodoFormFields> = ({ state }, formFields) => {
   if (state.inlineTodoForm) {
     state.inlineTodoForm = { ...state.inlineTodoForm, ...formFields }
   }
 }
 
-const saveEditingTodoClicked: Action = ({ state }) => {
+const saveEditingTodo: Action = ({ state }) => {
   const editingTodo = maybeEditingTodo(state.inlineTodoForm)
   if (!editingTodo) return
 
@@ -147,13 +144,30 @@ const saveEditingTodoClicked: Action = ({ state }) => {
   state.inlineTodoForm = null
 }
 
+const saveAddingTodo: Action = ({ state }) => {
+  const addingTodo = maybeAddingTodo(state.inlineTodoForm)
+  if (!addingTodo || addingTodo.title.trim().length === 0) return
+
+  const todo = createFakeTodo()
+  todo.title = addingTodo.title
+
+  state.todoList.push(todo)
+
+  state.inlineTodoForm = null
+}
+
 const cancelInlineTodoFormClicked: Action = ({ state }) => {
   state.inlineTodoForm = null
 }
 
-const addTodoClicked: Action = (ctx) =>{
-  const {state} = ctx
-  saveEditingTodoClicked(ctx)
+const saveInlineTodoFormClicked: Action = ctx => {
+  saveEditingTodo(ctx)
+  saveAddingTodo(ctx)
+}
+
+const addTodoClicked: Action = ctx => {
+  const { state } = ctx
+  saveEditingTodo(ctx)
   state.inlineTodoForm = createAddingTodo()
 }
 
@@ -169,9 +183,9 @@ const config = {
     deleteTodo,
     editTodoClicked,
     updateTodoForm,
-    saveEditingTodoClicked,
     cancelInlineTodoFormClicked,
-    addTodoClicked
+    addTodoClicked,
+    saveInlineTodoFormClicked,
   },
   effects: {},
 }
@@ -197,8 +211,8 @@ function App() {
   )
 }
 
-function maybeAddingTodo(form: InlineTodoForm):AddingTodo|null {
-  return form && form.tag ==='AddingTodo' ? form : null
+function maybeAddingTodo(form: InlineTodoForm): AddingTodo | null {
+  return form && form.tag === 'AddingTodo' ? form : null
 }
 
 function AppContent() {
@@ -208,11 +222,10 @@ function AppContent() {
     <div className="lh-copy" style={{ maxWidth: 500 }}>
       <div className="f4 pv1">TodoList</div>
       <ViewTodoList todoList={state.todoList}/>
-      {!!addingTodo && <ViewAddTodoForm addingTodo={addingTodo}/> }
+      {!!addingTodo && <ViewAddTodoForm addingTodo={addingTodo}/>}
     </div>
   )
 }
-
 
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
   const state = useStoreState()
@@ -226,7 +239,10 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
         )
         if (maybeEditingTodo) {
           return (
-            <ViewEditTodoForm key={todo.id} editingTodo={maybeEditingTodo}/>
+            <ViewEditTodoForm
+              key={todo.id}
+              editingTodo={maybeEditingTodo}
+            />
           )
         }
         const menuOpen = isTodoPopupOpenFor(todo.id, state.todoPopup)
@@ -246,12 +262,12 @@ function ViewEditTodoForm({ editingTodo }: { editingTodo: EditingTodo }) {
           type="text"
           className="ph1 pv1 lh-copy w-100"
           value={editingTodo.title}
-          onChange={e =>
-            actions.updateTodoForm({ title: e.target.value })
-          }
+          onChange={e => actions.updateTodoForm({ title: e.target.value })}
         />
         <div className="flex pv1">
-          <Button action={() => actions.saveEditingTodoClicked()}>Save</Button>
+          <Button action={() => actions.saveInlineTodoFormClicked()}>
+            Save
+          </Button>
           <Button action={() => actions.cancelInlineTodoFormClicked()}>
             Cancel
           </Button>
@@ -261,29 +277,32 @@ function ViewEditTodoForm({ editingTodo }: { editingTodo: EditingTodo }) {
   )
 }
 
-const ViewAddTodoForm :FC<{addingTodo:AddingTodo}> = ({addingTodo})=>{
+const ViewAddTodoForm: FC<{ addingTodo: AddingTodo }> = ({
+                                                           addingTodo,
+                                                         }) => {
   const actions = useStoreActions()
-  return <div className="flex">
-    <div className="ph1 pv2 flex-grow-1">
-      <input
-        autoFocus={true}
-        type="text"
-        className="ph1 pv1 lh-copy w-100"
-        value={addingTodo.title}
-        onChange={e =>
-          actions.updateTodoForm({ title: e.target.value })
-        }
-      />
-      <div className="flex pv1">
-        <Button action={() => actions.saveEditingTodoClicked()}>Save</Button>
-        <Button action={() => actions.cancelInlineTodoFormClicked()}>
-          Cancel
-        </Button>
+  return (
+    <div className="flex">
+      <div className="ph1 pv2 flex-grow-1">
+        <input
+          autoFocus={true}
+          type="text"
+          className="ph1 pv1 lh-copy w-100"
+          value={addingTodo.title}
+          onChange={e => actions.updateTodoForm({ title: e.target.value })}
+        />
+        <div className="flex pv1">
+          <Button action={() => actions.saveInlineTodoFormClicked()}>
+            Save
+          </Button>
+          <Button action={() => actions.cancelInlineTodoFormClicked()}>
+            Cancel
+          </Button>
+        </div>
       </div>
     </div>
-  </div>
+  )
 }
-
 
 const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
   function TodoItem({ todo, menuOpen }) {
