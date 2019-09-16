@@ -9,6 +9,7 @@ import isHK from 'is-hotkey'
 import { mergeRight } from 'ramda'
 import debounce from 'lodash.debounce'
 import { createActionsHook, createStateHook, createStore, IAction, Provider } from 'immer-store'
+import { Immutable } from 'immer'
 
 type TodoId = string
 
@@ -39,7 +40,7 @@ const initialState: State = {
   editingTodo: null,
 }
 
-function cacheStoreState(model: any) {
+function cacheStoreState(model: Immutable<State>) {
   const serializedModel = JSON.stringify(model)
   if (serializedModel) {
     localStorage.setItem('todoist-clone-model', serializedModel)
