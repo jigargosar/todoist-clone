@@ -136,7 +136,7 @@ const mergeEditingTodo: Action<TodoFormFields> = (
   }
 }
 
-const saveEditingTodo: Action = ({ state }) => {
+const saveEditingTodoClicked: Action = ({ state }) => {
   const editingTodo = maybeEditingTodo(state.inlineTodoForm)
   if (!editingTodo) return
 
@@ -153,7 +153,7 @@ const cancelEditingTodo: Action = ({ state }) => {
 
 const addTodoClicked: Action = (ctx) =>{
   const {state} = ctx
-  saveEditingTodo(ctx)
+  saveEditingTodoClicked(ctx)
   state.inlineTodoForm = createAddingTodo()
 }
 
@@ -169,7 +169,7 @@ const config = {
     deleteTodo,
     editTodo,
     mergeEditingTodo,
-    saveEditingTodo,
+    saveEditingTodoClicked,
     cancelEditingTodo,
     addTodoClicked
   },
@@ -244,7 +244,7 @@ function TodoEditItem({ editingTodo }: { editingTodo: EditingTodo }) {
           }
         />
         <div className="flex pv1">
-          <Button action={() => actions.saveEditingTodo()}>Save</Button>
+          <Button action={() => actions.saveEditingTodoClicked()}>Save</Button>
           <Button action={() => actions.cancelEditingTodo()}>
             Cancel
           </Button>
