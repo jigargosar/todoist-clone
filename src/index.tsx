@@ -119,7 +119,7 @@ const deleteTodo: Action<TodoId> = ({ state }, todoId) => {
 }
 
 
-const editTodo: Action<TodoId> = ({ state }, todoId) => {
+const editTodoClicked: Action<TodoId> = ({ state }, todoId) => {
   const maybeTodo = state.todoList.find(todo => todo.id === todoId)
   if (maybeTodo) {
     state.inlineTodoForm = createEditingTodo(maybeTodo)
@@ -167,7 +167,7 @@ const config = {
     closeTodoMenu,
     setDone,
     deleteTodo,
-    editTodo,
+    editTodoClicked,
     mergeEditingTodo,
     saveEditingTodoClicked,
     cancelInlineTodoFormClicked,
@@ -330,7 +330,7 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   }
 
   const items: [() => void, string][] = [
-    [() => actions.editTodo(todoId), 'Edit'],
+    [() => actions.editTodoClicked(todoId), 'Edit'],
     [() => actions.deleteTodo(todoId), 'Delete'],
   ]
 
