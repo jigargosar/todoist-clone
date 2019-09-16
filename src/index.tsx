@@ -127,12 +127,12 @@ const editTodoClicked: Action<TodoId> = ({ state }, todoId) => {
 }
 
 
-const mergeEditingTodo: Action<TodoFormFields> = (
+const updateTodoForm: Action<TodoFormFields> = (
   { state },
-  editingTodo,
+  formFields,
 ) => {
   if (state.inlineTodoForm) {
-    state.inlineTodoForm = { ...state.inlineTodoForm, ...editingTodo }
+    state.inlineTodoForm = { ...state.inlineTodoForm, ...formFields }
   }
 }
 
@@ -168,7 +168,7 @@ const config = {
     setDone,
     deleteTodo,
     editTodoClicked,
-    mergeEditingTodo,
+    updateTodoForm,
     saveEditingTodoClicked,
     cancelInlineTodoFormClicked,
     addTodoClicked
@@ -197,15 +197,22 @@ function App() {
   )
 }
 
+function maybeAddingTodo(form: InlineTodoForm):AddingTodo|null {
+  return form && form.tag ==='AddingTodo' ? form : null
+}
+
 function AppContent() {
   const state = useStoreState()
+  const addingTodo = maybeAddingTodo(state.inlineTodoForm)
   return (
     <div className="lh-copy" style={{ maxWidth: 500 }}>
       <div className="f4 pv1">TodoList</div>
       <ViewTodoList todoList={state.todoList}/>
+      {!!addingTodo && <ViewAddTodoForm addingTodo={addingTodo}/> }
     </div>
   )
 }
+
 
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
   const state = useStoreState()
@@ -219,7 +226,7 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
         )
         if (maybeEditingTodo) {
           return (
-            <TodoEditItem key={todo.id} editingTodo={maybeEditingTodo}/>
+            <ViewEditTodoForm key={todo.id} editingTodo={maybeEditingTodo}/>
           )
         }
         const menuOpen = isTodoPopupOpenFor(todo.id, state.todoPopup)
@@ -229,7 +236,7 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
   )
 }
 
-function TodoEditItem({ editingTodo }: { editingTodo: EditingTodo }) {
+function ViewEditTodoForm({ editingTodo }: { editingTodo: EditingTodo }) {
   const actions = useStoreActions()
   return (
     <div className="flex">
@@ -240,7 +247,7 @@ function TodoEditItem({ editingTodo }: { editingTodo: EditingTodo }) {
           className="ph1 pv1 lh-copy w-100"
           value={editingTodo.title}
           onChange={e =>
-            actions.mergeEditingTodo({ title: e.target.value })
+            actions.updateTodoForm({ title: e.target.value })
           }
         />
         <div className="flex pv1">
@@ -253,6 +260,30 @@ function TodoEditItem({ editingTodo }: { editingTodo: EditingTodo }) {
     </div>
   )
 }
+
+const ViewAddTodoForm :FC<{addingTodo:AddingTodo}> = ({addingTodo})=>{
+  const actions = useStoreActions()
+  return <div className="flex">
+    <div className="ph1 pv2 flex-grow-1">
+      <input
+        autoFocus={true}
+        type="text"
+        className="ph1 pv1 lh-copy w-100"
+        value={addingTodo.title}
+        onChange={e =>
+          actions.updateTodoForm({ title: e.target.value })
+        }
+      />
+      <div className="flex pv1">
+        <Button action={() => actions.saveEditingTodoClicked()}>Save</Button>
+        <Button action={() => actions.cancelInlineTodoFormClicked()}>
+          Cancel
+        </Button>
+      </div>
+    </div>
+  </div>
+}
+
 
 const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
   function TodoItem({ todo, menuOpen }) {
