@@ -262,7 +262,7 @@ function AppContent() {
       ) : (
         <>
           <Button action={() => actions.addTodoClicked()}>Add Task</Button>
-          <Button action={() => actions.addTodoClicked()}>
+          <Button action={() => actions.addFakeTodoClicked()}>
             Add Fake Task
           </Button>
         </>
