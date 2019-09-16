@@ -160,6 +160,9 @@ function isTodoPopupOpenFor(
   return !!todoPopup && todoPopup.todoId === todoId
 }
 
+function maybeEditingTodoFor(todoId:TodoId, editingTodo:EditingTodo|null) {
+  return editingTodo && editingTodo.id === todoId ? editingTodo : null
+}
 
 const AppProvider: FC = ({ children }) => {
   return <Provider store={store}>{children}</Provider>
@@ -184,15 +187,17 @@ function AppContent() {
 }
 
 
+
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
   const state = useStoreState()
 
   return (
     <>
       {todoList.map(todo => {
-        if (state.editingTodo && state.editingTodo.id === todo.id) {
+        const maybeEditingTodo = maybeEditingTodoFor(todo.id, state.editingTodo)
+        if (maybeEditingTodo) {
           return (
-            <TodoEditItem key={todo.id} editingTodo={state.editingTodo} />
+            <TodoEditItem key={todo.id} editingTodo={maybeEditingTodo} />
           )
         }
         const menuOpen = isTodoPopupOpenFor(todo.id, state.todoPopup)
