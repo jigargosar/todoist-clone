@@ -53,7 +53,7 @@ function createFakeTodo(): Todo {
 type State = {
   todoPopup: TodoPopup | null
   todoList: Todo[]
-  editingTodo: AddingTodo | EditingTodo | null
+  inlineTodoForm: AddingTodo | EditingTodo | null
 }
 
 const initialTodos: Todo[] = times(createFakeTodo, 10)
@@ -61,7 +61,7 @@ const initialTodos: Todo[] = times(createFakeTodo, 10)
 const defaultState: State = {
   todoPopup: null,
   todoList: initialTodos,
-  editingTodo: null,
+  inlineTodoForm: null,
 }
 
 function cacheStoreState(state: Immutable<State>) {
@@ -113,7 +113,7 @@ function createEditingTodo(maybeTodo: Todo): EditingTodo {
 const editTodo: Action<TodoId> = ({ state }, todoId) => {
   const maybeTodo = state.todoList.find(todo => todo.id === todoId)
   if (maybeTodo) {
-    state.editingTodo = createEditingTodo(maybeTodo)
+    state.inlineTodoForm = createEditingTodo(maybeTodo)
   }
 }
 
@@ -122,13 +122,13 @@ const mergeEditingTodo: Action<TodoFormFields> = (
   { state },
   editingTodo,
 ) => {
-  if (state.editingTodo) {
-    state.editingTodo = { ...state.editingTodo, ...editingTodo }
+  if (state.inlineTodoForm) {
+    state.inlineTodoForm = { ...state.inlineTodoForm, ...editingTodo }
   }
 }
 
 const saveEditingTodo: Action = ({ state }) => {
-  const editingTodo = state.editingTodo
+  const editingTodo = state.inlineTodoForm
   if (!editingTodo || editingTodo.tag !== 'EditingTodo') return
 
 
@@ -136,11 +136,11 @@ const saveEditingTodo: Action = ({ state }) => {
   if (maybeTodo) {
     maybeTodo.title = editingTodo.title
   }
-  state.editingTodo = null
+  state.inlineTodoForm = null
 }
 
 const cancelEditingTodo: Action = ({ state }) => {
-  state.editingTodo = null
+  state.inlineTodoForm = null
 }
 
 const config = {
@@ -200,7 +200,7 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
       {todoList.map(todo => {
         const maybeEditingTodo = maybeEditingTodoFor(
           todo.id,
-          state.editingTodo,
+          state.inlineTodoForm,
         )
         if (maybeEditingTodo) {
           return (
