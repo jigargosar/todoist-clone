@@ -75,8 +75,10 @@ interface Action<Payload = void> extends IAction<Payload, Config> {}
 const openTodoMenu: Action<TodoId> = ({ state }, todoId: TodoId) => {
   state.todoPopup = { todoId }
 }
-const closeTodoMenu: Action = ({ state }) => {
-  state.todoPopup = null
+const closeTodoMenu: Action<TodoId> = ({ state }, todoId) => {
+  if(isTodoPopupOpenFor(todoId, state.todoPopup)){
+    state.todoPopup = null
+  }
 }
 const setDone: Action<{ todoId: TodoId; isDone: boolean }> = (
   { state },
@@ -282,19 +284,20 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   const rootRef: RefObject<HTMLDivElement> = useRef(null)
 
   useEffect(() => {
-    return () => actions.closeTodoMenu()
+    return () => actions.closeTodoMenu(todoId)
   })
 
-  const onBlurCallback = useCallback(() => {
-    setTimeout(() => {
+  const onBlurCallback = useCallback((e) => {
+
       if (
         rootRef.current &&
-        !rootRef.current.contains(document.activeElement)
+        e.relatedTarget &&
+        !rootRef.current.contains(e.relatedTarget)
       ) {
-        actions.closeTodoMenu()
+        actions.closeTodoMenu(todoId)
       }
-    }, 0)
-  }, [rootRef.current])
+
+  }, [])
 
   function viewItem([action, label]: [() => void, string], idx: number) {
     return (
