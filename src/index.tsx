@@ -340,7 +340,7 @@ const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
           />
         </div>
         <div
-          className="ph1 pv1 flex-grow-1 lh-title "
+          className="ph1 pv1 flex-grow-1 lh-title"
           onClick={() => actions.editTodoClicked(todo.id)}
         >
           {todo.title}
