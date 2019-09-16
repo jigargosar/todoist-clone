@@ -57,11 +57,24 @@ const Project = {
 type ProjectList = Project[]
 
 const ProjectList = {
-  // findById(projectId: ProjectId) {
-  //   return function findById(projectList: ProjectList) {
-  //     return projectList.find(Project.idEq(projectId))
-  //   }
-  // },
+  findById(projectId: ProjectId) {
+    return function findById(projectList: ProjectList) {
+      return projectList.find(Project.idEq(projectId))
+    }
+  },
+  findTitleByIdOrInbox(projectId:ProjectId | null){
+    return function findTitleByIdOrInbox(projectList: ProjectList) {
+      if(!projectId){return 'Inbox'}
+
+      const project = ProjectList.findById(projectId)(projectList)
+      if(project){
+        return project.title
+      }else{
+        return 'Inbox'
+      }
+
+    }
+  },
   // findIndexById(projectId: ProjectId) {
   //   return function findIndexById(projectList: ProjectList) {
   //     return projectList.findIndex(Project.idEq(projectId))
@@ -434,6 +447,8 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
   return (
     <>
       {todoList.map(todo => {
+        const projectId = todo.projectId
+        const projectTitle = ProjectList.findTitleByIdOrInbox(projectId)(state.projectList)
         const maybeEditingTodo = maybeEditingTodoFor(
           todo.id,
           state.inlineTodoForm,
@@ -452,6 +467,8 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
             key={TodoId.toString(todo.id)}
             todo={todo}
             menuOpen={menuOpen}
+            projectId={projectId}
+            projectTitle={projectTitle}
           />
         )
       })}
@@ -494,9 +511,11 @@ function ViewInlineTodoForm({ fields }: { fields: TodoFormFields }) {
   )
 }
 
-const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
+const TodoItem: FC<{ todo: Todo; menuOpen: boolean ,projectId:ProjectId|null , projectTitle:string}> = memo(
   function TodoItem({ todo, menuOpen }) {
     const { actions } = useOvermind()
+
+
 
     function openTodoMenu() {
       actions.openTodoMenu(todo.id)
