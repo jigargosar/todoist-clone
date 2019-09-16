@@ -30,7 +30,7 @@ type Todo = {
   title: string
   isDone: boolean
 }
-type EditingTodo = { id: TodoId; title: string }
+type EditingTodo = { tag: 'EditingTodo'; id: TodoId; title: string }
 
 type TodoPopup = { todoId: string }
 
@@ -105,10 +105,15 @@ const deleteTodo: Action<TodoId> = ({ state }, todoId) => {
     state.todoList.splice(maybeIdx, 1)
   }
 }
+
+function createEditingTodo(maybeTodo: Todo): EditingTodo {
+  return { tag: 'EditingTodo', id: maybeTodo.id, title: maybeTodo.title }
+}
+
 const editTodo: Action<TodoId> = ({ state }, todoId) => {
   const maybeTodo = state.todoList.find(todo => todo.id === todoId)
   if (maybeTodo) {
-    state.editingTodo = { id: maybeTodo.id, title: maybeTodo.title }
+    state.editingTodo = createEditingTodo(maybeTodo)
   }
 }
 
