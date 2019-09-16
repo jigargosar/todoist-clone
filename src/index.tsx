@@ -97,12 +97,34 @@ const openTodoMenu:Action<TodoId> = ({state}, todoId:TodoId)=>{
 const closeTodoMenu:Action = ({state})=>{
   state.todoPopup = null
 }
-const setDone:Action<{todoId: string; isDone: boolean}> = ({state}, {todoId, isDone})=>{
+const setDone:Action<{todoId: TodoId; isDone: boolean}> = ({state}, {todoId, isDone})=>{
   const maybeTodo = state.todoList.find(todo => todo.id === todoId)
   if (maybeTodo) {
     maybeTodo.isDone = isDone
   }
 }
+const deleteTodo:Action<{todoId: TodoId}> = ({state}, {todoId})=>{
+  const maybeIdx = state.todoList.findIndex(
+    todo => todo.id === todoId,
+  )
+  if (maybeIdx > -1) {
+    state.todoList.splice(maybeIdx, 1)
+  }
+}
+const editTodo:Action<{todoId: TodoId}> = ({state}, {todoId})=>{
+  const maybeTodo = state.todoList.find(todo => todo.id === todoId)
+  if (maybeTodo) {
+    state.editingTodo = { id: maybeTodo.id, title: maybeTodo.title }
+  }
+}
+
+const mergeEditingTodo:Action<EditingTodoPartial> = ({state}, editingTodo)=>{
+  if (state.editingTodo) {
+    state.editingTodo = { ...state.editingTodo, ...editingTodo }
+  }
+}
+
+
 
 
 const config = {
@@ -115,7 +137,10 @@ const config = {
   actions: {
     openTodoMenu,
     closeTodoMenu,
-    setDone
+    setDone,
+    deleteTodo,
+    editTodo,
+    mergeEditingTodo
   },
   effects:{
 
