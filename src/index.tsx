@@ -222,7 +222,7 @@ function AppContent() {
     <div className="lh-copy" style={{ maxWidth: 500 }}>
       <div className="f4 pv1">TodoList</div>
       <ViewTodoList todoList={state.todoList} />
-      {!!addingTodo && <ViewAddTodoForm addingTodo={addSingTodo} />}
+      {!!addingTodo && <ViewAddTodoForm addingTodo={addingTodo} />}
     </div>
   )
 }
