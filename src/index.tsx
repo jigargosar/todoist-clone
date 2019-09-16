@@ -94,6 +94,16 @@ interface Action<Payload = void> extends IAction<Payload, Config> {}
 const openTodoMenu:Action<TodoId> = ({state}, todoId:TodoId)=>{
   state.todoPopup = {todoId}
 }
+const closeTodoMenu:Action = ({state})=>{
+  state.todoPopup = null
+}
+const setDone:Action<{todoId: string; isDone: boolean}> = ({state}, {todoId, isDone})=>{
+  const maybeTodo = state.todoList.find(todo => todo.id === todoId)
+  if (maybeTodo) {
+    maybeTodo.isDone = isDone
+  }
+}
+
 
 const config = {
   state: {
@@ -104,6 +114,8 @@ const config = {
   },
   actions: {
     openTodoMenu,
+    closeTodoMenu,
+    setDone
   },
   effects:{
 
