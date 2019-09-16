@@ -11,8 +11,6 @@ import { Action, createOvermind, IConfig } from 'overmind'
 
 import { createHook, Provider } from 'overmind-react'
 import equals from 'ramda/es/equals'
-import { Simulate } from 'react-dom/test-utils'
-import play = Simulate.play
 
 type ProjectId = { tag: 'ProjectId'; value: string }
 
@@ -62,11 +60,11 @@ const ProjectList = {
       return projectList.findIndex(Project.idEq(projectId))
     }
   },
-  append(project:Project){
-    return function append(projectList: ProjectList){
+  append(project: Project) {
+    return function append(projectList: ProjectList) {
       return [...projectList, project]
     }
-  }
+  },
 }
 
 type TodoId = string
