@@ -219,7 +219,8 @@ const config = {
     addTodoClicked,
     saveInlineTodoFormClicked,
     deleteProject,
-    addFakeTodoClicked
+    addFakeTodoClicked,
+    addFakeProjectClicked
   },
   effects: {},
 }
@@ -257,9 +258,12 @@ function AppContent() {
 
   const addingTodo = maybeAddingTodo(state.inlineTodoForm)
   return (
-    <div className="lh-copy" style={{ maxWidth: 500 }}>
+    <div className="pl2 lh-copy" style={{ maxWidth: 500 }}>
       <div className="f4 pv1">ProjectList</div>
       <ViewProjectList projectList={state.projectList} />
+      <Button action={() => actions.addFakeProjectClicked()}>
+        Add Fake Project
+      </Button>
       <div className="f4 pv1">TodoList</div>
       <ViewTodoList todoList={state.todoList} />
       {addingTodo ? (
