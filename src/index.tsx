@@ -11,6 +11,7 @@ import { Action, createOvermind, IConfig } from 'overmind'
 
 import { createHook, Provider } from 'overmind-react'
 import equals from 'ramda/es/equals'
+import reject from 'ramda/es/reject'
 
 type ProjectId = { tag: 'ProjectId'; value: string }
 
@@ -65,9 +66,29 @@ const ProjectList = {
       return [...projectList, project]
     }
   },
+  withoutId(projectId: ProjectId) {
+    return function withoutId(projectList: ProjectList) {
+      return reject(Project.idEq(projectId))(projectList)
+    }
+  },
 }
 
-type TodoId = string
+type TodoId = { tag: 'TodoId'; value: string }
+
+const TodoId = {
+  gen(): TodoId {
+    return { tag: 'TodoId', value: nanoid() }
+  },
+  toString(todoId: TodoId) {
+    return todoId.value
+  },
+
+  eq(a: TodoId) {
+    return function eq(b: TodoId) {
+      return equals(a, b)
+    }
+  },
+}
 
 type Todo = {
   id: TodoId
@@ -75,8 +96,44 @@ type Todo = {
   isDone: boolean
 }
 
-function createFakeTodo(): Todo {
-  return { id: nanoid(), title: faker.hacker.phrase(), isDone: false }
+const Todo = {
+  idEq(id: TodoId) {
+    return function idEq(todo: Todo) {
+      return TodoId.eq(id)(todo.id)
+    }
+  },
+  createFake(): Todo {
+    return {
+      id: TodoId.gen(),
+      title: faker.hacker.phrase(),
+      isDone: false,
+    }
+  },
+}
+
+type TodoList = Todo[]
+
+const TodoList = {
+  findById(todoId: TodoId) {
+    return function findById(todoList: TodoList) {
+      return todoList.find(Todo.idEq(todoId))
+    }
+  },
+  findIndexById(todoId: TodoId) {
+    return function findIndexById(todoList: TodoList) {
+      return todoList.findIndex(Todo.idEq(todoId))
+    }
+  },
+  append(todo: Todo) {
+    return function append(todoList: TodoList) {
+      return [...todoList, todo]
+    }
+  },
+  withoutId(todoId: TodoId) {
+    return function withoutId(todoList: TodoList) {
+      return reject(Todo.idEq(todoId))(todoList)
+    }
+  },
 }
 
 type TodoFormFields = { title: string }
@@ -106,13 +163,13 @@ function maybeEditingTodoFor(
   return editingTodo && editingTodo.id === todoId ? editingTodo : null
 }
 
-type TodoPopup = { todoId: string }
+type TodoPopup = { todoId: TodoId }
 
 function isTodoPopupOpenFor(
   todoId: TodoId,
   todoPopup: TodoPopup | null,
 ): boolean {
-  return !!todoPopup && todoPopup.todoId === todoId
+  return !!todoPopup && TodoId.eq(todoPopup.todoId)(todoId)
 }
 
 type State = {
@@ -122,7 +179,7 @@ type State = {
   projectList: Project[]
 }
 
-const initialTodos: Todo[] = times(createFakeTodo, 10)
+const initialTodos: Todo[] = times(Todo.createFake, 10)
 const initialProjects: Project[] = times(Project.createFake, 5)
 
 const defaultState: State = {
@@ -159,27 +216,21 @@ const setDone: Action<{ todoId: TodoId; isDone: boolean }> = (
   { state },
   { todoId, isDone },
 ) => {
-  const maybeTodo = state.todoList.find(todo => todo.id === todoId)
+  const maybeTodo = TodoList.findById(todoId)(state.todoList)
   if (maybeTodo) {
     maybeTodo.isDone = isDone
   }
 }
 const deleteProject: Action<ProjectId> = ({ state }, projectId) => {
-  const maybeIdx = ProjectList.findIndexById(projectId)(state.projectList)
-  if (maybeIdx > -1) {
-    state.projectList.splice(maybeIdx, 1)
-  }
+  state.projectList = ProjectList.withoutId(projectId)(state.projectList)
 }
 const deleteTodo: Action<TodoId> = ({ state }, todoId) => {
-  const maybeIdx = state.todoList.findIndex(todo => todo.id === todoId)
-  if (maybeIdx > -1) {
-    state.todoList.splice(maybeIdx, 1)
-  }
+  state.todoList = TodoList.withoutId(todoId)(state.todoList)
 }
 
 const editTodoClicked: Action<TodoId> = (ctx, todoId) => {
   const { state } = ctx
-  const maybeTodo = state.todoList.find(todo => todo.id === todoId)
+  const maybeTodo = TodoList.findById(todoId)(state.todoList)
   if (maybeTodo) {
     saveInlineTodoFormClicked(ctx)
     state.inlineTodoForm = createEditingTodo(maybeTodo)
@@ -192,8 +243,9 @@ const addTodoClicked: Action = ctx => {
 }
 
 const addFakeTodoClicked: Action = ({ state }) => {
-  const todo = createFakeTodo()
-  state.todoList.push(todo)
+  const todo = Todo.createFake()
+  state.todoList = TodoList.append(todo)(state.todoList)
+  // state.todoList.push(todo)
 }
 
 const addFakeProjectClicked: Action = ({ state }) => {
@@ -226,7 +278,7 @@ const saveAddingTodo: Action = ({ state }) => {
   const addingTodo = maybeAddingTodo(state.inlineTodoForm)
   if (!addingTodo || addingTodo.title.trim().length === 0) return
 
-  const todo = createFakeTodo()
+  const todo = Todo.createFake()
   todo.title = addingTodo.title
 
   state.todoList.push(todo)
@@ -374,13 +426,19 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
         if (maybeEditingTodo) {
           return (
             <ViewEditTodoForm
-              key={todo.id}
+              key={TodoId.toString(todo.id)}
               editingTodo={maybeEditingTodo}
             />
           )
         }
         const menuOpen = isTodoPopupOpenFor(todo.id, state.todoPopup)
-        return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen} />
+        return (
+          <TodoItem
+            key={TodoId.toString(todo.id)}
+            todo={todo}
+            menuOpen={menuOpen}
+          />
+        )
       })}
     </>
   )
