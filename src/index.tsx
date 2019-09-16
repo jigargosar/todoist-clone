@@ -1,15 +1,10 @@
 import React, {
-  createContext,
-  Dispatch,
   FC,
   memo,
   RefObject,
-  SetStateAction,
   useCallback,
-  useContext,
   useEffect,
   useRef,
-  useState,
 } from 'react'
 import { render } from 'react-dom'
 import 'tachyons'
@@ -17,7 +12,6 @@ import './index.css'
 import nanoid from 'nanoid'
 import faker from 'faker'
 import times from 'ramda/es/times'
-import produce from 'immer'
 import isHK from 'is-hotkey'
 import { mergeRight } from 'ramda'
 import debounce from 'lodash.debounce'
@@ -27,9 +21,8 @@ import {
   createStore,
   IAction,
   Provider,
-
 } from 'immer-store'
-
+import { State } from 'immer-store/lib/types'
 
 type TodoId = string
 
@@ -54,30 +47,20 @@ function createFakeTodo(): Todo {
 
 const initialTodos: Todo[] = times(createFakeTodo, 10)
 
-
-
-
 const defaultModel: Model = {
   todoPopup: null,
   todoList: initialTodos,
   editingTodo: null,
 }
 
-function cacheModel(model: Model) {
+function cacheStoreState(model: State) {
   const serializedModel = JSON.stringify(model)
   if (serializedModel) {
     localStorage.setItem('todoist-clone-model', serializedModel)
   }
 }
 
-const debouncedCacheModel = debounce(cacheModel, 1000)
-
-function useCacheModelEffect() {
-  const model = useContext(ModelContext)
-  useEffect(() => {
-    debouncedCacheModel(model)
-  }, [model])
-}
+const debouncedCacheStoreState = debounce(cacheStoreState, 1000)
 
 function getCachedModel() {
   return JSON.parse(localStorage.getItem('todoist-clone-model') || '{}')
@@ -87,68 +70,65 @@ const cachedModel: Model = getCachedModel()
 
 const initialModel: Model = mergeRight(defaultModel, cachedModel)
 
-
-
 interface Action<Payload = void> extends IAction<Payload, Config> {}
 
-const openTodoMenu:Action<TodoId> = ({state}, todoId:TodoId)=>{
-  state.todoPopup = {todoId}
+const openTodoMenu: Action<TodoId> = ({ state }, todoId: TodoId) => {
+  state.todoPopup = { todoId }
 }
-const closeTodoMenu:Action = ({state})=>{
+const closeTodoMenu: Action = ({ state }) => {
   state.todoPopup = null
 }
-const setDone:Action<{todoId: TodoId; isDone: boolean}> = ({state}, {todoId, isDone})=>{
+const setDone: Action<{ todoId: TodoId; isDone: boolean }> = (
+  { state },
+  { todoId, isDone },
+) => {
   const maybeTodo = state.todoList.find(todo => todo.id === todoId)
   if (maybeTodo) {
     maybeTodo.isDone = isDone
   }
 }
-const deleteTodo:Action<{todoId: TodoId}> = ({state}, {todoId})=>{
-  const maybeIdx = state.todoList.findIndex(
-    todo => todo.id === todoId,
-  )
+const deleteTodo: Action<TodoId> = ({ state }, todoId) => {
+  const maybeIdx = state.todoList.findIndex(todo => todo.id === todoId)
   if (maybeIdx > -1) {
     state.todoList.splice(maybeIdx, 1)
   }
 }
-const editTodo:Action<{todoId: TodoId}> = ({state}, {todoId})=>{
+const editTodo: Action<TodoId> = ({ state }, todoId) => {
   const maybeTodo = state.todoList.find(todo => todo.id === todoId)
   if (maybeTodo) {
     state.editingTodo = { id: maybeTodo.id, title: maybeTodo.title }
   }
 }
 
-const mergeEditingTodo:Action<EditingTodoPartial> = ({state}, editingTodo)=>{
+const mergeEditingTodo: Action<EditingTodoPartial> = (
+  { state },
+  editingTodo,
+) => {
   if (state.editingTodo) {
     state.editingTodo = { ...state.editingTodo, ...editingTodo }
   }
 }
 
-const saveEditingTodo:Action = ({state})=>{
+const saveEditingTodo: Action = ({ state }) => {
   const editingTodo = state.editingTodo
   if (!editingTodo) return
-  const maybeTodo = state.todoList.find(
-    todo => todo.id === editingTodo.id,
-  )
+  const maybeTodo = state.todoList.find(todo => todo.id === editingTodo.id)
   if (maybeTodo) {
     maybeTodo.title = editingTodo.title
   }
   state.editingTodo = null
 }
 
-const cancelEditingTodo:Action = ({state})=>{
+const cancelEditingTodo: Action = ({ state }) => {
   state.editingTodo = null
 }
-
-
-
 
 const config = {
   state: {
     todoPopup: null,
     todoList: initialTodos,
     editingTodo: null,
-    ...initialModel
+    ...initialModel,
   },
   actions: {
     openTodoMenu,
@@ -158,110 +138,24 @@ const config = {
     editTodo,
     mergeEditingTodo,
     saveEditingTodo,
-    cancelEditingTodo
+    cancelEditingTodo,
   },
-  effects:{
-
-  }
+  effects: {},
 }
 
 type Config = typeof config
 
 const store = createStore(config)
+store.subscribe(state => {
+  debouncedCacheStoreState(state)
+})
 const useStoreActions = createActionsHook<Config>()
 const useStoreState = createStateHook<Config>()
 
-
-function exhaustiveCheck(never: never) {
-  return never
-}
-
 type EditingTodoPartial = Partial<Omit<EditingTodo, 'id'>>
-type Msg =
-  | { tag: 'OpenTodoMenu'; todoId: string }
-  | { tag: 'CloseTodoMenu' }
-  | { tag: 'SetDone'; todoId: string; isDone: boolean }
-  | { tag: 'DeleteTodo'; todoId: string }
-  | { tag: 'EditTodo'; todoId: string }
-  | { tag: 'MergeEditingTodo'; editingTodo: EditingTodoPartial }
-  | { tag: 'SaveEditingTodo' }
-  | { tag: 'CancelEditingTodo' }
-
-function update(msg: Msg, model: Model): void {
-  if (msg.tag === 'OpenTodoMenu') {
-    model.todoPopup = { todoId: msg.todoId }
-  } else if (msg.tag === 'CloseTodoMenu') {
-    model.todoPopup = null
-  } else if (msg.tag === 'SetDone') {
-    const maybeTodo = model.todoList.find(todo => todo.id === msg.todoId)
-    if (maybeTodo) {
-      maybeTodo.isDone = msg.isDone
-    }
-  } else if (msg.tag === 'DeleteTodo') {
-    const maybeIdx = model.todoList.findIndex(
-      todo => todo.id === msg.todoId,
-    )
-    if (maybeIdx > -1) {
-      model.todoList.splice(maybeIdx, 1)
-    }
-  } else if (msg.tag === 'EditTodo') {
-    const maybeTodo = model.todoList.find(todo => todo.id === msg.todoId)
-    if (maybeTodo) {
-      model.editingTodo = { id: maybeTodo.id, title: maybeTodo.title }
-    }
-  } else if (msg.tag === 'MergeEditingTodo') {
-    if (model.editingTodo) {
-      model.editingTodo = { ...model.editingTodo, ...msg.editingTodo }
-    }
-  } else if (msg.tag === 'SaveEditingTodo') {
-    const editingTodo = model.editingTodo
-    if (!editingTodo) return
-    const maybeTodo = model.todoList.find(
-      todo => todo.id === editingTodo.id,
-    )
-    if (maybeTodo) {
-      maybeTodo.title = editingTodo.title
-    }
-    model.editingTodo = null
-  } else if (msg.tag === 'CancelEditingTodo') {
-    model.editingTodo = null
-  } else {
-    return exhaustiveCheck(msg)
-  }
-}
-
-const DispatcherContext = createContext((_: Msg) => {})
-const ModelContext = createContext(initialModel)
-
-function useDispatchCallback(setModel: Dispatch<SetStateAction<Model>>) {
-  return useCallback(
-    (msg: Msg) => {
-      setModel(model => {
-        return produce(model, draft => update(msg, draft))
-      })
-    },
-    [setModel],
-  )
-}
 
 const AppProvider: FC = ({ children }) => {
-  const [model, setModel] = useState(initialModel)
-
-  const dispatch = useDispatchCallback(setModel)
-
-
-
-  return (
-    <DispatcherContext.Provider value={dispatch}>
-
-        <ModelContext.Provider value={model}>
-          <Provider store={store}>
-          {children}
-          </Provider>
-        </ModelContext.Provider>
-
-    </DispatcherContext.Provider>
-  )
+  return <Provider store={store}>{children}</Provider>
 }
 
 function App() {
@@ -273,8 +167,6 @@ function App() {
 }
 
 function AppContent() {
-
-  useCacheModelEffect()
   const state = useStoreState()
   return (
     <div className="lh-copy" style={{ maxWidth: 500 }}>
@@ -292,17 +184,17 @@ function isTodoPopupOpenFor(
 }
 
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
-  const model = useContext(ModelContext)
+  const state = useStoreState()
 
   return (
     <>
       {todoList.map(todo => {
-        if (model.editingTodo && model.editingTodo.id === todo.id) {
+        if (state.editingTodo && state.editingTodo.id === todo.id) {
           return (
-            <TodoEditItem key={todo.id} editingTodo={model.editingTodo} />
+            <TodoEditItem key={todo.id} editingTodo={state.editingTodo} />
           )
         }
-        const menuOpen = isTodoPopupOpenFor(todo.id, model.todoPopup)
+        const menuOpen = isTodoPopupOpenFor(todo.id, state.todoPopup)
         return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen} />
       })}
     </>
@@ -310,7 +202,7 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
 }
 
 function TodoEditItem({ editingTodo }: { editingTodo: EditingTodo }) {
-  const dispatch = useContext(DispatcherContext)
+  const actions = useStoreActions()
   return (
     <div className="flex">
       <div className="ph1 pv2 flex-grow-1">
@@ -320,17 +212,12 @@ function TodoEditItem({ editingTodo }: { editingTodo: EditingTodo }) {
           className="ph1 pv1 lh-copy w-100"
           value={editingTodo.title}
           onChange={e => {
-            dispatch({
-              tag: 'MergeEditingTodo',
-              editingTodo: { title: e.target.value },
-            })
+            actions.mergeEditingTodo({ title: e.target.value })
           }}
         />
         <div className="flex pv1">
-          <Button action={() => dispatch({ tag: 'SaveEditingTodo' })}>
-            Save
-          </Button>
-          <Button action={() => dispatch({ tag: 'CancelEditingTodo' })}>
+          <Button action={() => actions.saveEditingTodo()}>Save</Button>
+          <Button action={() => actions.cancelEditingTodo()}>
             Cancel
           </Button>
         </div>
@@ -341,19 +228,13 @@ function TodoEditItem({ editingTodo }: { editingTodo: EditingTodo }) {
 
 const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
   function TodoItem({ todo, menuOpen }) {
-    const dispatch = useContext(DispatcherContext)
     const actions = useStoreActions()
     function openTodoMenu() {
-      dispatch({
-        tag: 'OpenTodoMenu',
-        todoId: todo.id,
-      })
       actions.openTodoMenu(todo.id)
     }
 
     function setDone(isDone: boolean) {
-      dispatch({
-        tag: 'SetDone',
+      actions.setDone({
         todoId: todo.id,
         isDone,
       })
@@ -392,12 +273,12 @@ const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
 )
 
 function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
-  const dispatch = useContext(DispatcherContext)
+  const actions = useStoreActions()
 
   const rootRef: RefObject<HTMLDivElement> = useRef(null)
 
   useEffect(() => {
-    return () => dispatch({ tag: 'CloseTodoMenu' })
+    return () => actions.closeTodoMenu()
   })
 
   const onBlurCallback = useCallback(() => {
@@ -406,7 +287,7 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
         rootRef.current &&
         !rootRef.current.contains(document.activeElement)
       ) {
-        dispatch({ tag: 'CloseTodoMenu' })
+        actions.closeTodoMenu()
       }
     }, 0)
   }, [rootRef.current])
@@ -431,8 +312,8 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   }
 
   const items: [() => void, string][] = [
-    [() => dispatch({ tag: 'EditTodo', todoId }), 'Edit'],
-    [() => dispatch({ tag: 'DeleteTodo', todoId }), 'Delete'],
+    [() => actions.editTodo(todoId), 'Edit'],
+    [() => actions.deleteTodo(todoId), 'Delete'],
   ]
 
   return (
