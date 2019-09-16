@@ -8,20 +8,18 @@ import times from 'ramda/es/times'
 import isHK from 'is-hotkey'
 import debounce from 'lodash.debounce'
 import {
-  createActionsHook,
-  createStateHook,
-  createStore,
-  IAction,
-  Provider,
-} from 'immer-store'
-import { Immutable } from 'immer'
+  Action, createOvermind,
+
+  IConfig,
+} from 'overmind'
+
+import { createHook, Provider } from 'overmind-react'
 
 type ProjectId = string
 
 type Project = {
   id: ProjectId
   title: string
-
 }
 
 function createFakeProject(): Project {
@@ -93,7 +91,7 @@ const defaultState: State = {
   projectList: initialProjects,
 }
 
-function cacheStoreState(state: Immutable<State>) {
+function cacheStoreState(state: State) {
   const serializedModel = JSON.stringify(state)
   if (serializedModel) {
     localStorage.setItem('todoist-clone-model', serializedModel)
@@ -108,8 +106,6 @@ function getCachedState() {
 
 const cachedState: State = getCachedState()
 
-interface Action<Payload = void> extends IAction<Payload, StoreConfig> {
-}
 
 const openTodoMenu: Action<TodoId> = ({ state }, todoId: TodoId) => {
   state.todoPopup = { todoId }
@@ -216,18 +212,21 @@ const config = {
   },
   effects: {},
 }
+declare module 'overmind' {
+  interface Config extends IConfig<typeof config> {}
+}
 
-type StoreConfig = typeof config
+const useOvermind = createHook<typeof config>()
 
-const store = createStore(config)
-store.subscribe(state => {
-  debouncedCacheStoreState(state)
+const overmind = createOvermind(config)
+
+overmind.addMutationListener((mutation, paths, flushId) => {
+  debouncedCacheStoreState(overmind.state)
 })
-const useStoreActions = createActionsHook<StoreConfig>()
-const useStoreState = createStateHook<StoreConfig>()
+
 
 const AppProvider: FC = ({ children }) => {
-  return <Provider store={store}>{children}</Provider>
+  return <Provider value={overmind}>{children}</Provider>
 }
 
 function App() {
@@ -243,8 +242,8 @@ function maybeAddingTodo(form: InlineTodoForm): AddingTodo | null {
 }
 
 function AppContent() {
-  const state = useStoreState()
-  const actions = useStoreActions()
+  const {state, actions} = useOvermind()
+
   const addingTodo = maybeAddingTodo(state.inlineTodoForm)
   return (
     <div className="lh-copy" style={{ maxWidth: 500 }}>
@@ -262,7 +261,7 @@ function AppContent() {
 }
 
 function ViewProjectList({ projectList }: { projectList: Project[] }) {
-  const state = useStoreState()
+  const {state, actions} = useOvermind()
 
   return (
     <>
@@ -275,7 +274,7 @@ function ViewProjectList({ projectList }: { projectList: Project[] }) {
 
 const ProjectItem: FC<{ project: Project }> = memo(
   function ProjectItem({ project }) {
-    const actions = useStoreActions()
+    const {state, actions} = useOvermind()
     return (
       <div className="flex">
         <div
@@ -294,7 +293,7 @@ const ProjectItem: FC<{ project: Project }> = memo(
 
 
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
-  const state = useStoreState()
+  const {state, actions} = useOvermind()
 
   return (
     <>
@@ -319,7 +318,7 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
 }
 
 function ViewEditTodoForm({ editingTodo }: { editingTodo: EditingTodo }) {
-  const actions = useStoreActions()
+  const {state, actions} = useOvermind()
   return (
     <div className="flex">
       <div className="ph1 pv2 flex-grow-1">
@@ -346,7 +345,7 @@ function ViewEditTodoForm({ editingTodo }: { editingTodo: EditingTodo }) {
 const ViewAddTodoForm: FC<{ addingTodo: AddingTodo }> = ({
                                                            addingTodo,
                                                          }) => {
-  const actions = useStoreActions()
+  const {state, actions} = useOvermind()
   return (
     <div className="flex">
       <div className="ph1 pv2 flex-grow-1">
@@ -372,7 +371,7 @@ const ViewAddTodoForm: FC<{ addingTodo: AddingTodo }> = ({
 
 const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
   function TodoItem({ todo, menuOpen }) {
-    const actions = useStoreActions()
+    const {state, actions} = useOvermind()
 
     function openTodoMenu() {
       actions.openTodoMenu(todo.id)
@@ -423,7 +422,7 @@ const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
 )
 
 function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
-  const actions = useStoreActions()
+  const {state, actions} = useOvermind()
 
   const rootRef: RefObject<HTMLDivElement> = useRef(null)
 
