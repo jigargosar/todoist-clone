@@ -120,11 +120,18 @@ const deleteTodo: Action<TodoId> = ({ state }, todoId) => {
   }
 }
 
-const editTodoClicked: Action<TodoId> = ({ state }, todoId) => {
+const editTodoClicked: Action<TodoId> = (ctx, todoId) => {
+  const {state} = ctx
   const maybeTodo = state.todoList.find(todo => todo.id === todoId)
   if (maybeTodo) {
+    saveInlineTodoFormClicked(ctx)
     state.inlineTodoForm = createEditingTodo(maybeTodo)
   }
+}
+const addTodoClicked: Action = ctx => {
+  const { state } = ctx
+  saveEditingTodo(ctx)
+  state.inlineTodoForm = createAddingTodo()
 }
 
 const updateTodoForm: Action<TodoFormFields> = ({ state }, formFields) => {
@@ -165,11 +172,6 @@ const saveInlineTodoFormClicked: Action = ctx => {
   saveAddingTodo(ctx)
 }
 
-const addTodoClicked: Action = ctx => {
-  const { state } = ctx
-  saveEditingTodo(ctx)
-  state.inlineTodoForm = createAddingTodo()
-}
 
 const config = {
   state: {
