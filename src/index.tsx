@@ -1,4 +1,11 @@
-import React, { FC, memo, RefObject, useCallback, useEffect, useRef } from 'react'
+import React, {
+  FC,
+  memo,
+  RefObject,
+  useCallback,
+  useEffect,
+  useRef,
+} from 'react'
 import { render } from 'react-dom'
 import 'tachyons'
 import './index.css'
@@ -7,7 +14,13 @@ import faker from 'faker'
 import times from 'ramda/es/times'
 import isHK from 'is-hotkey'
 import debounce from 'lodash.debounce'
-import { createActionsHook, createStateHook, createStore, IAction, Provider } from 'immer-store'
+import {
+  createActionsHook,
+  createStateHook,
+  createStore,
+  IAction,
+  Provider,
+} from 'immer-store'
 import { Immutable } from 'immer'
 
 type TodoId = string
@@ -21,7 +34,6 @@ type EditingTodo = { id: TodoId; title: string }
 
 type TodoPopup = { todoId: string }
 
-
 function isTodoPopupOpenFor(
   todoId: TodoId,
   todoPopup: TodoPopup | null,
@@ -29,13 +41,15 @@ function isTodoPopupOpenFor(
   return !!todoPopup && todoPopup.todoId === todoId
 }
 
-function maybeEditingTodoFor(todoId:TodoId, editingTodo:EditingTodo|null) {
+function maybeEditingTodoFor(
+  todoId: TodoId,
+  editingTodo: EditingTodo | null,
+) {
   return editingTodo && editingTodo.id === todoId ? editingTodo : null
 }
 function createFakeTodo(): Todo {
   return { id: nanoid(), title: faker.hacker.phrase(), isDone: false }
 }
-
 
 type State = {
   todoPopup: TodoPopup | null
@@ -72,7 +86,7 @@ const openTodoMenu: Action<TodoId> = ({ state }, todoId: TodoId) => {
   state.todoPopup = { todoId }
 }
 const closeTodoMenu: Action<TodoId> = ({ state }, todoId) => {
-  if(isTodoPopupOpenFor(todoId, state.todoPopup)){
+  if (isTodoPopupOpenFor(todoId, state.todoPopup)) {
     state.todoPopup = null
   }
 }
@@ -149,7 +163,6 @@ store.subscribe(state => {
 const useStoreActions = createActionsHook<Config>()
 const useStoreState = createStateHook<Config>()
 
-
 const AppProvider: FC = ({ children }) => {
   return <Provider store={store}>{children}</Provider>
 }
@@ -172,15 +185,16 @@ function AppContent() {
   )
 }
 
-
-
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
   const state = useStoreState()
 
   return (
     <>
       {todoList.map(todo => {
-        const maybeEditingTodo = maybeEditingTodoFor(todo.id, state.editingTodo)
+        const maybeEditingTodo = maybeEditingTodoFor(
+          todo.id,
+          state.editingTodo,
+        )
         if (maybeEditingTodo) {
           return (
             <TodoEditItem key={todo.id} editingTodo={maybeEditingTodo} />
@@ -203,7 +217,9 @@ function TodoEditItem({ editingTodo }: { editingTodo: EditingTodo }) {
           type="text"
           className="ph1 pv1 lh-copy w-100"
           value={editingTodo.title}
-          onChange={e => actions.mergeEditingTodo({ title: e.target.value })}
+          onChange={e =>
+            actions.mergeEditingTodo({ title: e.target.value })
+          }
         />
         <div className="flex pv1">
           <Button action={() => actions.saveEditingTodo()}>Save</Button>
@@ -271,8 +287,6 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
     return () => actions.closeTodoMenu(todoId)
   })
 
-
-
   function viewItem([action, label]: [() => void, string], idx: number) {
     return (
       <button
@@ -302,8 +316,7 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
       ref={rootRef}
       className="absolute right-0 top-2 bg-white shadow-1 z-1"
       style={{ width: 200 }}
-      onBlur={(e) => {
-
+      onBlur={e => {
         if (
           rootRef.current &&
           e.relatedTarget instanceof Node &&
@@ -311,7 +324,6 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
         ) {
           actions.closeTodoMenu(todoId)
         }
-
       }}
     >
       {items.map(viewItem)}
