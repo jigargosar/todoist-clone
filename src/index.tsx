@@ -519,7 +519,7 @@ const TodoItem: FC<{
   menuOpen: boolean
   projectId: ProjectId | null
   projectTitle: string
-}> = memo(function TodoItem({ todo, menuOpen }) {
+}> = memo(function TodoItem({ todo, menuOpen , projectId, projectTitle}) {
   const { actions } = useOvermind()
 
   function openTodoMenu() {
@@ -549,6 +549,12 @@ const TodoItem: FC<{
         onClick={() => actions.editTodoClicked(todo.id)}
       >
         {todo.title}
+      </div>
+      <div
+        className="ph1 pv1"
+        // onClick={() => actions.editTodoClicked(todo.id)}
+      >
+        <div className="f7 bg-light-pink bn bw1 br-pill ph1 lh-copy">{projectTitle}</div>
       </div>
       <div className="relative">
         <Button action={() => openTodoMenu()}>...</Button>
