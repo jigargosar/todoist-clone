@@ -124,6 +124,22 @@ const mergeEditingTodo:Action<EditingTodoPartial> = ({state}, editingTodo)=>{
   }
 }
 
+const saveEditingTodo:Action = ({state})=>{
+  const editingTodo = state.editingTodo
+  if (!editingTodo) return
+  const maybeTodo = state.todoList.find(
+    todo => todo.id === editingTodo.id,
+  )
+  if (maybeTodo) {
+    maybeTodo.title = editingTodo.title
+  }
+  state.editingTodo = null
+}
+
+const cancelEditingTodo:Action = ({state})=>{
+  state.editingTodo = null
+}
+
 
 
 
@@ -140,7 +156,9 @@ const config = {
     setDone,
     deleteTodo,
     editTodo,
-    mergeEditingTodo
+    mergeEditingTodo,
+    saveEditingTodo,
+    cancelEditingTodo
   },
   effects:{
 
