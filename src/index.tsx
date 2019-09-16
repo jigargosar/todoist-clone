@@ -7,11 +7,7 @@ import faker from 'faker'
 import times from 'ramda/es/times'
 import isHK from 'is-hotkey'
 import debounce from 'lodash.debounce'
-import {
-  Action, createOvermind,
-
-  IConfig,
-} from 'overmind'
+import { Action, createOvermind, IConfig } from 'overmind'
 
 import { createHook, Provider } from 'overmind-react'
 
@@ -23,7 +19,10 @@ type Project = {
 }
 
 function createFakeProject(): Project {
-  return { id: nanoid(), title: faker.hacker.ingverb() + faker.hacker.noun() }
+  return {
+    id: nanoid(),
+    title: faker.hacker.ingverb() + faker.hacker.noun(),
+  }
 }
 
 type TodoId = string
@@ -106,7 +105,6 @@ function getCachedState() {
 
 const cachedState: State = getCachedState()
 
-
 const openTodoMenu: Action<TodoId> = ({ state }, todoId: TodoId) => {
   state.todoPopup = { todoId }
 }
@@ -125,7 +123,9 @@ const setDone: Action<{ todoId: TodoId; isDone: boolean }> = (
   }
 }
 const deleteProject: Action<ProjectId> = ({ state }, projectId) => {
-  const maybeIdx = state.projectList.findIndex(project => project.id === projectId)
+  const maybeIdx = state.projectList.findIndex(
+    project => project.id === projectId,
+  )
   if (maybeIdx > -1) {
     state.projectList.splice(maybeIdx, 1)
   }
@@ -224,7 +224,6 @@ overmind.addMutationListener((mutation, paths, flushId) => {
   debouncedCacheStoreState(overmind.state)
 })
 
-
 const AppProvider: FC = ({ children }) => {
   return <Provider value={overmind}>{children}</Provider>
 }
@@ -232,7 +231,7 @@ const AppProvider: FC = ({ children }) => {
 function App() {
   return (
     <AppProvider>
-      <AppContent/>
+      <AppContent />
     </AppProvider>
   )
 }
@@ -242,17 +241,17 @@ function maybeAddingTodo(form: InlineTodoForm): AddingTodo | null {
 }
 
 function AppContent() {
-  const {state, actions} = useOvermind()
+  const { state, actions } = useOvermind()
 
   const addingTodo = maybeAddingTodo(state.inlineTodoForm)
   return (
     <div className="lh-copy" style={{ maxWidth: 500 }}>
       <div className="f4 pv1">ProjectList</div>
-      <ViewProjectList projectList={state.projectList}/>
+      <ViewProjectList projectList={state.projectList} />
       <div className="f4 pv1">TodoList</div>
-      <ViewTodoList todoList={state.todoList}/>
+      <ViewTodoList todoList={state.todoList} />
       {addingTodo ? (
-        <ViewAddTodoForm addingTodo={addingTodo}/>
+        <ViewAddTodoForm addingTodo={addingTodo} />
       ) : (
         <Button action={() => actions.addTodoClicked()}>Add Task</Button>
       )}
@@ -261,39 +260,42 @@ function AppContent() {
 }
 
 function ViewProjectList({ projectList }: { projectList: Project[] }) {
-  const {state, actions} = useOvermind()
+  const { state, actions } = useOvermind()
 
   return (
     <>
       {projectList.map(project => {
-        return <ProjectItem key={project.id} project={project}/>
+        return <ProjectItem key={project.id} project={project} />
       })}
     </>
   )
 }
 
-const ProjectItem: FC<{ project: Project }> = memo(
-  function ProjectItem({ project }) {
-    const {state, actions} = useOvermind()
-    return (
-      <div className="flex">
-        <div
-          className="ph1 pv1 flex-grow-1 lh-title"
-          // onClick={() => actions.editTodoClicked(project.id)}
-        >
-          {project.title}
-        </div>
-        <Button action={() => {
-          actions.deleteProject(project.id)
-        }}>X</Button>
+const ProjectItem: FC<{ project: Project }> = memo(function ProjectItem({
+  project,
+}) {
+  const { state, actions } = useOvermind()
+  return (
+    <div className="flex">
+      <div
+        className="ph1 pv1 flex-grow-1 lh-title"
+        // onClick={() => actions.editTodoClicked(project.id)}
+      >
+        {project.title}
       </div>
-    )
-  },
-)
-
+      <Button
+        action={() => {
+          actions.deleteProject(project.id)
+        }}
+      >
+        X
+      </Button>
+    </div>
+  )
+})
 
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
-  const {state, actions} = useOvermind()
+  const { state, actions } = useOvermind()
 
   return (
     <>
@@ -311,14 +313,14 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
           )
         }
         const menuOpen = isTodoPopupOpenFor(todo.id, state.todoPopup)
-        return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen}/>
+        return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen} />
       })}
     </>
   )
 }
 
 function ViewEditTodoForm({ editingTodo }: { editingTodo: EditingTodo }) {
-  const {state, actions} = useOvermind()
+  const { state, actions } = useOvermind()
   return (
     <div className="flex">
       <div className="ph1 pv2 flex-grow-1">
@@ -343,9 +345,9 @@ function ViewEditTodoForm({ editingTodo }: { editingTodo: EditingTodo }) {
 }
 
 const ViewAddTodoForm: FC<{ addingTodo: AddingTodo }> = ({
-                                                           addingTodo,
-                                                         }) => {
-  const {state, actions} = useOvermind()
+  addingTodo,
+}) => {
+  const { state, actions } = useOvermind()
   return (
     <div className="flex">
       <div className="ph1 pv2 flex-grow-1">
@@ -371,7 +373,7 @@ const ViewAddTodoForm: FC<{ addingTodo: AddingTodo }> = ({
 
 const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
   function TodoItem({ todo, menuOpen }) {
-    const {state, actions} = useOvermind()
+    const { state, actions } = useOvermind()
 
     function openTodoMenu() {
       actions.openTodoMenu(todo.id)
@@ -414,7 +416,7 @@ const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
           >
             ...
           </div>
-          {menuOpen && <OpenedTodoMenu todoId={todo.id}/>}
+          {menuOpen && <OpenedTodoMenu todoId={todo.id} />}
         </div>
       </div>
     )
@@ -422,7 +424,7 @@ const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
 )
 
 function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
-  const {state, actions} = useOvermind()
+  const { state, actions } = useOvermind()
 
   const rootRef: RefObject<HTMLDivElement> = useRef(null)
 
@@ -475,10 +477,10 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
 }
 
 const Button: FC<{ action: () => void; className?: string }> = ({
-                                                                  action,
-                                                                  className,
-                                                                  children,
-                                                                }) => (
+  action,
+  className,
+  children,
+}) => (
   <button
     className={`button-reset input-reset bn bg-inherit ph2 pv1 pointer blue${
       className ? className : ''
@@ -495,4 +497,4 @@ const Button: FC<{ action: () => void; className?: string }> = ({
   </button>
 )
 
-render(<App/>, document.getElementById('root'))
+render(<App />, document.getElementById('root'))
