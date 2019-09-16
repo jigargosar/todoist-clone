@@ -8,7 +8,6 @@ import React, {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from 'react'
@@ -20,8 +19,17 @@ import faker from 'faker'
 import times from 'ramda/es/times'
 import produce from 'immer'
 import isHK from 'is-hotkey'
-import { mergeRight, mapObjIndexed } from 'ramda'
+import { mergeRight } from 'ramda'
 import debounce from 'lodash.debounce'
+import {
+  createActionsHook,
+  createStateHook,
+  createStore,
+  IAction,
+  Provider,
+
+} from 'immer-store'
+
 
 type TodoId = string
 
@@ -45,6 +53,9 @@ function createFakeTodo(): Todo {
 }
 
 const initialTodos: Todo[] = times(createFakeTodo, 10)
+
+
+
 
 const defaultModel: Model = {
   todoPopup: null,
@@ -75,6 +86,36 @@ function getCachedModel() {
 const cachedModel: Model = getCachedModel()
 
 const initialModel: Model = mergeRight(defaultModel, cachedModel)
+
+
+
+interface Action<Payload = void> extends IAction<Payload, Config> {}
+
+const openTodoMenu:Action<TodoId> = ({state}, todoId:TodoId)=>{
+  state.todoPopup = {todoId}
+}
+
+const config = {
+  state: {
+    todoPopup: null,
+    todoList: initialTodos,
+    editingTodo: null,
+    ...initialModel
+  },
+  actions: {
+    openTodoMenu,
+  },
+  effects:{
+
+  }
+}
+
+type Config = typeof config
+
+const store = createStore(config)
+const useStoreActions = createActionsHook<Config>()
+const useStoreState = createStateHook<Config>()
+
 
 function exhaustiveCheck(never: never) {
   return never
@@ -135,7 +176,6 @@ function update(msg: Msg, model: Model): void {
 }
 
 const DispatcherContext = createContext((_: Msg) => {})
-const ActionsContext = createContext({})
 const ModelContext = createContext(initialModel)
 
 function useDispatchCallback(setModel: Dispatch<SetStateAction<Model>>) {
@@ -148,42 +188,23 @@ function useDispatchCallback(setModel: Dispatch<SetStateAction<Model>>) {
     [setModel],
   )
 }
-const actionDefs = {
-  openTodoMenu(model: Model, todoId: TodoId) {
-    model.todoPopup = { todoId }
-  },
-}
 
 const AppProvider: FC = ({ children }) => {
   const [model, setModel] = useState(initialModel)
 
   const dispatch = useDispatchCallback(setModel)
 
-  const prevModelRef = useRef(model)
-  useEffect(() => {
-    prevModelRef.current = model
-  }, [model])
 
-  const actions = useMemo(() => {
-    return mapObjIndexed(
-      <V, R>(fn: (model: Model, value: V) => R): ((value: V) => void) =>
-        function(value: V) {
-          const prevModel: Model = prevModelRef.current
-          const newModel = produce(prevModel, (draft: Model) => {
-            fn(draft, value)
-          })
-          setModel(newModel)
-        },
-    )(actionDefs)
-  }, [prevModelRef, setModel])
 
   return (
     <DispatcherContext.Provider value={dispatch}>
-      <ActionsContext.Provider value={actions}>
+
         <ModelContext.Provider value={model}>
+          <Provider store={store}>
           {children}
+          </Provider>
         </ModelContext.Provider>
-      </ActionsContext.Provider>
+
     </DispatcherContext.Provider>
   )
 }
@@ -197,12 +218,13 @@ function App() {
 }
 
 function AppContent() {
-  const model = useContext(ModelContext)
+
   useCacheModelEffect()
+  const state = useStoreState()
   return (
     <div className="lh-copy" style={{ maxWidth: 500 }}>
       <div className="f4 pv1">TodoList</div>
-      <ViewTodoList todoList={model.todoList} />
+      <ViewTodoList todoList={state.todoList} />
     </div>
   )
 }
@@ -265,12 +287,13 @@ function TodoEditItem({ editingTodo }: { editingTodo: EditingTodo }) {
 const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
   function TodoItem({ todo, menuOpen }) {
     const dispatch = useContext(DispatcherContext)
-
+    const actions = useStoreActions()
     function openTodoMenu() {
       dispatch({
         tag: 'OpenTodoMenu',
         todoId: todo.id,
       })
+      actions.openTodoMenu(todo.id)
     }
 
     function setDone(isDone: boolean) {
