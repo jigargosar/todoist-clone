@@ -16,6 +16,18 @@ import {
 } from 'immer-store'
 import { Immutable } from 'immer'
 
+type ProjectId = string
+
+type Project = {
+  id: ProjectId
+  title: string
+
+}
+
+function createFakeProject(): Project {
+  return { id: nanoid(), title: faker.hacker.ingverb() + faker.hacker.noun() }
+}
+
 type TodoId = string
 
 type Todo = {
@@ -68,14 +80,17 @@ type State = {
   todoPopup: TodoPopup | null
   todoList: Todo[]
   inlineTodoForm: AddingTodo | EditingTodo | null
+  projectList: Project[]
 }
 
 const initialTodos: Todo[] = times(createFakeTodo, 10)
+const initialProjects: Project[] = times(createFakeProject, 5)
 
 const defaultState: State = {
   todoPopup: null,
   todoList: initialTodos,
   inlineTodoForm: null,
+  projectList: initialProjects,
 }
 
 function cacheStoreState(state: Immutable<State>) {
@@ -93,7 +108,8 @@ function getCachedState() {
 
 const cachedState: State = getCachedState()
 
-interface Action<Payload = void> extends IAction<Payload, StoreConfig> {}
+interface Action<Payload = void> extends IAction<Payload, StoreConfig> {
+}
 
 const openTodoMenu: Action<TodoId> = ({ state }, todoId: TodoId) => {
   state.todoPopup = { todoId }
@@ -110,6 +126,12 @@ const setDone: Action<{ todoId: TodoId; isDone: boolean }> = (
   const maybeTodo = state.todoList.find(todo => todo.id === todoId)
   if (maybeTodo) {
     maybeTodo.isDone = isDone
+  }
+}
+const deleteProject: Action<ProjectId> = ({ state }, projectId) => {
+  const maybeIdx = state.projectList.findIndex(project => project.id === projectId)
+  if (maybeIdx > -1) {
+    state.projectList.splice(maybeIdx, 1)
   }
 }
 const deleteTodo: Action<TodoId> = ({ state }, todoId) => {
@@ -190,6 +212,7 @@ const config = {
     cancelInlineTodoFormClicked,
     addTodoClicked,
     saveInlineTodoFormClicked,
+    deleteProject,
   },
   effects: {},
 }
@@ -210,7 +233,7 @@ const AppProvider: FC = ({ children }) => {
 function App() {
   return (
     <AppProvider>
-      <AppContent />
+      <AppContent/>
     </AppProvider>
   )
 }
@@ -225,16 +248,50 @@ function AppContent() {
   const addingTodo = maybeAddingTodo(state.inlineTodoForm)
   return (
     <div className="lh-copy" style={{ maxWidth: 500 }}>
+      <div className="f4 pv1">ProjectList</div>
+      <ViewProjectList projectList={state.projectList}/>
       <div className="f4 pv1">TodoList</div>
-      <ViewTodoList todoList={state.todoList} />
+      <ViewTodoList todoList={state.todoList}/>
       {addingTodo ? (
-        <ViewAddTodoForm addingTodo={addingTodo} />
+        <ViewAddTodoForm addingTodo={addingTodo}/>
       ) : (
         <Button action={() => actions.addTodoClicked()}>Add Task</Button>
       )}
     </div>
   )
 }
+
+function ViewProjectList({ projectList }: { projectList: Project[] }) {
+  const state = useStoreState()
+
+  return (
+    <>
+      {projectList.map(project => {
+        return <ProjectItem key={project.id} project={project}/>
+      })}
+    </>
+  )
+}
+
+const ProjectItem: FC<{ project: Project }> = memo(
+  function ProjectItem({ project }) {
+    const actions = useStoreActions()
+    return (
+      <div className="flex">
+        <div
+          className="ph1 pv1 flex-grow-1 lh-title"
+          // onClick={() => actions.editTodoClicked(project.id)}
+        >
+          {project.title}
+        </div>
+        <Button action={() => {
+          actions.deleteProject(project.id)
+        }}>X</Button>
+      </div>
+    )
+  },
+)
+
 
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
   const state = useStoreState()
@@ -255,7 +312,7 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
           )
         }
         const menuOpen = isTodoPopupOpenFor(todo.id, state.todoPopup)
-        return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen} />
+        return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen}/>
       })}
     </>
   )
@@ -287,8 +344,8 @@ function ViewEditTodoForm({ editingTodo }: { editingTodo: EditingTodo }) {
 }
 
 const ViewAddTodoForm: FC<{ addingTodo: AddingTodo }> = ({
-  addingTodo,
-}) => {
+                                                           addingTodo,
+                                                         }) => {
   const actions = useStoreActions()
   return (
     <div className="flex">
@@ -358,7 +415,7 @@ const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
           >
             ...
           </div>
-          {menuOpen && <OpenedTodoMenu todoId={todo.id} />}
+          {menuOpen && <OpenedTodoMenu todoId={todo.id}/>}
         </div>
       </div>
     )
@@ -419,10 +476,10 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
 }
 
 const Button: FC<{ action: () => void; className?: string }> = ({
-  action,
-  className,
-  children,
-}) => (
+                                                                  action,
+                                                                  className,
+                                                                  children,
+                                                                }) => (
   <button
     className={`button-reset input-reset bn bg-inherit ph2 pv1 pointer blue${
       className ? className : ''
@@ -439,4 +496,4 @@ const Button: FC<{ action: () => void; className?: string }> = ({
   </button>
 )
 
-render(<App />, document.getElementById('root'))
+render(<App/>, document.getElementById('root'))
