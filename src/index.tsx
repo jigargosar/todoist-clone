@@ -10,17 +10,56 @@ import debounce from 'lodash.debounce'
 import { Action, createOvermind, IConfig } from 'overmind'
 
 import { createHook, Provider } from 'overmind-react'
+import equals from 'ramda/es/equals'
 
-type ProjectId = string
+type ProjectId = { tag: 'ProjectId'; value: string }
+
+const ProjectId = {
+  gen(): ProjectId {
+    return { tag: 'ProjectId', value: nanoid() }
+  },
+  toString(projectId: ProjectId) {
+    return projectId.value
+  },
+
+  eq(a: ProjectId) {
+    return function eq(b: ProjectId) {
+      return equals(a, b)
+    }
+  },
+}
 
 type Project = {
   id: ProjectId
   title: string
 }
 
+const Project = {
+  idEq(id: ProjectId) {
+    return function idEq(project: Project) {
+      return ProjectId.eq(id)(project.id)
+    }
+  },
+}
+type ProjectList = Project[]
+
+const ProjectList = {
+  findById(projectId:ProjectId){
+    return function findById(projectList: ProjectList) {
+      return projectList.find(Project.idEq(projectId))
+    }
+  },
+  findIndexById(projectId:ProjectId){
+    return function findIndexById(projectList: ProjectList) {
+      return projectList.findIndex(Project.idEq(projectId))
+    }
+  }
+}
+
+
 function createFakeProject(): Project {
   return {
-    id: nanoid(),
+    id: ProjectId.gen(),
     title: faker.hacker.ingverb() + ' ' + faker.hacker.noun(),
   }
 }
@@ -123,9 +162,7 @@ const setDone: Action<{ todoId: TodoId; isDone: boolean }> = (
   }
 }
 const deleteProject: Action<ProjectId> = ({ state }, projectId) => {
-  const maybeIdx = state.projectList.findIndex(
-    project => project.id === projectId,
-  )
+  const maybeIdx = ProjectList.findIndexById(projectId)(state.projectList)
   if (maybeIdx > -1) {
     state.projectList.splice(maybeIdx, 1)
   }
@@ -151,12 +188,12 @@ const addTodoClicked: Action = ctx => {
   state.inlineTodoForm = createAddingTodo()
 }
 
-const addFakeTodoClicked: Action = ({state}) => {
+const addFakeTodoClicked: Action = ({ state }) => {
   const todo = createFakeTodo()
   state.todoList.push(todo)
 }
 
-const addFakeProjectClicked: Action = ({state}) => {
+const addFakeProjectClicked: Action = ({ state }) => {
   const project = createFakeProject()
   state.projectList.push(project)
 }
@@ -220,7 +257,7 @@ const config = {
     saveInlineTodoFormClicked,
     deleteProject,
     addFakeTodoClicked,
-    addFakeProjectClicked
+    addFakeProjectClicked,
   },
   effects: {},
 }
@@ -286,7 +323,12 @@ function ViewProjectList({ projectList }: { projectList: Project[] }) {
   return (
     <>
       {projectList.map(project => {
-        return <ProjectItem key={project.id} project={project} />
+        return (
+          <ProjectItem
+            key={ProjectId.toString(project.id)}
+            project={project}
+          />
+        )
       })}
     </>
   )
