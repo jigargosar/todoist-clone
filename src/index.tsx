@@ -93,8 +93,7 @@ function getCachedState() {
 
 const cachedState: State = getCachedState()
 
-interface Action<Payload = void> extends IAction<Payload, StoreConfig> {
-}
+interface Action<Payload = void> extends IAction<Payload, StoreConfig> {}
 
 const openTodoMenu: Action<TodoId> = ({ state }, todoId: TodoId) => {
   state.todoPopup = { todoId }
@@ -121,7 +120,7 @@ const deleteTodo: Action<TodoId> = ({ state }, todoId) => {
 }
 
 const editTodoClicked: Action<TodoId> = (ctx, todoId) => {
-  const {state} = ctx
+  const { state } = ctx
   const maybeTodo = state.todoList.find(todo => todo.id === todoId)
   if (maybeTodo) {
     saveInlineTodoFormClicked(ctx)
@@ -172,7 +171,6 @@ const saveInlineTodoFormClicked: Action = ctx => {
   saveAddingTodo(ctx)
 }
 
-
 const config = {
   state: {
     ...defaultState,
@@ -208,7 +206,7 @@ const AppProvider: FC = ({ children }) => {
 function App() {
   return (
     <AppProvider>
-      <AppContent/>
+      <AppContent />
     </AppProvider>
   )
 }
@@ -223,8 +221,8 @@ function AppContent() {
   return (
     <div className="lh-copy" style={{ maxWidth: 500 }}>
       <div className="f4 pv1">TodoList</div>
-      <ViewTodoList todoList={state.todoList}/>
-      {!!addingTodo && <ViewAddTodoForm addingTodo={addingTodo}/>}
+      <ViewTodoList todoList={state.todoList} />
+      {!!addingTodo && <ViewAddTodoForm addingTodo={addSingTodo} />}
     </div>
   )
 }
@@ -248,7 +246,7 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
           )
         }
         const menuOpen = isTodoPopupOpenFor(todo.id, state.todoPopup)
-        return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen}/>
+        return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen} />
       })}
     </>
   )
@@ -280,8 +278,8 @@ function ViewEditTodoForm({ editingTodo }: { editingTodo: EditingTodo }) {
 }
 
 const ViewAddTodoForm: FC<{ addingTodo: AddingTodo }> = ({
-                                                           addingTodo,
-                                                         }) => {
+  addingTodo,
+}) => {
   const actions = useStoreActions()
   return (
     <div className="flex">
@@ -346,7 +344,7 @@ const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
           >
             ...
           </div>
-          {menuOpen && <OpenedTodoMenu todoId={todo.id}/>}
+          {menuOpen && <OpenedTodoMenu todoId={todo.id} />}
         </div>
       </div>
     )
@@ -407,10 +405,10 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
 }
 
 const Button: FC<{ action: () => void; className?: string }> = ({
-                                                                  action,
-                                                                  className,
-                                                                  children,
-                                                                }) => (
+  action,
+  className,
+  children,
+}) => (
   <button
     className={`button-reset input-reset bn bg-inherit ph2 pv1 pointer${
       className ? className : ''
@@ -427,4 +425,4 @@ const Button: FC<{ action: () => void; className?: string }> = ({
   </button>
 )
 
-render(<App/>, document.getElementById('root'))
+render(<App />, document.getElementById('root'))
