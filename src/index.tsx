@@ -22,26 +22,38 @@ type EditingTodo = { id: TodoId; title: string }
 
 type TodoPopup = { todoId: string }
 
+
+function isTodoPopupOpenFor(
+  todoId: TodoId,
+  todoPopup: TodoPopup | null,
+): boolean {
+  return !!todoPopup && todoPopup.todoId === todoId
+}
+
+function maybeEditingTodoFor(todoId:TodoId, editingTodo:EditingTodo|null) {
+  return editingTodo && editingTodo.id === todoId ? editingTodo : null
+}
+function createFakeTodo(): Todo {
+  return { id: nanoid(), title: faker.hacker.phrase(), isDone: false }
+}
+
+
 type State = {
   todoPopup: TodoPopup | null
   todoList: Todo[]
   editingTodo: EditingTodo | null
 }
 
-function createFakeTodo(): Todo {
-  return { id: nanoid(), title: faker.hacker.phrase(), isDone: false }
-}
-
 const initialTodos: Todo[] = times(createFakeTodo, 10)
 
-const initialState: State = {
+const defaultState: State = {
   todoPopup: null,
   todoList: initialTodos,
   editingTodo: null,
 }
 
-function cacheStoreState(model: Immutable<State>) {
-  const serializedModel = JSON.stringify(model)
+function cacheStoreState(state: Immutable<State>) {
+  const serializedModel = JSON.stringify(state)
   if (serializedModel) {
     localStorage.setItem('todoist-clone-model', serializedModel)
   }
@@ -49,13 +61,11 @@ function cacheStoreState(model: Immutable<State>) {
 
 const debouncedCacheStoreState = debounce(cacheStoreState, 1000)
 
-function getCachedModel() {
+function getCachedState() {
   return JSON.parse(localStorage.getItem('todoist-clone-model') || '{}')
 }
 
-const cachedModel: State = getCachedModel()
-
-const initialModel: State = mergeRight(initialState, cachedModel)
+const cachedState: State = getCachedState()
 
 interface Action<Payload = void> extends IAction<Payload, Config> {}
 
@@ -115,10 +125,8 @@ const cancelEditingTodo: Action = ({ state }) => {
 
 const config = {
   state: {
-    todoPopup: null,
-    todoList: initialTodos,
-    editingTodo: null,
-    ...initialModel,
+    ...defaultState,
+    ...cachedState,
   },
   actions: {
     openTodoMenu,
@@ -142,16 +150,6 @@ store.subscribe(state => {
 const useStoreActions = createActionsHook<Config>()
 const useStoreState = createStateHook<Config>()
 
-function isTodoPopupOpenFor(
-  todoId: TodoId,
-  todoPopup: TodoPopup | null,
-): boolean {
-  return !!todoPopup && todoPopup.todoId === todoId
-}
-
-function maybeEditingTodoFor(todoId:TodoId, editingTodo:EditingTodo|null) {
-  return editingTodo && editingTodo.id === todoId ? editingTodo : null
-}
 
 const AppProvider: FC = ({ children }) => {
   return <Provider store={store}>{children}</Provider>
