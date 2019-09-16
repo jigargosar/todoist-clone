@@ -17,9 +17,24 @@ type Todo = {
   title: string
   isDone: boolean
 }
+
+function createFakeTodo(): Todo {
+  return { id: nanoid(), title: faker.hacker.phrase(), isDone: false }
+}
+
+
 type TodoFormFields = { title: string }
 type EditingTodo = { tag: 'EditingTodo'; id: TodoId } & TodoFormFields
+
+function createEditingTodo(maybeTodo: Todo): EditingTodo {
+  return { tag: 'EditingTodo', id: maybeTodo.id, title: maybeTodo.title }
+}
+
 type AddingTodo = { tag: 'AddingTodo' } & TodoFormFields
+
+function createAddingTodo():AddingTodo {
+  return {tag:'AddingTodo', title:''}
+}
 
 type InlineTodoForm = AddingTodo | EditingTodo | null
 
@@ -46,9 +61,6 @@ function isTodoPopupOpenFor(
 
 
 
-function createFakeTodo(): Todo {
-  return { id: nanoid(), title: faker.hacker.phrase(), isDone: false }
-}
 
 type State = {
   todoPopup: TodoPopup | null
@@ -106,9 +118,6 @@ const deleteTodo: Action<TodoId> = ({ state }, todoId) => {
   }
 }
 
-function createEditingTodo(maybeTodo: Todo): EditingTodo {
-  return { tag: 'EditingTodo', id: maybeTodo.id, title: maybeTodo.title }
-}
 
 const editTodo: Action<TodoId> = ({ state }, todoId) => {
   const maybeTodo = state.todoList.find(todo => todo.id === todoId)
@@ -128,9 +137,8 @@ const mergeEditingTodo: Action<TodoFormFields> = (
 }
 
 const saveEditingTodo: Action = ({ state }) => {
-  const editingTodo = state.inlineTodoForm
-  if (!editingTodo || editingTodo.tag !== 'EditingTodo') return
-
+  const editingTodo = maybeEditingTodo(state.inlineTodoForm)
+  if (!editingTodo) return
 
   const maybeTodo = state.todoList.find(todo => todo.id === editingTodo.id)
   if (maybeTodo) {
@@ -141,6 +149,12 @@ const saveEditingTodo: Action = ({ state }) => {
 
 const cancelEditingTodo: Action = ({ state }) => {
   state.inlineTodoForm = null
+}
+
+const addTodoClicked: Action = (ctx) =>{
+  const {state} = ctx
+  saveEditingTodo(ctx)
+  state.inlineTodoForm = createAddingTodo()
 }
 
 const config = {
@@ -157,6 +171,7 @@ const config = {
     mergeEditingTodo,
     saveEditingTodo,
     cancelEditingTodo,
+    addTodoClicked
   },
   effects: {},
 }
