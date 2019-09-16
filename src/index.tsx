@@ -271,17 +271,7 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
     return () => actions.closeTodoMenu(todoId)
   })
 
-  const onBlurCallback = useCallback((e) => {
 
-      if (
-        rootRef.current &&
-        e.relatedTarget &&
-        !rootRef.current.contains(e.relatedTarget)
-      ) {
-        actions.closeTodoMenu(todoId)
-      }
-
-  }, [])
 
   function viewItem([action, label]: [() => void, string], idx: number) {
     return (
@@ -312,7 +302,17 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
       ref={rootRef}
       className="absolute right-0 top-2 bg-white shadow-1 z-1"
       style={{ width: 200 }}
-      onBlur={onBlurCallback}
+      onBlur={(e) => {
+
+        if (
+          rootRef.current &&
+          e.relatedTarget instanceof Node &&
+          !rootRef.current.contains(e.relatedTarget)
+        ) {
+          actions.closeTodoMenu(todoId)
+        }
+
+      }}
     >
       {items.map(viewItem)}
     </div>
