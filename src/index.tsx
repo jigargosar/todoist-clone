@@ -217,12 +217,14 @@ function maybeAddingTodo(form: InlineTodoForm): AddingTodo | null {
 
 function AppContent() {
   const state = useStoreState()
+  const actions = useStoreActions()
   const addingTodo = maybeAddingTodo(state.inlineTodoForm)
   return (
     <div className="lh-copy" style={{ maxWidth: 500 }}>
       <div className="f4 pv1">TodoList</div>
       <ViewTodoList todoList={state.todoList} />
-      {!!addingTodo && <ViewAddTodoForm addingTodo={addingTodo} />}
+      {addingTodo?  <ViewAddTodoForm addingTodo={addingTodo} /> :
+      <Button action={()=>actions.addTodoClicked()}>Add Task</Button>}
     </div>
   )
 }
