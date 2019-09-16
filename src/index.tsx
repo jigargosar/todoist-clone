@@ -1,4 +1,11 @@
-import React, { ButtonHTMLAttributes, FC, memo, RefObject, useEffect, useRef } from 'react'
+import React, {
+  ButtonHTMLAttributes,
+  FC,
+  memo,
+  RefObject,
+  useEffect,
+  useRef,
+} from 'react'
 import { render } from 'react-dom'
 import 'tachyons'
 import './index.css'
@@ -159,7 +166,9 @@ function maybeEditingTodoFor(
   form: InlineTodoForm,
 ): EditingTodo | null {
   const editingTodo = maybeEditingTodo(form)
-  return editingTodo && TodoId.eq(editingTodo.id)(todoId) ? editingTodo : null
+  return editingTodo && TodoId.eq(editingTodo.id)(todoId)
+    ? editingTodo
+    : null
 }
 
 type TodoPopup = { todoId: TodoId }
@@ -373,7 +382,7 @@ function AppContent() {
 }
 
 function ViewProjectList({ projectList }: { projectList: Project[] }) {
-  const { } = useOvermind()
+  const {} = useOvermind()
 
   return (
     <>
@@ -392,7 +401,7 @@ function ViewProjectList({ projectList }: { projectList: Project[] }) {
 const ProjectItem: FC<{ project: Project }> = memo(function ProjectItem({
   project,
 }) {
-  const {  actions } = useOvermind()
+  const { actions } = useOvermind()
   return (
     <div className="flex">
       <div
@@ -413,7 +422,7 @@ const ProjectItem: FC<{ project: Project }> = memo(function ProjectItem({
 })
 
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
-  const { state, } = useOvermind()
+  const { state } = useOvermind()
 
   return (
     <>
@@ -444,7 +453,7 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
 }
 
 function ViewEditTodoForm({ editingTodo }: { editingTodo: EditingTodo }) {
-  const {  actions } = useOvermind()
+  const { actions } = useOvermind()
   return (
     <div className="flex">
       <div className="ph1 pv2 flex-grow-1">
@@ -471,7 +480,7 @@ function ViewEditTodoForm({ editingTodo }: { editingTodo: EditingTodo }) {
 const ViewAddTodoForm: FC<{ addingTodo: AddingTodo }> = ({
   addingTodo,
 }) => {
-  const {  actions } = useOvermind()
+  const { actions } = useOvermind()
   return (
     <div className="flex">
       <div className="ph1 pv2 flex-grow-1">
@@ -497,7 +506,7 @@ const ViewAddTodoForm: FC<{ addingTodo: AddingTodo }> = ({
 
 const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
   function TodoItem({ todo, menuOpen }) {
-    const {  actions } = useOvermind()
+    const { actions } = useOvermind()
 
     function openTodoMenu() {
       actions.openTodoMenu(todo.id)
@@ -528,11 +537,7 @@ const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
           {todo.title}
         </div>
         <div className="relative">
-          <Button
-            action={() => openTodoMenu()}
-          >
-            ...
-          </Button>
+          <Button action={() => openTodoMenu()}>...</Button>
           {menuOpen && <OpenedTodoMenu todoId={todo.id} />}
         </div>
       </div>
@@ -541,7 +546,7 @@ const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
 )
 
 function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
-  const {  actions } = useOvermind()
+  const { actions } = useOvermind()
 
   const rootRef: RefObject<HTMLDivElement> = useRef(null)
 
@@ -574,9 +579,10 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
       style={{ width: 200 }}
       onBlur={e => {
         if (
-          rootRef.current &&
-          e.relatedTarget instanceof Node &&
-          !rootRef.current.contains(e.relatedTarget)
+          e.relatedTarget === null ||
+          (e.relatedTarget instanceof Node &&
+            rootRef.current &&
+            !rootRef.current.contains(e.relatedTarget))
         ) {
           actions.closeTodoMenu(todoId)
         }
@@ -587,12 +593,11 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   )
 }
 
-const Button: FC<{ action: () => void; className?: string } & ButtonHTMLAttributes<HTMLButtonElement>> = ({
-  action,
-  className,
-  children,
-  ...other
-}) => (
+const Button: FC<
+  { action: () => void; className?: string } & ButtonHTMLAttributes<
+    HTMLButtonElement
+  >
+> = ({ action, className, children, ...other }) => (
   <button
     className={`button-reset input-reset bn bg-inherit ph2 pv1 pointer blue${
       className ? className : ''
