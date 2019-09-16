@@ -160,7 +160,7 @@ function maybeEditingTodoFor(
   form: InlineTodoForm,
 ): EditingTodo | null {
   const editingTodo = maybeEditingTodo(form)
-  return editingTodo && editingTodo.id === todoId ? editingTodo : null
+  return editingTodo && TodoId.eq(editingTodo.id)(todoId) ? editingTodo : null
 }
 
 type TodoPopup = { todoId: TodoId }
@@ -267,7 +267,7 @@ const saveEditingTodo: Action = ({ state }) => {
   const editingTodo = maybeEditingTodo(state.inlineTodoForm)
   if (!editingTodo) return
 
-  const maybeTodo = state.todoList.find(todo => todo.id === editingTodo.id)
+  const maybeTodo = TodoList.findById(editingTodo.id)(state.todoList)
   if (maybeTodo) {
     maybeTodo.title = editingTodo.title
   }
@@ -529,18 +529,11 @@ const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
           {todo.title}
         </div>
         <div className="relative">
-          <div
-            className="ph1 b pointer"
-            onClick={() => openTodoMenu()}
-            tabIndex={0}
-            onKeyDown={e => {
-              if (isHK(['enter', 'space'], e.nativeEvent)) {
-                openTodoMenu()
-              }
-            }}
+          <Button
+            action={() => openTodoMenu()}
           >
             ...
-          </div>
+          </Button>
           {menuOpen && <OpenedTodoMenu todoId={todo.id} />}
         </div>
       </div>
@@ -610,13 +603,7 @@ const Button: FC<{ action: () => void; className?: string }> = ({
     className={`button-reset input-reset bn bg-inherit ph2 pv1 pointer blue${
       className ? className : ''
     }`}
-    tabIndex={0}
     onClick={action}
-    onKeyDown={e => {
-      if (isHK(['enter', 'space'], e.nativeEvent)) {
-        action()
-      }
-    }}
   >
     {children}
   </button>
