@@ -217,9 +217,7 @@ function TodoEditItem({ editingTodo }: { editingTodo: EditingTodo }) {
           type="text"
           className="ph1 pv1 lh-copy w-100"
           value={editingTodo.title}
-          onChange={e => {
-            actions.mergeEditingTodo({ title: e.target.value })
-          }}
+          onChange={e => actions.mergeEditingTodo({ title: e.target.value })}
         />
         <div className="flex pv1">
           <Button action={() => actions.saveEditingTodo()}>Save</Button>
