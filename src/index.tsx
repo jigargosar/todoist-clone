@@ -156,6 +156,11 @@ const addFakeTodoClicked: Action = ({state}) => {
   state.todoList.push(todo)
 }
 
+const addFakeProjectClicked: Action = ({state}) => {
+  const project = createFakeProject()
+  state.projectList.push(project)
+}
+
 const updateTodoForm: Action<Partial<TodoFormFields>> = (
   { state },
   formFields,
