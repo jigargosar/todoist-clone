@@ -1,11 +1,4 @@
-import React, {
-  FC,
-  memo,
-  RefObject,
-  useCallback,
-  useEffect,
-  useRef,
-} from 'react'
+import React, { FC, memo, RefObject, useEffect, useRef } from 'react'
 import { render } from 'react-dom'
 import 'tachyons'
 import './index.css'
@@ -14,13 +7,7 @@ import faker from 'faker'
 import times from 'ramda/es/times'
 import isHK from 'is-hotkey'
 import debounce from 'lodash.debounce'
-import {
-  createActionsHook,
-  createStateHook,
-  createStore,
-  IAction,
-  Provider,
-} from 'immer-store'
+import { createActionsHook, createStateHook, createStore, IAction, Provider } from 'immer-store'
 import { Immutable } from 'immer'
 
 type TodoId = string
@@ -30,7 +17,23 @@ type Todo = {
   title: string
   isDone: boolean
 }
-type EditingTodo = { tag: 'EditingTodo'; id: TodoId; title: string }
+type TodoFormFields = { title: string }
+type EditingTodo = { tag: 'EditingTodo'; id: TodoId } & TodoFormFields
+type AddingTodo = { tag: 'AddingTodo' } & TodoFormFields
+
+type InlineTodoForm = AddingTodo | EditingTodo | null
+
+function maybeEditingTodo(form: InlineTodoForm):EditingTodo | null {
+  return (form && form.tag ==='EditingTodo') ? form : null
+}
+
+function maybeEditingTodoFor(
+  todoId: TodoId,
+  form: InlineTodoForm,
+):EditingTodo | null {
+  const editingTodo = maybeEditingTodo(form)
+  return editingTodo && editingTodo.id === todoId ? editingTodo : null
+}
 
 type TodoPopup = { todoId: string }
 
@@ -41,12 +44,8 @@ function isTodoPopupOpenFor(
   return !!todoPopup && todoPopup.todoId === todoId
 }
 
-function maybeEditingTodoFor(
-  todoId: TodoId,
-  editingTodo: EditingTodo | null,
-) {
-  return editingTodo && editingTodo.id === todoId ? editingTodo : null
-}
+
+
 function createFakeTodo(): Todo {
   return { id: nanoid(), title: faker.hacker.phrase(), isDone: false }
 }
@@ -54,7 +53,7 @@ function createFakeTodo(): Todo {
 type State = {
   todoPopup: TodoPopup | null
   todoList: Todo[]
-  editingTodo: EditingTodo | null
+  editingTodo: AddingTodo | EditingTodo | null
 }
 
 const initialTodos: Todo[] = times(createFakeTodo, 10)
@@ -80,7 +79,8 @@ function getCachedState() {
 
 const cachedState: State = getCachedState()
 
-interface Action<Payload = void> extends IAction<Payload, StoreConfig> {}
+interface Action<Payload = void> extends IAction<Payload, StoreConfig> {
+}
 
 const openTodoMenu: Action<TodoId> = ({ state }, todoId: TodoId) => {
   state.todoPopup = { todoId }
@@ -117,8 +117,8 @@ const editTodo: Action<TodoId> = ({ state }, todoId) => {
   }
 }
 
-type EditingTodoPartial = Partial<Omit<EditingTodo, 'id'>>
-const mergeEditingTodo: Action<EditingTodoPartial> = (
+
+const mergeEditingTodo: Action<TodoFormFields> = (
   { state },
   editingTodo,
 ) => {
@@ -129,7 +129,9 @@ const mergeEditingTodo: Action<EditingTodoPartial> = (
 
 const saveEditingTodo: Action = ({ state }) => {
   const editingTodo = state.editingTodo
-  if (!editingTodo) return
+  if (!editingTodo || editingTodo.tag !== 'EditingTodo') return
+
+
   const maybeTodo = state.todoList.find(todo => todo.id === editingTodo.id)
   if (maybeTodo) {
     maybeTodo.title = editingTodo.title
@@ -175,7 +177,7 @@ const AppProvider: FC = ({ children }) => {
 function App() {
   return (
     <AppProvider>
-      <AppContent />
+      <AppContent/>
     </AppProvider>
   )
 }
@@ -185,7 +187,7 @@ function AppContent() {
   return (
     <div className="lh-copy" style={{ maxWidth: 500 }}>
       <div className="f4 pv1">TodoList</div>
-      <ViewTodoList todoList={state.todoList} />
+      <ViewTodoList todoList={state.todoList}/>
     </div>
   )
 }
@@ -202,11 +204,11 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
         )
         if (maybeEditingTodo) {
           return (
-            <TodoEditItem key={todo.id} editingTodo={maybeEditingTodo} />
+            <TodoEditItem key={todo.id} editingTodo={maybeEditingTodo}/>
           )
         }
         const menuOpen = isTodoPopupOpenFor(todo.id, state.todoPopup)
-        return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen} />
+        return <TodoItem key={todo.id} todo={todo} menuOpen={menuOpen}/>
       })}
     </>
   )
@@ -240,6 +242,7 @@ function TodoEditItem({ editingTodo }: { editingTodo: EditingTodo }) {
 const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
   function TodoItem({ todo, menuOpen }) {
     const actions = useStoreActions()
+
     function openTodoMenu() {
       actions.openTodoMenu(todo.id)
     }
@@ -276,7 +279,7 @@ const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
           >
             ...
           </div>
-          {menuOpen && <OpenedTodoMenu todoId={todo.id} />}
+          {menuOpen && <OpenedTodoMenu todoId={todo.id}/>}
         </div>
       </div>
     )
@@ -337,10 +340,10 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
 }
 
 const Button: FC<{ action: () => void; className?: string }> = ({
-  action,
-  className,
-  children,
-}) => (
+                                                                  action,
+                                                                  className,
+                                                                  children,
+                                                                }) => (
   <button
     className={`button-reset input-reset bn bg-inherit ph2 pv1 pointer${
       className ? className : ''
@@ -357,4 +360,4 @@ const Button: FC<{ action: () => void; className?: string }> = ({
   </button>
 )
 
-render(<App />, document.getElementById('root'))
+render(<App/>, document.getElementById('root'))
