@@ -11,6 +11,8 @@ import { Action, createOvermind, IConfig } from 'overmind'
 
 import { createHook, Provider } from 'overmind-react'
 import equals from 'ramda/es/equals'
+import { Simulate } from 'react-dom/test-utils'
+import play = Simulate.play
 
 type ProjectId = { tag: 'ProjectId'; value: string }
 
@@ -40,27 +42,30 @@ const Project = {
       return ProjectId.eq(id)(project.id)
     }
   },
+  createFake(): Project {
+    return {
+      id: ProjectId.gen(),
+      title: faker.hacker.ingverb() + ' ' + faker.hacker.noun(),
+    }
+  },
 }
 type ProjectList = Project[]
 
 const ProjectList = {
-  findById(projectId:ProjectId){
+  findById(projectId: ProjectId) {
     return function findById(projectList: ProjectList) {
       return projectList.find(Project.idEq(projectId))
     }
   },
-  findIndexById(projectId:ProjectId){
+  findIndexById(projectId: ProjectId) {
     return function findIndexById(projectList: ProjectList) {
       return projectList.findIndex(Project.idEq(projectId))
     }
-  }
-}
-
-
-function createFakeProject(): Project {
-  return {
-    id: ProjectId.gen(),
-    title: faker.hacker.ingverb() + ' ' + faker.hacker.noun(),
+  },
+  append(project:Project){
+    return function append(projectList: ProjectList){
+      return [...projectList, project]
+    }
   }
 }
 
@@ -120,7 +125,7 @@ type State = {
 }
 
 const initialTodos: Todo[] = times(createFakeTodo, 10)
-const initialProjects: Project[] = times(createFakeProject, 5)
+const initialProjects: Project[] = times(Project.createFake, 5)
 
 const defaultState: State = {
   todoPopup: null,
@@ -194,8 +199,9 @@ const addFakeTodoClicked: Action = ({ state }) => {
 }
 
 const addFakeProjectClicked: Action = ({ state }) => {
-  const project = createFakeProject()
-  state.projectList.push(project)
+  const project = Project.createFake()
+  state.projectList = ProjectList.append(project)(state.projectList)
+  // state.projectList.push(project)
 }
 
 const updateTodoForm: Action<Partial<TodoFormFields>> = (
