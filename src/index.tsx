@@ -100,6 +100,7 @@ const editTodo: Action<TodoId> = ({ state }, todoId) => {
   }
 }
 
+type EditingTodoPartial = Partial<Omit<EditingTodo, 'id'>>
 const mergeEditingTodo: Action<EditingTodoPartial> = (
   { state },
   editingTodo,
@@ -152,7 +153,13 @@ store.subscribe(state => {
 const useStoreActions = createActionsHook<Config>()
 const useStoreState = createStateHook<Config>()
 
-type EditingTodoPartial = Partial<Omit<EditingTodo, 'id'>>
+function isTodoPopupOpenFor(
+  todoId: TodoId,
+  todoPopup: TodoPopup | null,
+): boolean {
+  return !!todoPopup && todoPopup.todoId === todoId
+}
+
 
 const AppProvider: FC = ({ children }) => {
   return <Provider store={store}>{children}</Provider>
@@ -176,12 +183,6 @@ function AppContent() {
   )
 }
 
-function isTodoPopupOpenFor(
-  todoId: TodoId,
-  todoPopup: TodoPopup | null,
-): boolean {
-  return !!todoPopup && todoPopup.todoId === todoId
-}
 
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
   const state = useStoreState()
