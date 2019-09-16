@@ -114,7 +114,7 @@ const Todo = {
       id: TodoId.gen(),
       title: faker.hacker.phrase(),
       isDone: false,
-      projectId : null
+      projectId: null,
     }
   },
 }
@@ -455,33 +455,16 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
 }
 
 function ViewEditTodoForm({ editingTodo }: { editingTodo: EditingTodo }) {
-  const { actions } = useOvermind()
-  return (
-    <div className="flex">
-      <div className="ph1 pv2 flex-grow-1">
-        <input
-          autoFocus={true}
-          type="text"
-          className="ph1 pv1 lh-copy w-100"
-          value={editingTodo.title}
-          onChange={e => actions.updateTodoForm({ title: e.target.value })}
-        />
-        <div className="flex pv1">
-          <Button action={() => actions.saveInlineTodoFormClicked()}>
-            Save
-          </Button>
-          <Button action={() => actions.cancelInlineTodoFormClicked()}>
-            Cancel
-          </Button>
-        </div>
-      </div>
-    </div>
-  )
+  return <ViewInlineTodoForm fields={editingTodo} />
 }
 
 const ViewAddTodoForm: FC<{ addingTodo: AddingTodo }> = ({
   addingTodo,
 }) => {
+  return <ViewInlineTodoForm fields={addingTodo} />
+}
+
+function ViewInlineTodoForm({ fields }: { fields: TodoFormFields }) {
   const { actions } = useOvermind()
   return (
     <div className="flex">
@@ -490,7 +473,7 @@ const ViewAddTodoForm: FC<{ addingTodo: AddingTodo }> = ({
           autoFocus={true}
           type="text"
           className="ph1 pv1 lh-copy w-100"
-          value={addingTodo.title}
+          value={fields.title}
           onChange={e => actions.updateTodoForm({ title: e.target.value })}
         />
         <div className="flex pv1">
