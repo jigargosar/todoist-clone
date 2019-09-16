@@ -62,17 +62,18 @@ const ProjectList = {
       return projectList.find(Project.idEq(projectId))
     }
   },
-  findTitleByIdOrInbox(projectId:ProjectId | null){
+  findTitleByIdOrInbox(projectId: ProjectId | null) {
     return function findTitleByIdOrInbox(projectList: ProjectList) {
-      if(!projectId){return 'Inbox'}
-
-      const project = ProjectList.findById(projectId)(projectList)
-      if(project){
-        return project.title
-      }else{
+      if (!projectId) {
         return 'Inbox'
       }
 
+      const project = ProjectList.findById(projectId)(projectList)
+      if (project) {
+        return project.title
+      } else {
+        return 'Inbox'
+      }
     }
   },
   // findIndexById(projectId: ProjectId) {
@@ -448,7 +449,9 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
     <>
       {todoList.map(todo => {
         const projectId = todo.projectId
-        const projectTitle = ProjectList.findTitleByIdOrInbox(projectId)(state.projectList)
+        const projectTitle = ProjectList.findTitleByIdOrInbox(projectId)(
+          state.projectList,
+        )
         const maybeEditingTodo = maybeEditingTodoFor(
           todo.id,
           state.inlineTodoForm,
@@ -511,48 +514,49 @@ function ViewInlineTodoForm({ fields }: { fields: TodoFormFields }) {
   )
 }
 
-const TodoItem: FC<{ todo: Todo; menuOpen: boolean ,projectId:ProjectId|null , projectTitle:string}> = memo(
-  function TodoItem({ todo, menuOpen }) {
-    const { actions } = useOvermind()
+const TodoItem: FC<{
+  todo: Todo
+  menuOpen: boolean
+  projectId: ProjectId | null
+  projectTitle: string
+}> = memo(function TodoItem({ todo, menuOpen }) {
+  const { actions } = useOvermind()
 
+  function openTodoMenu() {
+    actions.openTodoMenu(todo.id)
+  }
 
+  function setDone(isDone: boolean) {
+    actions.setDone({
+      todoId: todo.id,
+      isDone,
+    })
+  }
 
-    function openTodoMenu() {
-      actions.openTodoMenu(todo.id)
-    }
-
-    function setDone(isDone: boolean) {
-      actions.setDone({
-        todoId: todo.id,
-        isDone,
-      })
-    }
-
-    return (
-      <div className="flex">
-        <div className="ph1 pv2">
-          <input
-            type="checkbox"
-            className=""
-            checked={todo.isDone}
-            style={{ width: 24, height: 24 }}
-            onChange={e => setDone(e.target.checked)}
-          />
-        </div>
-        <div
-          className="ph1 pv1 flex-grow-1 lh-title"
-          onClick={() => actions.editTodoClicked(todo.id)}
-        >
-          {todo.title}
-        </div>
-        <div className="relative">
-          <Button action={() => openTodoMenu()}>...</Button>
-          {menuOpen && <OpenedTodoMenu todoId={todo.id} />}
-        </div>
+  return (
+    <div className="flex">
+      <div className="ph1 pv2">
+        <input
+          type="checkbox"
+          className=""
+          checked={todo.isDone}
+          style={{ width: 24, height: 24 }}
+          onChange={e => setDone(e.target.checked)}
+        />
       </div>
-    )
-  },
-)
+      <div
+        className="ph1 pv1 flex-grow-1 lh-title"
+        onClick={() => actions.editTodoClicked(todo.id)}
+      >
+        {todo.title}
+      </div>
+      <div className="relative">
+        <Button action={() => openTodoMenu()}>...</Button>
+        {menuOpen && <OpenedTodoMenu todoId={todo.id} />}
+      </div>
+    </div>
+  )
+})
 
 function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   const { actions } = useOvermind()
