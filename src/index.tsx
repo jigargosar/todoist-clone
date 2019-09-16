@@ -133,7 +133,10 @@ const addTodoClicked: Action = ctx => {
   state.inlineTodoForm = createAddingTodo()
 }
 
-const updateTodoForm: Action<TodoFormFields> = ({ state }, formFields) => {
+const updateTodoForm: Action<Partial<TodoFormFields>> = (
+  { state },
+  formFields,
+) => {
   if (state.inlineTodoForm) {
     state.inlineTodoForm = { ...state.inlineTodoForm, ...formFields }
   }
@@ -224,8 +227,11 @@ function AppContent() {
     <div className="lh-copy" style={{ maxWidth: 500 }}>
       <div className="f4 pv1">TodoList</div>
       <ViewTodoList todoList={state.todoList} />
-      {addingTodo?  <ViewAddTodoForm addingTodo={addingTodo} /> :
-      <Button action={()=>actions.addTodoClicked()}>Add Task</Button>}
+      {addingTodo ? (
+        <ViewAddTodoForm addingTodo={addingTodo} />
+      ) : (
+        <Button action={() => actions.addTodoClicked()}>Add Task</Button>
+      )}
     </div>
   )
 }
@@ -333,7 +339,12 @@ const TodoItem: FC<{ todo: Todo; menuOpen: boolean }> = memo(
             onChange={e => setDone(e.target.checked)}
           />
         </div>
-        <div className="ph1 pv1 flex-grow-1 lh-title ">{todo.title}</div>
+        <div
+          className="ph1 pv1 flex-grow-1 lh-title "
+          onClick={() => actions.editTodoClicked(todo.id)}
+        >
+          {todo.title}
+        </div>
         <div className="relative">
           <div
             className="ph1 b pointer"
