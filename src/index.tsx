@@ -80,7 +80,7 @@ function getCachedState() {
 
 const cachedState: State = getCachedState()
 
-interface Action<Payload = void> extends IAction<Payload, Config> {}
+interface Action<Payload = void> extends IAction<Payload, StoreConfig> {}
 
 const openTodoMenu: Action<TodoId> = ({ state }, todoId: TodoId) => {
   state.todoPopup = { todoId }
@@ -154,14 +154,14 @@ const config = {
   effects: {},
 }
 
-type Config = typeof config
+type StoreConfig = typeof config
 
 const store = createStore(config)
 store.subscribe(state => {
   debouncedCacheStoreState(state)
 })
-const useStoreActions = createActionsHook<Config>()
-const useStoreState = createStateHook<Config>()
+const useStoreActions = createActionsHook<StoreConfig>()
+const useStoreState = createStateHook<StoreConfig>()
 
 const AppProvider: FC = ({ children }) => {
   return <Provider store={store}>{children}</Provider>
