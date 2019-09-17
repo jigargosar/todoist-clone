@@ -595,12 +595,8 @@ const ViewTodoItem: FC<{
         // onClick={() => actions.editTodoClicked(todo.id)}
       >
         <div
-          className="f7 bg-light-pink bn bw1 br-pill ph1 ttc lh-copy truncate"
-          style={
-            projectTitle === 'Inbox'
-              ? materialColorHash('Blue', 500)
-              : materialColorHash(projectTitle, 500)
-          }
+          className="f7 bn bw1 br-pill ph1 ttc lh-copy truncate"
+          style={materialColorHash(projectTitle, 700)}
         >
           {projectTitle}
         </div>
