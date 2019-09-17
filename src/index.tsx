@@ -11,7 +11,6 @@ import equals from 'ramda/es/equals'
 import reject from 'ramda/es/reject'
 import clone from 'ramda/es/clone'
 import materialColorHash from 'material-color-hash'
-import { ResolveState } from 'overmind/lib/internalTypes'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import IconButton from '@material-ui/core/IconButton'
 import DeleteIcon from '@material-ui/icons/Delete'
@@ -247,25 +246,6 @@ const defaultState: State = {
   },
 }
 
-function cacheStoreState(state: State) {
-  const serializedModel = JSON.stringify(state)
-  if (serializedModel) {
-    localStorage.setItem('todoist-clone-model', serializedModel)
-  }
-}
-
-const debouncedCacheStoreState = debounce(cacheStoreState, 1000)
-
-function getCachedState(): State {
-  const parsedState = JSON.parse(
-    localStorage.getItem('todoist-clone-model') || '{}',
-  )
-  // @ts-ignore
-  return pick(Object.keys(defaultState), parsedState)
-}
-
-const cachedState: State = getCachedState()
-
 // Actions: TodoContextMenu
 const openTodoMenu: Action<TodoId> = ({ state }, todoId: TodoId) => {
   state.todoMenu = { todoId }
@@ -407,11 +387,27 @@ const getTodoContextMenuAnchorEl = (todoMenu?: TodoMenu) => {
     getTodoContextMenuAnchorElDomId(todoMenu.todoId),
   )
 }
+function cacheStoreState(state: State) {
+  const serializedModel = JSON.stringify(state)
+  if (serializedModel) {
+    localStorage.setItem('todoist-clone-model', serializedModel)
+  }
+}
+
+const debouncedCacheStoreState = debounce(cacheStoreState, 1000)
+
+function getCachedState() {
+  const parsedState = JSON.parse(
+    localStorage.getItem('todoist-clone-model') || '{}',
+  )
+
+  return pick(Object.keys(defaultState), parsedState)
+}
 
 const config = {
   state: {
     ...defaultState,
-    ...cachedState,
+    ...getCachedState(),
   },
   actions,
   effects: {
