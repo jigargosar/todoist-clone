@@ -155,7 +155,7 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
 }
 
 function ViewTodoItemContextMenu() {
-  const { actions,  reaction } = useOvermind()
+  const { actions, reaction } = useOvermind()
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
 
