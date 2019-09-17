@@ -184,13 +184,6 @@ export function maybeEditingTodoFor(
 
 type TodoMenu = { todoId: TodoId }
 
-function isTodoMenuOpenFor(
-  todoId: TodoId,
-  todoMenu: TodoMenu | null,
-): boolean {
-  return !!todoMenu && TodoId.eq(todoMenu.todoId)(todoId)
-}
-
 export type State = {
   todoMenu: TodoMenu | null
   todoList: Todo[]
