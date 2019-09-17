@@ -1,5 +1,6 @@
 import * as actions from './actions'
-import { debouncedCacheStoreState, state } from './state'
+import * as effects from './effects'
+import { state } from './state'
 import { json, OnInitialize } from 'overmind'
 
 const onInitialize: OnInitialize = async (
@@ -7,8 +8,8 @@ const onInitialize: OnInitialize = async (
   overmind,
 ) => {
   overmind.addFlushListener((_mutation, _paths, _flushId, _isAsync) => {
-    debouncedCacheStoreState(json(overmind.state))
+    effects.debouncedCacheStoreState(json(overmind.state))
   })
 }
 
-export { onInitialize, state, actions }
+export { onInitialize, state, actions, effects }

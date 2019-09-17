@@ -1,7 +1,7 @@
 import * as root from './root'
 
 import { merge, namespaced } from 'overmind/config'
-import * as todoMenu from './todo-menu'
+import * as todoMenu from './todoMenu'
 import { Config, IConfig } from 'overmind'
 import { createHook } from 'overmind-react'
 

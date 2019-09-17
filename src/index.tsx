@@ -26,7 +26,7 @@ import {
   TodoFormFields,
   TodoId,
 } from './overmind/state'
-import { TodoMenuAction } from './overmind/todo-menu/actions'
+import { TodoMenuAction } from './overmind/todoMenu/actions'
 import { config, useOvermind } from './overmind'
 
 const { memo, useEffect, useState } = React
