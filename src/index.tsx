@@ -1,14 +1,9 @@
 import * as React from 'react'
 import { ButtonHTMLAttributes, FC } from 'react'
-const { memo, useEffect, useState } = React
-
 import { render } from 'react-dom'
 import 'tachyons'
 import './index.css'
-const nanoid = require('nanoid')
-const faker = require('faker')
 import times from 'ramda/es/times'
-const debounce = require('lodash.debounce')
 import { Action, createOvermind, Derive, IConfig, json } from 'overmind'
 import { createHook, Provider } from 'overmind-react'
 
@@ -16,13 +11,19 @@ import equals from 'ramda/es/equals'
 import reject from 'ramda/es/reject'
 import clone from 'ramda/es/clone'
 import materialColorHash from 'material-color-hash'
-import { ResolveActions, ResolveState } from 'overmind/lib/internalTypes'
+import { ResolveState } from 'overmind/lib/internalTypes'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import IconButton from '@material-ui/core/IconButton'
 import DeleteIcon from '@material-ui/icons/Delete'
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
+
+const { memo, useEffect, useState } = React
+
+const nanoid = require('nanoid')
+const faker = require('faker')
+const debounce = require('lodash.debounce')
 
 type ProjectId = {
   readonly tag: 'ProjectId'
@@ -394,8 +395,6 @@ const actions = {
   addFakeTodoClicked,
   addFakeProjectClicked,
 }
-
-type Actions = ResolveActions<typeof actions>
 
 const getTodoContextMenuAnchorEl = (todoPopup?: TodoPopup) => {
   if (!todoPopup) return null
