@@ -207,21 +207,21 @@ function maybeEditingTodoFor(
     : null
 }
 
-type TodoPopup = { todoId: TodoId }
+type TodoMenu = { todoId: TodoId }
 
-function isTodoPopupOpenFor(
+function isTodoMenuOpenFor(
   todoId: TodoId,
-  todoPopup: TodoPopup | null,
+  todoMenu: TodoMenu | null,
 ): boolean {
-  return !!todoPopup && TodoId.eq(todoPopup.todoId)(todoId)
+  return !!todoMenu && TodoId.eq(todoMenu.todoId)(todoId)
 }
 
 type State = {
-  todoPopup: TodoPopup | null
+  todoMenu: TodoMenu | null
   todoList: Todo[]
   inlineTodoForm: AddingTodo | EditingTodo | null
   projectList: Project[]
-  isTodoPopupOpenFor: Derive<State, (todoId: TodoId) => boolean>
+  isTodoMenuOpenFor: Derive<State, (todoId: TodoId) => boolean>
   todoMenuAnchorElId: Derive<State, string>
 }
 
@@ -229,24 +229,24 @@ const initialTodos: Todo[] = times(Todo.createFake, 10)
 const initialProjects: Project[] = times(Project.createFake, 5)
 
 const defaultState: State = {
-  todoPopup: null,
+  todoMenu: null,
   todoList: initialTodos,
   inlineTodoForm: null,
   projectList: initialProjects,
-  isTodoPopupOpenFor: state => {
-    const todoPopup = state.todoPopup
+  isTodoMenuOpenFor: state => {
+    const todoMenu = state.todoMenu
     return function(todoId) {
-      return isTodoPopupOpenFor(todoId, state.todoPopup || todoPopup)
+      return isTodoMenuOpenFor(todoId, state.todoMenu || todoMenu)
     }
   },
   todoMenuAnchorElId: state => {
-    return state.todoPopup && state.todoPopup.todoId
-      ? getTodoContextMenuAnchorElDomId(state.todoPopup.todoId)
+    return state.todoMenu && state.todoMenu.todoId
+      ? getTodoContextMenuAnchorElDomId(state.todoMenu.todoId)
       : ''
   },
 }
 
-function cacheStoreState(state: ResolveState<State>) {
+function cacheStoreState(state: State) {
   const serializedModel = JSON.stringify(state)
   if (serializedModel) {
     localStorage.setItem('todoist-clone-model', serializedModel)
@@ -263,17 +263,17 @@ const cachedState: State = getCachedState()
 
 // Actions: TodoContextMenu
 const openTodoMenu: Action<TodoId> = ({ state }, todoId: TodoId) => {
-  state.todoPopup = { todoId }
+  state.todoMenu = { todoId }
 }
 const closeTodoMenu: Action = ({ state }) => {
-  state.todoPopup = null
+  state.todoMenu = null
 }
 type TodoContextMenuAction = 'Edit' | 'Delete'
 const todoContextMenuItemClicked: Action<TodoContextMenuAction> = (
-  { state: { todoPopup }, actions },
+  { state: { todoMenu }, actions },
   actionType,
 ) => {
-  const todoId = todoPopup && todoPopup.todoId
+  const todoId = todoMenu && todoMenu.todoId
   if (!todoId) return
   actions.todoMenu.close()
   switch (actionType) {
@@ -396,10 +396,10 @@ const actions = {
   addFakeProjectClicked,
 }
 
-const getTodoContextMenuAnchorEl = (todoPopup?: TodoPopup) => {
-  if (!todoPopup) return null
+const getTodoContextMenuAnchorEl = (todoMenu?: TodoMenu) => {
+  if (!todoMenu) return null
   return document.getElementById(
-    getTodoContextMenuAnchorElDomId(todoPopup.todoId),
+    getTodoContextMenuAnchorElDomId(todoMenu.todoId),
   )
 }
 
@@ -512,7 +512,7 @@ const ProjectItem: FC<{ project: Project }> = function ProjectItem({
 
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
   const {
-    state: { inlineTodoForm, projectList, isTodoPopupOpenFor },
+    state: { inlineTodoForm, projectList, isTodoMenuOpenFor },
   } = useOvermind()
 
   return (
@@ -536,7 +536,7 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
           <ViewTodoItem
             key={TodoId.toString(id)}
             todo={todo}
-            menuOpen={isTodoPopupOpenFor(id)}
+            menuOpen={isTodoMenuOpenFor(id)}
             projectId={projectId}
             projectTitle={projectTitle}
           />
