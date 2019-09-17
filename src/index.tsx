@@ -21,6 +21,10 @@ import reject from 'ramda/es/reject'
 import clone from 'ramda/es/clone'
 import materialColorHash from 'material-color-hash'
 import { ResolveState } from 'overmind/lib/internalTypes'
+import CssBaseline from '@material-ui/core/CssBaseline'
+import IconButton from '@material-ui/core/IconButton'
+import DeleteIcon from '@material-ui/icons/Delete'
+import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
 
 type ProjectId = {
   readonly tag: 'ProjectId'
@@ -387,6 +391,8 @@ const AppProvider: FC = ({ children }) => {
 function App() {
   return (
     <AppProvider>
+      <CssBaseline />
+
       <AppContent />
     </AppProvider>
   )
@@ -452,13 +458,12 @@ const ProjectItem: FC<{ project: Project }> = function ProjectItem({
       >
         {project.title}
       </div>
-      <Button
-        action={() => {
-          actions.deleteProject(project.id)
-        }}
+      <IconButton
+        size="small"
+        onClick={() => actions.deleteProject(project.id)}
       >
-        X
-      </Button>
+        <DeleteIcon fontSize="small" />
+      </IconButton>
     </div>
   )
 }
@@ -602,7 +607,9 @@ const ViewTodoItem: FC<{
         </div>
       </div>
       <div className="relative">
-        <Button className="b f3" action={() => openTodoMenu()}>...</Button>
+        <IconButton size="small" onClick={() => openTodoMenu()}>
+          <MoreHorizIcon fontSize="small" />
+        </IconButton>
         {menuOpen && <ViewTodoItemContextMenu todoId={todo.id} />}
       </div>
     </div>
