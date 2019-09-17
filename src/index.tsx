@@ -550,15 +550,12 @@ function ViewTodoItemContextMenu() {
     reaction(
       ({ todoPopup }) => todoPopup,
       ({ todoPopup }) => {
-        if (!todoPopup) {
-          setAnchorEl(null)
-          return
-        }
-
         setAnchorEl(
-          document.getElementById(
-            todoItemContextMenuAnchorElDomId(todoPopup.todoId),
-          ),
+          !todoPopup
+            ? null
+            : document.getElementById(
+                todoItemContextMenuAnchorElDomId(todoPopup.todoId),
+              ),
         )
       },
       { nested: true, immediate: true },
