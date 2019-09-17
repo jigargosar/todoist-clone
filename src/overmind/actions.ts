@@ -11,7 +11,7 @@ import {
   TodoFormFields,
   TodoId,
   TodoList,
-} from '../state'
+} from './state'
 import clone from 'ramda/es/clone'
 
 

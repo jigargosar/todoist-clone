@@ -12,10 +12,8 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
-import pick from 'ramda/es/pick'
 import {
   AddingTodo,
-  defaultState,
   EditingTodo,
   getTodoMenuAnchorDomIdFor,
   maybeAddingTodo,
@@ -23,41 +21,20 @@ import {
   Project,
   ProjectId,
   ProjectList,
-  State,
   Todo,
   TodoFormFields,
   TodoId,
-} from './state'
-import { TodoMenuAction } from './actions/todo-menu'
-import * as actions from './actions'
+} from './overmind/state'
+import { TodoMenuAction } from './overmind/todo-menu/actions'
+import * as todoMenu from './overmind/todo-menu'
+import * as root from './overmind'
+import { debouncedCacheStoreState } from './overmind'
+import { merge, namespaced } from 'overmind/config'
 
 const { memo, useEffect, useState } = React
 
-const debounce = require('lodash.debounce')
+const config = merge(root, namespaced({ todoMenu }))
 
-function cacheStoreState(state: State) {
-  const serializedModel = JSON.stringify(state)
-  if (serializedModel) {
-    localStorage.setItem('todoist-clone-model', serializedModel)
-  }
-}
-const debouncedCacheStoreState = debounce(cacheStoreState, 1000)
-function getCachedState() {
-  const parsedState = JSON.parse(
-    localStorage.getItem('todoist-clone-model') || '{}',
-  )
-  return pick(Object.keys(defaultState), parsedState)
-}
-
-import * as todoMenu from './actions/todo-menu'
-const config = {
-  state: {
-    ...defaultState,
-    ...getCachedState(),
-  },
-  actions: { ...actions, todoMenu },
-  effects: {},
-}
 declare module 'overmind' {
   // noinspection JSUnusedGlobalSymbols
   interface Config extends IConfig<typeof config> {}
