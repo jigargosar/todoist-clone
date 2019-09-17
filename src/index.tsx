@@ -1,19 +1,14 @@
-import React, {
-  ButtonHTMLAttributes,
-  FC,
-  memo,
-  RefObject,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import * as React from 'react'
+import { ButtonHTMLAttributes, FC } from 'react'
+const { memo, useEffect, useState } = React
+
 import { render } from 'react-dom'
 import 'tachyons'
 import './index.css'
-import nanoid from 'nanoid'
-import faker from 'faker'
+const nanoid = require('nanoid')
+const faker = require('faker')
 import times from 'ramda/es/times'
-import debounce from 'lodash.debounce'
+const debounce = require('lodash.debounce')
 import { Action, createOvermind, Derive, IConfig } from 'overmind'
 import { createHook, Provider } from 'overmind-react'
 
@@ -28,7 +23,6 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
-import prop from 'ramda/es/prop'
 
 type ProjectId = {
   readonly tag: 'ProjectId'
@@ -227,6 +221,7 @@ type State = {
   inlineTodoForm: AddingTodo | EditingTodo | null
   projectList: Project[]
   isTodoPopupOpenFor: Derive<State, (todoId: TodoId) => boolean>
+  todoContextMenuAnchorElDomId: Derive<State, string>
 }
 
 const initialTodos: Todo[] = times(Todo.createFake, 10)
@@ -242,6 +237,10 @@ const defaultState: State = {
     return function(todoId) {
       return isTodoPopupOpenFor(todoId, state.todoPopup || todoPopup)
     }
+  },
+  todoContextMenuAnchorElDomId: ({ todoPopup }) => {
+    if (!todoPopup) return ''
+    return todoItemContextMenuAnchorElDomId(todoPopup.todoId)
   },
 }
 
@@ -551,25 +550,23 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
 }
 
 function ViewTodoItemContextMenu() {
-  const { actions, reaction } = useOvermind()
+  const { reaction, actions } = useOvermind()
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
 
   useEffect(() =>
     reaction(
-      ({ todoPopup }) => todoPopup,
-      ({ todoPopup }) => {
+      ({ todoContextMenuAnchorElDomId }) => todoContextMenuAnchorElDomId,
+      state => {
         setAnchorEl(
-          !todoPopup
-            ? null
-            : document.getElementById(
-                todoItemContextMenuAnchorElDomId(todoPopup.todoId),
-              ),
+          // @ts-ignore
+          document.getElementById(state.todoContextMenuAnchorElDomId),
         )
       },
-      { nested: true, immediate: true },
+      { immediate: true },
     ),
   )
+  // const anchorEl = state.todoContextMenuAnchorElDomId
 
   return (
     <Menu
