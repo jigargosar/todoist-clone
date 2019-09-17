@@ -296,13 +296,17 @@ const updateTodoForm: Action<Partial<TodoFormFields>> = (
   }
 }
 
+function updatedTodoWithFormFields(form:TodoFormFields, todo:Todo) {
+  todo.title = form.title
+  todo.projectId = clone(form.projectId)
+}
+
 const saveEditingTodo: Action = ({ state }) => {
   const editingTodo = maybeEditingTodo(state.inlineTodoForm)
   if (!editingTodo) return
-  const maybeTodo = TodoList.findById(editingTodo.id)(state.todoList)
-  if (maybeTodo) {
-    maybeTodo.title = editingTodo.title
-    maybeTodo.projectId = clone(editingTodo.projectId)
+  const todo = TodoList.findById(editingTodo.id)(state.todoList)
+  if (todo) {
+    updatedTodoWithFormFields(editingTodo, todo)
   }
   state.inlineTodoForm = null
 }
@@ -312,11 +316,8 @@ const saveAddingTodo: Action = ({ state }) => {
   if (!addingTodo || addingTodo.title.trim().length === 0) return
 
   const todo = Todo.createFake()
-  todo.title = addingTodo.title
-  todo.projectId = addingTodo.projectId
-
+  updatedTodoWithFormFields(addingTodo, todo)
   state.todoList.push(todo)
-
   state.inlineTodoForm = null
 }
 
