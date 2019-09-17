@@ -9,7 +9,7 @@ const nanoid = require('nanoid')
 const faker = require('faker')
 import times from 'ramda/es/times'
 const debounce = require('lodash.debounce')
-import { Action, createOvermind, Derive, IConfig } from 'overmind'
+import { Action, createOvermind, Derive, IConfig, json } from 'overmind'
 import { createHook, Provider } from 'overmind-react'
 
 import equals from 'ramda/es/equals'
@@ -23,6 +23,7 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
+import omit from 'ramda/es/omit'
 
 type ProjectId = {
   readonly tag: 'ProjectId'
@@ -238,9 +239,10 @@ const defaultState: State = {
       return isTodoPopupOpenFor(todoId, state.todoPopup || todoPopup)
     }
   },
-  todoContextMenuAnchorElDomId: ({ todoPopup }) => {
-    if (!todoPopup) return ''
-    return todoItemContextMenuAnchorElDomId(todoPopup.todoId)
+  todoContextMenuAnchorElDomId: state => {
+    return state.todoPopup && state.todoPopup.todoId
+      ? getTodoContextMenuAnchorElDomId(state.todoPopup.todoId)
+      : ''
   },
 }
 
@@ -401,7 +403,7 @@ type Actions = ResolveActions<typeof actions>
 const getTodoContextMenuAnchorEl = (todoPopup?: TodoPopup) => {
   if (!todoPopup) return null
   return document.getElementById(
-    todoItemContextMenuAnchorElDomId(todoPopup.todoId),
+    getTodoContextMenuAnchorElDomId(todoPopup.todoId),
   )
 }
 
@@ -424,8 +426,8 @@ const useOvermind = createHook<typeof config>()
 
 const overmind = createOvermind(config)
 
-overmind.addMutationListener((_mutation, _paths, _flushId) => {
-  debouncedCacheStoreState(overmind.state)
+overmind.addFlushListener((_mutation, _paths, _flushId, _isAsync) => {
+  debouncedCacheStoreState(json(overmind.state))
 })
 
 const AppProvider: FC = ({ children }) => {
@@ -646,7 +648,7 @@ function ViewInlineTodoForm({ fields }: { fields: TodoFormFields }) {
   )
 }
 
-function todoItemContextMenuAnchorElDomId(todoId: TodoId) {
+function getTodoContextMenuAnchorElDomId(todoId: TodoId) {
   return TodoId.toString(todoId) + '__context-menu-anchor'
 }
 
@@ -701,7 +703,7 @@ const ViewTodoItem: FC<{
       </div>
       <div className="relative">
         <IconButton
-          id={todoItemContextMenuAnchorElDomId(todoId)}
+          id={getTodoContextMenuAnchorElDomId(todoId)}
           size="small"
           onClick={() => openTodoMenu()}
         >
