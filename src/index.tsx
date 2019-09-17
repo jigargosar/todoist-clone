@@ -18,6 +18,7 @@ import { Action, createOvermind, IConfig } from 'overmind'
 import { createHook, Provider } from 'overmind-react'
 import equals from 'ramda/es/equals'
 import reject from 'ramda/es/reject'
+import clone from 'ramda/es/clone';
 
 type ProjectId = { tag: 'ProjectId'; value: string }
 
@@ -302,7 +303,7 @@ const saveEditingTodo: Action = ({ state }) => {
   const maybeTodo = TodoList.findById(editingTodo.id)(state.todoList)
   if (maybeTodo) {
     maybeTodo.title = editingTodo.title
-    maybeTodo.projectId = editingTodo.projectId
+    maybeTodo.projectId = clone(editingTodo.projectId)
   }
 }
 
