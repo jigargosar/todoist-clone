@@ -542,18 +542,14 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
 }
 
 function ViewTodoItemContextMenu() {
-  const {
-    state: { todoPopup },
-    actions,
-    reaction,
-  } = useOvermind()
+  const { actions, reaction } = useOvermind()
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
 
   useEffect(() =>
     reaction(
-      ({ todoPopup }) => todoPopup,
-      () => {
+      ({ todoPopup }) => [todoPopup],
+      ({ todoPopup }) => {
         const contextMenuOpenFor = !!todoPopup && todoPopup.todoId
         const anchorEl = contextMenuOpenFor
           ? document.getElementById(
