@@ -165,12 +165,12 @@ const TodoList = {
 type TodoFormFields = { title: string; projectId: ProjectId | null }
 type EditingTodo = { tag: 'EditingTodo'; id: TodoId } & TodoFormFields
 
-function createEditingTodo(maybeTodo: Todo): EditingTodo {
+function createEditingTodo(todo: Todo): EditingTodo {
   return {
     tag: 'EditingTodo',
-    id: maybeTodo.id,
-    title: maybeTodo.title,
-    projectId: null,
+    id: todo.id,
+    title: todo.title,
+    projectId: todo.projectId,
   }
 }
 
