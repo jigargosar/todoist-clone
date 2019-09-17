@@ -35,7 +35,6 @@ const { memo, useEffect, useState } = React
 
 const debounce = require('lodash.debounce')
 
-
 function cacheStoreState(state: State) {
   const serializedModel = JSON.stringify(state)
   if (serializedModel) {
@@ -50,12 +49,13 @@ function getCachedState() {
   return pick(Object.keys(defaultState), parsedState)
 }
 
+import * as todoMenu from './actions/todo-menu'
 const config = {
   state: {
     ...defaultState,
     ...getCachedState(),
   },
-  actions,
+  actions: { ...actions, todoMenu },
   effects: {},
 }
 declare module 'overmind' {

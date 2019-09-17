@@ -13,9 +13,9 @@ import {
   TodoList,
 } from '../state'
 import clone from 'ramda/es/clone'
-import * as todoMenuActions from './todo-menu'
 
-export const todoMenu = todoMenuActions
+
+
 
 export const setDone: Action<{ todoId: TodoId; isDone: boolean }> = (
   { state },
