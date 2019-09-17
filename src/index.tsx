@@ -1,4 +1,4 @@
-import React, { ButtonHTMLAttributes, FC, RefObject, useEffect, useRef } from 'react'
+import React, { ButtonHTMLAttributes, FC, memo, RefObject, useEffect, useRef } from 'react'
 import { render } from 'react-dom'
 import 'tachyons'
 import './index.css'
@@ -208,7 +208,7 @@ type State = {
   todoList: Todo[]
   inlineTodoForm: AddingTodo | EditingTodo | null
   projectList: Project[]
-  isTodoPopupOpenFor:Derive<State, (todoId:TodoId) => boolean>
+  isTodoPopupOpenFor: Derive<State, (todoId: TodoId) => boolean>
 }
 
 const initialTodos: Todo[] = times(Todo.createFake, 10)
@@ -219,12 +219,12 @@ const defaultState: State = {
   todoList: initialTodos,
   inlineTodoForm: null,
   projectList: initialProjects,
-  isTodoPopupOpenFor:(state=>{
+  isTodoPopupOpenFor: state => {
     const todoPopup = state.todoPopup
     return function(todoId) {
       return isTodoPopupOpenFor(todoId, state.todoPopup || todoPopup)
     }
-  })
+  },
 }
 
 function cacheStoreState(state: ResolveState<State>) {
@@ -455,7 +455,7 @@ const ProjectItem: FC<{ project: Project }> = function ProjectItem({
 
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
   const {
-    state: { inlineTodoForm, projectList, todoPopup },
+    state: { inlineTodoForm, projectList, isTodoPopupOpenFor },
   } = useOvermind()
 
   return (
@@ -477,23 +477,11 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
             />
           )
         }
-        const menuOpen = isTodoPopupOpenFor(todo.id, todoPopup)
-        if (menuOpen) {
-          return (
-            <ViewTodoItem
-              key={TodoId.toString(todo.id) + '___menu-open'}
-              todo={todo}
-              menuOpen={menuOpen}
-              projectId={projectId}
-              projectTitle={projectTitle}
-            />
-          )
-        }
         return (
           <ViewTodoItem
             key={TodoId.toString(todo.id)}
             todo={todo}
-            menuOpen={menuOpen}
+            menuOpen={isTodoPopupOpenFor(todo.id)}
             projectId={projectId}
             projectTitle={projectTitle}
           />
@@ -567,11 +555,7 @@ const ViewTodoItem: FC<{
   menuOpen: boolean
   projectId: ProjectId | null
   projectTitle: string
-}> = (function ViewTodoItem({
-  todo,
-  menuOpen,
-  projectTitle,
-}) {
+}> = memo(function ViewTodoItem({ todo, menuOpen, projectTitle }) {
   const { actions } = useOvermind()
 
   function openTodoMenu() {
@@ -624,7 +608,6 @@ const ViewTodoItem: FC<{
     </div>
   )
 })
-
 function ViewTodoItemContextMenu({ todoId }: { todoId: TodoId }) {
   const { actions } = useOvermind()
 
