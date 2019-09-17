@@ -11,9 +11,9 @@ export const close: Action = ({ state }) => {
   state.todoMenu = null
 }
 
-export type TodoContextMenuAction = 'Edit' | 'Delete'
+export type TodoMenuAction = 'Edit' | 'Delete'
 
-export const itemClicked: Action<TodoContextMenuAction> = (
+export const itemClicked: Action<TodoMenuAction> = (
   { state: { todoMenu }, actions },
   actionType,
 ) => {

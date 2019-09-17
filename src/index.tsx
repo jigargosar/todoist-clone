@@ -33,7 +33,8 @@ import {
   TodoId,
   TodoList,
 } from './state'
-import { close, open, TodoContextMenuAction, itemClicked } from './actions/todo-menu'
+import * as todoMenuActions from './actions/todo-menu'
+import { TodoMenuAction } from './actions/todo-menu'
 
 const { memo, useEffect, useState } = React
 
@@ -127,11 +128,7 @@ const saveInlineTodoFormClicked: Action = ctx => {
 }
 
 const actions = {
-  todoMenu: {
-    open: open,
-    close: close,
-    itemClicked: itemClicked,
-  },
+  todoMenu: todoMenuActions,
   setDone,
   deleteTodo,
   editTodoClicked,
@@ -310,7 +307,7 @@ function ViewTodoItemContextMenu() {
     setAnchorEl(document.getElementById(todoMenuAnchorElId))
   }, [todoMenuAnchorElId])
 
-  const itemAction = (action: TodoContextMenuAction) => () =>
+  const itemAction = (action: TodoMenuAction) => () =>
     actions.todoMenu.itemClicked(action)
   return (
     <Menu
@@ -394,7 +391,7 @@ const ViewTodoItem: FC<{
 
   function setDone(isDone: boolean) {
     actions.setDone({
-      todoId: todoId,
+      todoId,
       isDone,
     })
   }
