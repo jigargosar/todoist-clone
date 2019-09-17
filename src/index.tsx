@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { FC } from 'react'
+import { FC, forwardRef } from 'react'
 import { render } from 'react-dom'
 import 'tachyons'
 import './index.css'
