@@ -24,7 +24,6 @@ import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 
-
 type ProjectId = {
   readonly tag: 'ProjectId'
   readonly value: string
@@ -261,12 +260,32 @@ function getCachedState() {
 
 const cachedState: State = getCachedState()
 
+// Actions: TodoContextMenu
 const openTodoMenu: Action<TodoId> = ({ state }, todoId: TodoId) => {
   state.todoPopup = { todoId }
 }
 const closeTodoMenu: Action = ({ state }) => {
   state.todoPopup = null
 }
+type TodoContextMenuAction = 'Edit' | 'Delete'
+const todoContextMenuItemClicked: Action<TodoContextMenuAction> = (
+  { state: { todoPopup }, actions },
+  actionType,
+) => {
+  const todoId = todoPopup && todoPopup.todoId
+  if (!todoId) return
+  actions.closeTodoMenu()
+  switch (actionType) {
+    case 'Edit':
+      actions.editTodoClicked(todoId)
+      return
+    case 'Delete':
+      actions.deleteTodo(todoId)
+      return
+  }
+  return shouldNeverBeCalled(actionType)
+}
+
 const setDone: Action<{ todoId: TodoId; isDone: boolean }> = (
   { state },
   { todoId, isDone },
@@ -294,25 +313,6 @@ const editTodoClicked: Action<TodoId> = (ctx, todoId) => {
 
 function shouldNeverBeCalled(nopes: never) {
   return nopes
-}
-
-type TodoContextMenuAction = 'Edit' | 'Delete'
-const todoContextMenuItemClicked: Action<TodoContextMenuAction> = (
-  { state: { todoPopup }, actions },
-  actionType,
-) => {
-  const todoId = todoPopup && todoPopup.todoId
-  if (!todoId) return
-  actions.closeTodoMenu()
-  switch (actionType) {
-    case 'Edit':
-      actions.editTodoClicked(todoId)
-      return
-    case 'Delete':
-      actions.deleteTodo(todoId)
-      return
-  }
-  return shouldNeverBeCalled(actionType)
 }
 
 const addTodoClicked: Action = ctx => {
@@ -379,9 +379,13 @@ const saveInlineTodoFormClicked: Action = ctx => {
 
 const actions = {
   openTodoMenu,
-
   closeTodoMenu,
   todoContextMenuItemClicked,
+  todoMenu: {
+    open: openTodoMenu,
+    close: closeTodoMenu,
+    itemClicked: todoContextMenuItemClicked,
+  },
   setDone,
   deleteTodo,
   editTodoClicked,
@@ -638,7 +642,7 @@ const ViewTodoItem: FC<{
   menuOpen: boolean
   projectId: ProjectId | null
   projectTitle: string
-}> = memo(function ViewTodoItem({ todo,  projectTitle }) {
+}> = memo(function ViewTodoItem({ todo, projectTitle }) {
   const { actions } = useOvermind()
 
   const todoId = todo.id
@@ -695,8 +699,6 @@ const ViewTodoItem: FC<{
     </div>
   )
 })
-
-
 
 const Button: FC<
   { action: () => void; className?: string } & ButtonHTMLAttributes<
