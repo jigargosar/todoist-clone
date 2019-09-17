@@ -178,9 +178,7 @@ function ViewEditTodoForm({ editingTodo }: { editingTodo: EditingTodo }) {
   return <ViewInlineTodoForm fields={editingTodo} />
 }
 
-const ViewAddTodoForm: FC<{ addingTodo: AddingTodo }> = ({
-  addingTodo,
-}) => {
+function ViewAddTodoForm({ addingTodo }: { addingTodo: AddingTodo }) {
   return <ViewInlineTodoForm fields={addingTodo} />
 }
 
