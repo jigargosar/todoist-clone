@@ -519,7 +519,7 @@ const ViewTodoItem: FC<{
   menuOpen: boolean
   projectId: ProjectId | null
   projectTitle: string
-}> = memo(function TodoItem({ todo, menuOpen , projectId, projectTitle}) {
+}> = memo(function ViewTodoItem({ todo, menuOpen , projectId, projectTitle}) {
   const { actions } = useOvermind()
 
   function openTodoMenu() {
