@@ -564,7 +564,7 @@ function ViewTodoItemContextMenu() {
     setAnchorEl(document.getElementById(todoContextMenuAnchorElDomId))
   }, [todoContextMenuAnchorElDomId])
 
-  const menuAction = (action: TodoContextMenuAction) => () =>
+  const itemAction = (action: TodoContextMenuAction) => () =>
     actions.todoContextMenuItemClicked(action)
   return (
     <Menu
@@ -573,8 +573,8 @@ function ViewTodoItemContextMenu() {
       keepMounted={true}
       onClose={() => actions.closeTodoMenu()}
     >
-      <MenuItem onClick={menuAction('Edit')}>Edit</MenuItem>
-      <MenuItem onClick={menuAction('Delete')}>Delete</MenuItem>
+      <MenuItem onClick={itemAction('Edit')}>Edit</MenuItem>
+      <MenuItem onClick={itemAction('Delete')}>Delete</MenuItem>
     </Menu>
   )
 }
