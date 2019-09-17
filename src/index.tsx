@@ -381,26 +381,17 @@ const actions = {
   addFakeProjectClicked,
 }
 
-const getTodoContextMenuAnchorEl = (todoMenu?: TodoMenu) => {
-  if (!todoMenu) return null
-  return document.getElementById(
-    getTodoContextMenuAnchorElDomId(todoMenu.todoId),
-  )
-}
 function cacheStoreState(state: State) {
   const serializedModel = JSON.stringify(state)
   if (serializedModel) {
     localStorage.setItem('todoist-clone-model', serializedModel)
   }
 }
-
 const debouncedCacheStoreState = debounce(cacheStoreState, 1000)
-
 function getCachedState() {
   const parsedState = JSON.parse(
     localStorage.getItem('todoist-clone-model') || '{}',
   )
-
   return pick(Object.keys(defaultState), parsedState)
 }
 
@@ -410,9 +401,7 @@ const config = {
     ...getCachedState(),
   },
   actions,
-  effects: {
-    todoContextMenuAnchorEl: getTodoContextMenuAnchorEl,
-  },
+  effects: {},
 }
 declare module 'overmind' {
   // noinspection JSUnusedGlobalSymbols
