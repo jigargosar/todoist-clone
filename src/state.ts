@@ -208,3 +208,7 @@ export const defaultState: State = {
 export function getTodoMenuAnchorDomIdFor(todoId: TodoId) {
   return TodoId.toString(todoId) + '__context-menu-anchor'
 }
+
+export function maybeAddingTodo(form: InlineTodoForm): AddingTodo | null {
+  return form && form.tag === 'AddingTodo' ? form : null
+}

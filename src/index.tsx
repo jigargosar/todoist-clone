@@ -3,9 +3,8 @@ import { ButtonHTMLAttributes, FC } from 'react'
 import { render } from 'react-dom'
 import 'tachyons'
 import './index.css'
-import { Action, createOvermind, IConfig, json } from 'overmind'
+import { createOvermind, IConfig, json } from 'overmind'
 import { createHook, Provider } from 'overmind-react'
-import clone from 'ramda/es/clone'
 import materialColorHash from 'material-color-hash'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import IconButton from '@material-ui/core/IconButton'
@@ -16,13 +15,10 @@ import MenuItem from '@material-ui/core/MenuItem'
 import pick from 'ramda/es/pick'
 import {
   AddingTodo,
-  createAddingTodo,
-  createEditingTodo,
   defaultState,
   EditingTodo,
   getTodoMenuAnchorDomIdFor,
-  InlineTodoForm,
-  maybeEditingTodo,
+  maybeAddingTodo,
   maybeEditingTodoFor,
   Project,
   ProjectId,
@@ -31,101 +27,25 @@ import {
   Todo,
   TodoFormFields,
   TodoId,
-  TodoList,
 } from './state'
 import * as todoMenuActions from './actions/todo-menu'
 import { TodoMenuAction } from './actions/todo-menu'
+import {
+  addFakeProjectClicked,
+  addFakeTodoClicked,
+  addTodoClicked,
+  cancelInlineTodoFormClicked,
+  deleteProject,
+  deleteTodo,
+  editTodoClicked,
+  saveInlineTodoFormClicked,
+  setDone,
+  updateTodoForm,
+} from './actions'
 
 const { memo, useEffect, useState } = React
 
 const debounce = require('lodash.debounce')
-
-const setDone: Action<{ todoId: TodoId; isDone: boolean }> = (
-  { state },
-  { todoId, isDone },
-) => {
-  const maybeTodo = TodoList.findById(todoId)(state.todoList)
-  if (maybeTodo) {
-    maybeTodo.isDone = isDone
-  }
-}
-const deleteProject: Action<ProjectId> = ({ state }, projectId) => {
-  state.projectList = ProjectList.withoutId(projectId)(state.projectList)
-}
-const deleteTodo: Action<TodoId> = ({ state }, todoId) => {
-  state.todoList = TodoList.withoutId(todoId)(state.todoList)
-}
-
-const editTodoClicked: Action<TodoId> = (ctx, todoId) => {
-  const { state } = ctx
-  const maybeTodo = TodoList.findById(todoId)(state.todoList)
-  if (maybeTodo) {
-    saveInlineTodoFormClicked(ctx)
-    state.inlineTodoForm = createEditingTodo(maybeTodo)
-  }
-}
-
-const addTodoClicked: Action = ctx => {
-  const { state } = ctx
-  saveEditingTodo(ctx)
-  state.inlineTodoForm = createAddingTodo()
-}
-
-const addFakeTodoClicked: Action = ({ state }) => {
-  const todo = Todo.createFake()
-  state.todoList = TodoList.append(todo)(state.todoList)
-  // state.todoList.push(todo)
-}
-
-const addFakeProjectClicked: Action = ({ state }) => {
-  const project = Project.createFake()
-  state.projectList = ProjectList.append(project)(state.projectList)
-  // state.projectList.push(project)
-}
-
-const updateTodoForm: Action<Partial<TodoFormFields>> = (
-  { state },
-  formFields,
-) => {
-  if (state.inlineTodoForm) {
-    state.inlineTodoForm = { ...state.inlineTodoForm, ...formFields }
-  }
-}
-
-function updatedTodoWithFormFields(form: TodoFormFields, todo: Todo) {
-  todo.title = form.title
-  todo.projectId = clone(form.projectId)
-}
-
-const saveEditingTodo: Action = ({ state }) => {
-  const editingTodo = maybeEditingTodo(state.inlineTodoForm)
-  if (!editingTodo) return
-  const todo = TodoList.findById(editingTodo.id)(state.todoList)
-  if (todo) {
-    updatedTodoWithFormFields(editingTodo, todo)
-  }
-  state.inlineTodoForm = null
-}
-
-const saveAddingTodo: Action = ({ state }) => {
-  const addingTodo = maybeAddingTodo(state.inlineTodoForm)
-  if (!addingTodo || addingTodo.title.trim().length === 0) return
-
-  const todo = Todo.createFake()
-  updatedTodoWithFormFields(addingTodo, todo)
-  state.todoList.push(todo)
-  state.inlineTodoForm = null
-}
-
-const cancelInlineTodoFormClicked: Action = ({ state }) => {
-  state.inlineTodoForm = null
-}
-
-const saveInlineTodoFormClicked: Action = ctx => {
-  saveEditingTodo(ctx)
-  saveAddingTodo(ctx)
-  ctx.state.inlineTodoForm = null
-}
 
 const actions = {
   todoMenu: todoMenuActions,
@@ -188,10 +108,6 @@ function App() {
       <AppContent />
     </AppProvider>
   )
-}
-
-function maybeAddingTodo(form: InlineTodoForm): AddingTodo | null {
-  return form && form.tag === 'AddingTodo' ? form : null
 }
 
 function AppContent() {
