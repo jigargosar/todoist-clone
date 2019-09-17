@@ -156,16 +156,20 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
 }
 
 function ViewTodoItemContextMenu() {
-  const {
-    actions,
-    state: { todoMenuAnchorElId },
-  } = useOvermind()
+  const { actions, state, reaction } = useOvermind()
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
 
-  useEffect(() => {
-    setAnchorEl(document.getElementById(todoMenuAnchorElId))
-  }, [todoMenuAnchorElId])
+  useEffect(() =>
+    reaction(
+      state => state.todoMenuAnchorElId,
+      state => {
+        // @ts-ignore
+        setAnchorEl(document.getElementById(state.todoMenuAnchorElId))
+      },
+      { immediate: true },
+    ),
+  )
 
   const itemAction = (action: TodoMenuAction) => () =>
     actions.todoMenuItemClicked(action)
