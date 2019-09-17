@@ -235,17 +235,6 @@ const ViewTodoItem: FC<{
 
   const todoId = todo.id
 
-  function openTodoMenu() {
-    actions.todoMenuOpen(todoId)
-  }
-
-  function setDone(isDone: boolean) {
-    actions.setDone({
-      todoId,
-      isDone,
-    })
-  }
-
   return (
     <div className="flex">
       <div className="ph1 pv2">
@@ -254,7 +243,9 @@ const ViewTodoItem: FC<{
           className=""
           checked={todo.isDone}
           style={{ width: 24, height: 24 }}
-          onChange={e => setDone(e.target.checked)}
+          onChange={e =>
+            actions.setDone({ todoId, isDone: e.target.checked })
+          }
         />
       </div>
       <div
@@ -275,7 +266,7 @@ const ViewTodoItem: FC<{
         <IconButton
           id={getTodoMenuAnchorDomIdFor(todoId)}
           size="small"
-          onClick={() => openTodoMenu()}
+          onClick={() => actions.todoMenuOpen(todoId)}
         >
           <MoreHorizIcon fontSize="small" />
         </IconButton>
