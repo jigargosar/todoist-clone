@@ -399,13 +399,22 @@ const actions = {
 
 type Actions = ResolveActions<typeof actions>
 
+const getTodoContextMenuAnchorEl = (todoPopup?: TodoPopup) => {
+  if (!todoPopup) return null
+  return document.getElementById(
+    todoItemContextMenuAnchorElDomId(todoPopup.todoId),
+  )
+}
+
 const config = {
   state: {
     ...defaultState,
     ...cachedState,
   },
   actions,
-  effects: {},
+  effects: {
+    todoContextMenuAnchorEl: getTodoContextMenuAnchorEl,
+  },
 }
 declare module 'overmind' {
   // noinspection JSUnusedGlobalSymbols
