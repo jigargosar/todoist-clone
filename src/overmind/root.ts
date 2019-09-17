@@ -1,7 +1,14 @@
 import * as actions from './actions'
-import {state} from './state'
+import { debouncedCacheStoreState, state } from './state'
+import { json, OnInitialize } from 'overmind'
 
-export  {
-  state,
-  actions
+const onInitialize: OnInitialize = async (
+  { state, actions, effects },
+  overmind,
+) => {
+  overmind.addFlushListener((_mutation, _paths, _flushId, _isAsync) => {
+    debouncedCacheStoreState(json(overmind.state))
+  })
 }
+
+export { onInitialize, state, actions }
