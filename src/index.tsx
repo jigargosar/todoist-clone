@@ -588,7 +588,7 @@ const ViewTodoItem: FC<{
         className="ph1 pv1"
         // onClick={() => actions.editTodoClicked(todo.id)}
       >
-        <div className="f7 bg-light-pink bn bw1 br-pill ph1 lh-copy">
+        <div className="f7 bg-light-pink bn bw1 br-pill ph2 pv1 lh-copy truncate">
           {projectTitle}
         </div>
       </div>
