@@ -23,7 +23,7 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
-import omit from 'ramda/es/omit'
+
 
 type ProjectId = {
   readonly tag: 'ProjectId'
@@ -264,11 +264,6 @@ const cachedState: State = getCachedState()
 const openTodoMenu: Action<TodoId> = ({ state }, todoId: TodoId) => {
   state.todoPopup = { todoId }
 }
-const closeTodoMenuFor: Action<TodoId> = ({ state }, todoId) => {
-  if (isTodoPopupOpenFor(todoId, state.todoPopup)) {
-    state.todoPopup = null
-  }
-}
 const closeTodoMenu: Action = ({ state }) => {
   state.todoPopup = null
 }
@@ -384,7 +379,7 @@ const saveInlineTodoFormClicked: Action = ctx => {
 
 const actions = {
   openTodoMenu,
-  closeTodoMenuFor,
+
   closeTodoMenu,
   todoContextMenuItemClicked,
   setDone,
@@ -517,7 +512,7 @@ const ProjectItem: FC<{ project: Project }> = function ProjectItem({
 
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
   const {
-    state: { inlineTodoForm, projectList, isTodoPopupOpenFor, todoPopup },
+    state: { inlineTodoForm, projectList, isTodoPopupOpenFor },
   } = useOvermind()
 
   return (
@@ -643,7 +638,7 @@ const ViewTodoItem: FC<{
   menuOpen: boolean
   projectId: ProjectId | null
   projectTitle: string
-}> = memo(function ViewTodoItem({ todo, menuOpen, projectTitle }) {
+}> = memo(function ViewTodoItem({ todo,  projectTitle }) {
   const { actions } = useOvermind()
 
   const todoId = todo.id
@@ -701,58 +696,7 @@ const ViewTodoItem: FC<{
   )
 })
 
-function todoContextMenuItemsMeta(actions: Actions, todoId: TodoId) {
-  const items: [() => void, string][] = [
-    [() => actions.editTodoClicked(todoId), 'Edit'],
-    [() => actions.deleteTodo(todoId), 'Delete'],
-  ]
-  return items
-}
 
-// function ViewTodoItemContextMenu({ todoId }: { todoId: TodoId }) {
-//   const { actions } = useOvermind()
-//
-//   const rootRef: RefObject<HTMLDivElement> = useRef(null)
-//
-//   useEffect(() => {
-//     return () => actions.closeTodoMenu(todoId)
-//   })
-//
-//   function viewItem([action, label]: [() => void, string], idx: number) {
-//     return (
-//       <Button
-//         className="button-reset input-reset bn bg-inherit  ph2 pv1 pointer db w-100 tl"
-//         autoFocus={idx === 0}
-//         action={action}
-//         key={label}
-//       >
-//         {label}
-//       </Button>
-//     )
-//   }
-//
-//   const items = todoContextMenuItemsMeta(actions, todoId)
-//
-//   return (
-//     <div
-//       ref={rootRef}
-//       className="absolute right-0 top-2 bg-white shadow-1 z-1"
-//       style={{ width: 200 }}
-//       onBlur={e => {
-//         if (
-//           e.relatedTarget === null ||
-//           (e.relatedTarget instanceof Node &&
-//             rootRef.current &&
-//             !rootRef.current.contains(e.relatedTarget))
-//         ) {
-//           actions.closeTodoMenu(todoId)
-//         }
-//       }}
-//     >
-//       {items.map(viewItem)}
-//     </div>
-//   )
-// }
 
 const Button: FC<
   { action: () => void; className?: string } & ButtonHTMLAttributes<
