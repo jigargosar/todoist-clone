@@ -30,3 +30,4 @@ export const todoMenuItemClicked: Action<TodoMenuAction> = (
   }
   return shouldNeverBeCalled(actionType)
 }
+
