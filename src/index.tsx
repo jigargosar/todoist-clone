@@ -27,6 +27,8 @@ import {
 } from './overmind/state'
 import { TodoMenuAction } from './overmind/todoMenu/actions'
 import { config, useOvermind } from './overmind'
+import MUIButton from '@material-ui/core/Button'
+import { ButtonProps } from '@material-ui/core/Button'
 
 const { memo, useEffect, useState } = React
 
@@ -63,7 +65,11 @@ function AppContent() {
         <ViewAddTodoForm addingTodo={addingTodo} />
       ) : (
         <>
-          <Button onClick={() => actions.addTodoClicked()}>
+          <Button
+            size="small"
+            color="primary"
+            onClick={() => actions.addTodoClicked()}
+          >
             Add Task
           </Button>
           <Button onClick={() => actions.addFakeTodoClicked()}>
@@ -275,19 +281,8 @@ const ViewTodoItem: FC<{
   )
 })
 
-const Button: FC<ButtonHTMLAttributes<HTMLButtonElement>> = ({
-  className,
-  children,
-  ...other
-}) => (
-  <button
-    className={`button-reset input-reset bn bg-inherit ph2 pv1 pointer blue${
-      className ? className : ''
-    }`}
-    {...other}
-  >
-    {children}
-  </button>
+const Button = (props: ButtonProps) => (
+  <MUIButton size="small" color="primary" {...props} />
 )
 
 render(<App />, document.getElementById('root'))
