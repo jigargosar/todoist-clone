@@ -27,14 +27,14 @@ type ProjectId = {
 
 const ProjectId = {
   gen(): ProjectId {
-    return Object.freeze({ tag: 'ProjectId', value: nanoid() })
+    return ({ tag: 'ProjectId', value: nanoid() })
   },
   toString(projectId: ProjectId) {
     return projectId.value
   },
   fromString(str: string): ProjectId | null {
     if (str.trim() === '') return null
-    return Object.freeze({ tag: 'ProjectId', value: str.trim() })
+    return ({ tag: 'ProjectId', value: str.trim() })
   },
   eq(a: ProjectId) {
     return function eq(b: ProjectId) {
@@ -357,7 +357,8 @@ const config = {
 }
 declare module 'overmind' {
   // noinspection JSUnusedGlobalSymbols
-  interface Config extends IConfig<typeof config> {}
+  interface Config extends IConfig<typeof config> {
+  }
 }
 
 const useOvermind = createHook<typeof config>()
@@ -375,7 +376,7 @@ const AppProvider: FC = ({ children }) => {
 function App() {
   return (
     <AppProvider>
-      <AppContent />
+      <AppContent/>
     </AppProvider>
   )
 }
@@ -391,14 +392,14 @@ function AppContent() {
   return (
     <div className="pl2 lh-copy" style={{ maxWidth: 500 }}>
       <div className="f4 pv1">ProjectList</div>
-      <ViewProjectList projectList={state.projectList} />
+      <ViewProjectList projectList={state.projectList}/>
       <Button action={() => actions.addFakeProjectClicked()}>
         Add Fake Project
       </Button>
       <div className="f4 pv1">TodoList</div>
-      <ViewTodoList todoList={state.todoList} />
+      <ViewTodoList todoList={state.todoList}/>
       {addingTodo ? (
-        <ViewAddTodoForm addingTodo={addingTodo} />
+        <ViewAddTodoForm addingTodo={addingTodo}/>
       ) : (
         <>
           <Button action={() => actions.addTodoClicked()}>Add Task</Button>
@@ -429,8 +430,8 @@ function ViewProjectList({ projectList }: { projectList: Project[] }) {
 }
 
 const ProjectItem: FC<{ project: Project }> = memo(function ProjectItem({
-  project,
-}) {
+                                                                          project,
+                                                                        }) {
   const { actions } = useOvermind()
   return (
     <div className="flex">
@@ -489,13 +490,13 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
 }
 
 function ViewEditTodoForm({ editingTodo }: { editingTodo: EditingTodo }) {
-  return <ViewInlineTodoForm fields={editingTodo} />
+  return <ViewInlineTodoForm fields={editingTodo}/>
 }
 
 const ViewAddTodoForm: FC<{ addingTodo: AddingTodo }> = ({
-  addingTodo,
-}) => {
-  return <ViewInlineTodoForm fields={addingTodo} />
+                                                           addingTodo,
+                                                         }) => {
+  return <ViewInlineTodoForm fields={addingTodo}/>
 }
 
 function ViewInlineTodoForm({ fields }: { fields: TodoFormFields }) {
@@ -553,11 +554,11 @@ const ViewTodoItem: FC<{
   projectId: ProjectId | null
   projectTitle: string
 }> = memo(function ViewTodoItem({
-  todo,
-  menuOpen,
-  projectId,
-  projectTitle,
-}) {
+                                  todo,
+                                  menuOpen,
+                                  projectId,
+                                  projectTitle,
+                                }) {
   const { actions } = useOvermind()
 
   function openTodoMenu() {
@@ -605,7 +606,7 @@ const ViewTodoItem: FC<{
       </div>
       <div className="relative">
         <Button action={() => openTodoMenu()}>...</Button>
-        {menuOpen && <OpenedTodoMenu todoId={todo.id} />}
+        {menuOpen && <OpenedTodoMenu todoId={todo.id}/>}
       </div>
     </div>
   )
@@ -661,11 +662,7 @@ function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   )
 }
 
-const Button: FC<
-  { action: () => void; className?: string } & ButtonHTMLAttributes<
-    HTMLButtonElement
-  >
-> = ({ action, className, children, ...other }) => (
+const Button: FC<{ action: () => void; className?: string } & ButtonHTMLAttributes<HTMLButtonElement>> = ({ action, className, children, ...other }) => (
   <button
     className={`button-reset input-reset bn bg-inherit ph2 pv1 pointer blue${
       className ? className : ''
@@ -677,4 +674,4 @@ const Button: FC<
   </button>
 )
 
-render(<App />, document.getElementById('root'))
+render(<App/>, document.getElementById('root'))
