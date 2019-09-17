@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx nodemon -w tsconfig.json -w webpack.config.dev.js -w package-lock.json -w elm.json -x webpack-dev-server -- -d --open --config webpack.config.dev.js"
+    "start": "npx nodemon -w tsconfig.json -w webpack.config.dev.js -w package-lock.json -w elm.json -x webpack-dev-server -- -d --open --config webpack.config.dev.js",
+    "overmind": "npx overmind-devtools"
   },
   "keywords": [],
   "author": "",

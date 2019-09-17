@@ -1,11 +1,4 @@
-import React, {
-  ButtonHTMLAttributes,
-  FC,
-  memo,
-  RefObject,
-  useEffect,
-  useRef,
-} from 'react'
+import React, { ButtonHTMLAttributes, FC, RefObject, useEffect, useRef } from 'react'
 import { render } from 'react-dom'
 import 'tachyons'
 import './index.css'
@@ -13,13 +6,14 @@ import nanoid from 'nanoid'
 import faker from 'faker'
 import times from 'ramda/es/times'
 import debounce from 'lodash.debounce'
-import { Action, createOvermind, IConfig } from 'overmind'
+import { Action, createOvermind, Derive, IConfig } from 'overmind'
 import { createHook, Provider } from 'overmind-react'
 
 import equals from 'ramda/es/equals'
 import reject from 'ramda/es/reject'
 import clone from 'ramda/es/clone'
 import materialColorHash from 'material-color-hash'
+import { ResolveState } from 'overmind/lib/internalTypes'
 
 type ProjectId = {
   readonly tag: 'ProjectId'
@@ -214,6 +208,7 @@ type State = {
   todoList: Todo[]
   inlineTodoForm: AddingTodo | EditingTodo | null
   projectList: Project[]
+  isTodoPopupOpenFor:Derive<State, (todoId:TodoId) => boolean>
 }
 
 const initialTodos: Todo[] = times(Todo.createFake, 10)
@@ -224,9 +219,15 @@ const defaultState: State = {
   todoList: initialTodos,
   inlineTodoForm: null,
   projectList: initialProjects,
+  isTodoPopupOpenFor:(state=>{
+    const todoPopup = state.todoPopup
+    return function(todoId) {
+      return isTodoPopupOpenFor(todoId, state.todoPopup || todoPopup)
+    }
+  })
 }
 
-function cacheStoreState(state: State) {
+function cacheStoreState(state: ResolveState<State>) {
   const serializedModel = JSON.stringify(state)
   if (serializedModel) {
     localStorage.setItem('todoist-clone-model', serializedModel)
@@ -429,7 +430,7 @@ function ViewProjectList({ projectList }: { projectList: Project[] }) {
   )
 }
 
-const ProjectItem: FC<{ project: Project }> = memo(function ProjectItem({
+const ProjectItem: FC<{ project: Project }> = function ProjectItem({
   project,
 }) {
   const { actions } = useOvermind()
@@ -450,10 +451,12 @@ const ProjectItem: FC<{ project: Project }> = memo(function ProjectItem({
       </Button>
     </div>
   )
-})
+}
 
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
-  const { state: { inlineTodoForm, projectList, todoPopup } } = useOvermind()
+  const {
+    state: { inlineTodoForm, projectList, todoPopup },
+  } = useOvermind()
 
   return (
     <>
@@ -475,10 +478,10 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
           )
         }
         const menuOpen = isTodoPopupOpenFor(todo.id, todoPopup)
-        if(menuOpen){
+        if (menuOpen) {
           return (
             <ViewTodoItem
-              key={TodoId.toString(todo.id)+"___menu-open"}
+              key={TodoId.toString(todo.id) + '___menu-open'}
               todo={todo}
               menuOpen={menuOpen}
               projectId={projectId}
@@ -564,10 +567,9 @@ const ViewTodoItem: FC<{
   menuOpen: boolean
   projectId: ProjectId | null
   projectTitle: string
-}> = memo(function ViewTodoItem({
+}> = (function ViewTodoItem({
   todo,
   menuOpen,
-  projectId,
   projectTitle,
 }) {
   const { actions } = useOvermind()
@@ -622,8 +624,6 @@ const ViewTodoItem: FC<{
     </div>
   )
 })
-
-
 
 function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   const { actions } = useOvermind()
