@@ -27,14 +27,14 @@ type ProjectId = {
 
 const ProjectId = {
   gen(): ProjectId {
-    return { tag: 'ProjectId', value: nanoid() }
+    return Object.freeze({ tag: 'ProjectId', value: nanoid() })
   },
   toString(projectId: ProjectId) {
     return projectId.value
   },
   fromString(str: string): ProjectId | null {
     if (str.trim() === '') return null
-    return { tag: 'ProjectId', value: str.trim() }
+    return Object.freeze({ tag: 'ProjectId', value: str.trim() })
   },
   eq(a: ProjectId) {
     return function eq(b: ProjectId) {
