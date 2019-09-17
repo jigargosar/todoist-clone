@@ -20,7 +20,7 @@ import {
   createEditingTodo,
   defaultState,
   EditingTodo,
-  getTodoMenuAnchorElDomId,
+  getTodoMenuAnchorDomIdFor,
   InlineTodoForm,
   maybeEditingTodo,
   maybeEditingTodoFor,
@@ -459,7 +459,7 @@ const ViewTodoItem: FC<{
       </div>
       <div className="relative">
         <IconButton
-          id={getTodoMenuAnchorElDomId(todoId)}
+          id={getTodoMenuAnchorDomIdFor(todoId)}
           size="small"
           onClick={() => openTodoMenu()}
         >
