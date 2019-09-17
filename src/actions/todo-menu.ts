@@ -1,4 +1,3 @@
-// Actions: TodoContextMenu
 import { Action } from 'overmind'
 import { TodoId } from '../state'
 import { shouldNeverBeCalled } from '../utils'

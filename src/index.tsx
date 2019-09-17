@@ -28,38 +28,13 @@ import {
   TodoFormFields,
   TodoId,
 } from './state'
-import * as todoMenuActions from './actions/todo-menu'
 import { TodoMenuAction } from './actions/todo-menu'
-import {
-  addFakeProjectClicked,
-  addFakeTodoClicked,
-  addTodoClicked,
-  cancelInlineTodoFormClicked,
-  deleteProject,
-  deleteTodo,
-  editTodoClicked,
-  saveInlineTodoFormClicked,
-  setDone,
-  updateTodoForm,
-} from './actions'
+import * as actions from './actions'
 
 const { memo, useEffect, useState } = React
 
 const debounce = require('lodash.debounce')
 
-const actions = {
-  todoMenu: todoMenuActions,
-  setDone,
-  deleteTodo,
-  editTodoClicked,
-  updateTodoForm,
-  cancelInlineTodoFormClicked,
-  addTodoClicked,
-  saveInlineTodoFormClicked,
-  deleteProject,
-  addFakeTodoClicked,
-  addFakeProjectClicked,
-}
 
 function cacheStoreState(state: State) {
   const serializedModel = JSON.stringify(state)
