@@ -466,7 +466,7 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
         }
         const menuOpen = isTodoPopupOpenFor(todo.id, state.todoPopup)
         return (
-          <TodoItem
+          <ViewTodoItem
             key={TodoId.toString(todo.id)}
             todo={todo}
             menuOpen={menuOpen}
@@ -514,7 +514,7 @@ function ViewInlineTodoForm({ fields }: { fields: TodoFormFields }) {
   )
 }
 
-const TodoItem: FC<{
+const ViewTodoItem: FC<{
   todo: Todo
   menuOpen: boolean
   projectId: ProjectId | null
