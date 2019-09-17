@@ -55,25 +55,25 @@ function AppContent() {
     <div className="pl2 lh-copy" style={{ maxWidth: 500 }}>
       <div className="f4 pv1">ProjectList</div>
       <ViewProjectList projectList={state.projectList} />
-      <Button onClick={() => actions.addFakeProjectClicked()}>
+      <Btn onClick={() => actions.addFakeProjectClicked()}>
         Add Fake Project
-      </Button>
+      </Btn>
       <div className="f4 pv1">TodoList</div>
       <ViewTodoList todoList={state.todoList} />
       {addingTodo ? (
         <ViewAddTodoForm addingTodo={addingTodo} />
       ) : (
         <>
-          <Button
+          <Btn
             size="small"
             color="primary"
             onClick={() => actions.addTodoClicked()}
           >
             Add Task
-          </Button>
-          <Button onClick={() => actions.addFakeTodoClicked()}>
+          </Btn>
+          <Btn onClick={() => actions.addFakeTodoClicked()}>
             Add Fake Task
-          </Button>
+          </Btn>
         </>
       )}
     </div>
@@ -226,12 +226,12 @@ function ViewInlineTodoForm({ fields }: { fields: TodoFormFields }) {
           ))}
         </select>
         <div className="flex pv1">
-          <Button onClick={() => actions.saveInlineTodoFormClicked()}>
+          <Btn onClick={() => actions.saveInlineTodoFormClicked()}>
             Save
-          </Button>
-          <Button onClick={() => actions.cancelInlineTodoFormClicked()}>
+          </Btn>
+          <Btn onClick={() => actions.cancelInlineTodoFormClicked()}>
             Cancel
-          </Button>
+          </Btn>
         </div>
       </div>
     </div>
@@ -284,8 +284,8 @@ const ViewTodoItem: FC<{
   )
 })
 
-const Button = (props: ButtonProps) => (
-  <MUIButton size="small" color="primary" {...props} />
-)
+function Btn(props: ButtonProps) {
+  return <MUIButton size="small" color="primary" {...props} />
+}
 
 render(<App />, document.getElementById('root'))
