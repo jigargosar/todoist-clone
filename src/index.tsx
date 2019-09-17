@@ -301,7 +301,8 @@ function shouldNeverBeCalled(nopes: never) {
   return nopes
 }
 
-const todoContextMenuItemClicked: Action<'Edit' | 'Delete'> = (
+type TodoContextMenuAction = 'Edit' | 'Delete'
+const todoContextMenuItemClicked: Action<TodoContextMenuAction> = (
   { state: { todoPopup }, actions },
   actionType,
 ) => {
@@ -563,6 +564,8 @@ function ViewTodoItemContextMenu() {
     setAnchorEl(document.getElementById(todoContextMenuAnchorElDomId))
   }, [todoContextMenuAnchorElDomId])
 
+  const menuAction = (action: TodoContextMenuAction) => () =>
+    actions.todoContextMenuItemClicked(action)
   return (
     <Menu
       anchorEl={anchorEl}
@@ -570,14 +573,8 @@ function ViewTodoItemContextMenu() {
       keepMounted={true}
       onClose={() => actions.closeTodoMenu()}
     >
-      <MenuItem onClick={() => actions.todoContextMenuItemClicked('Edit')}>
-        Edit
-      </MenuItem>
-      <MenuItem
-        onClick={() => actions.todoContextMenuItemClicked('Delete')}
-      >
-        Delete
-      </MenuItem>
+      <MenuItem onClick={menuAction('Edit')}>Edit</MenuItem>
+      <MenuItem onClick={menuAction('Delete')}>Delete</MenuItem>
     </Menu>
   )
 }
