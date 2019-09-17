@@ -160,13 +160,13 @@ function ViewTodoItemContextMenu() {
   }, [todoMenuAnchorElId])
 
   const itemAction = (action: TodoMenuAction) => () =>
-    actions.todoMenu.itemClicked(action)
+      actions.todoMenuItemClicked(action)
   return (
     <Menu
       anchorEl={anchorEl}
       open={!!anchorEl}
       keepMounted={true}
-      onClose={() => actions.todoMenu.close()}
+      onClose={() => actions.todoMenuClose()}
     >
       <MenuItem onClick={itemAction('Edit')}>Edit</MenuItem>
       <MenuItem onClick={itemAction('Delete')}>Delete</MenuItem>
@@ -238,7 +238,7 @@ const ViewTodoItem: FC<{
   const todoId = todo.id
 
   function openTodoMenu() {
-    actions.todoMenu.open(todoId)
+    actions.todoMenuOpen(todoId)
   }
 
   function setDone(isDone: boolean) {

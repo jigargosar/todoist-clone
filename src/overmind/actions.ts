@@ -16,7 +16,7 @@ import clone from 'ramda/es/clone'
 import { Action } from './index'
 
 
-
+export * from './todoMenu/actions'
 
 export const setDone: Action<{ todoId: TodoId; isDone: boolean }> = (
   { state },
