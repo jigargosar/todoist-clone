@@ -302,6 +302,7 @@ const saveEditingTodo: Action = ({ state }) => {
   const maybeTodo = TodoList.findById(editingTodo.id)(state.todoList)
   if (maybeTodo) {
     maybeTodo.title = editingTodo.title
+    maybeTodo.projectId = editingTodo.projectId
   }
   state.inlineTodoForm = null
 }
@@ -312,6 +313,7 @@ const saveAddingTodo: Action = ({ state }) => {
 
   const todo = Todo.createFake()
   todo.title = addingTodo.title
+  todo.projectId = addingTodo.projectId
 
   state.todoList.push(todo)
 
