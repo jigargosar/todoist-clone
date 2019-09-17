@@ -562,6 +562,7 @@ function ViewTodoItemContextMenu() {
           : null
         setAnchorEl(anchorEl)
       },
+      { nested: true, immediate: true },
     ),
   )
 
