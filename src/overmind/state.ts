@@ -3,7 +3,6 @@ import times from 'ramda/es/times'
 import reject from 'ramda/es/reject'
 import { Derive } from 'overmind'
 
-
 const nanoid = require('nanoid')
 const faker = require('faker')
 
@@ -195,10 +194,10 @@ export type State = {
 const initialTodos: Todo[] = times(Todo.createFake, 10)
 const initialProjects: Project[] = times(Project.createFake, 5)
 const defaultState: State = {
+  todoMenu: null,
   todoList: initialTodos,
   inlineTodoForm: null,
   projectList: initialProjects,
-  todoMenu: null,
   todoMenuAnchorElId: state => {
     return state.todoMenu && state.todoMenu.todoId
       ? getTodoMenuAnchorDomIdFor(state.todoMenu.todoId)
@@ -213,7 +212,6 @@ export function getTodoMenuAnchorDomIdFor(todoId: TodoId) {
 export function maybeAddingTodo(form: InlineTodoForm): AddingTodo | null {
   return form && form.tag === 'AddingTodo' ? form : null
 }
-
 
 import pick from 'ramda/es/pick'
 
@@ -233,7 +231,7 @@ function getCachedState() {
   return pick(Object.keys(defaultState), parsedState)
 }
 
-export const state=  {
+export const state = {
   ...defaultState,
   ...getCachedState(),
 }

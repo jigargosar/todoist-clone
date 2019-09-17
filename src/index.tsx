@@ -3,7 +3,7 @@ import { ButtonHTMLAttributes, FC } from 'react'
 import { render } from 'react-dom'
 import 'tachyons'
 import './index.css'
-import { createOvermind, json } from 'overmind'
+import { createOvermind } from 'overmind'
 import { Provider } from 'overmind-react'
 import materialColorHash from 'material-color-hash'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -14,7 +14,6 @@ import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import {
   AddingTodo,
-  debouncedCacheStoreState,
   EditingTodo,
   getTodoMenuAnchorDomIdFor,
   maybeAddingTodo,
@@ -32,10 +31,6 @@ import { config, useOvermind } from './overmind'
 const { memo, useEffect, useState } = React
 
 const overmind = createOvermind(config)
-
-overmind.addFlushListener((_mutation, _paths, _flushId, _isAsync) => {
-  debouncedCacheStoreState(json(overmind.state))
-})
 
 const AppProvider: FC = ({ children }) => {
   return <Provider value={overmind}>{children}</Provider>
