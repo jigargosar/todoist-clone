@@ -20,7 +20,10 @@ import equals from 'ramda/es/equals'
 import reject from 'ramda/es/reject'
 import clone from 'ramda/es/clone'
 
-type ProjectId = { tag: 'ProjectId'; value: string }
+type ProjectId = {
+  readonly tag: 'ProjectId'
+  readonly value: string
+}
 
 const ProjectId = {
   gen(): ProjectId {
@@ -296,7 +299,7 @@ const updateTodoForm: Action<Partial<TodoFormFields>> = (
   }
 }
 
-function updatedTodoWithFormFields(form:TodoFormFields, todo:Todo) {
+function updatedTodoWithFormFields(form: TodoFormFields, todo: Todo) {
   todo.title = form.title
   todo.projectId = clone(form.projectId)
 }
