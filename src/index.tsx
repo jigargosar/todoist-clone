@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ButtonHTMLAttributes, FC } from 'react'
+import { FC } from 'react'
 import { render } from 'react-dom'
 import 'tachyons'
 import './index.css'
@@ -27,8 +27,7 @@ import {
 } from './overmind/state'
 import { TodoMenuAction } from './overmind/todoMenu/actions'
 import { config, useOvermind } from './overmind'
-import MUIButton from '@material-ui/core/Button'
-import { ButtonProps } from '@material-ui/core/Button'
+import MUIButton, { ButtonProps } from '@material-ui/core/Button'
 
 const { memo, useEffect, useState } = React
 
@@ -156,7 +155,7 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
 }
 
 function ViewTodoItemContextMenu() {
-  const { actions, state, reaction } = useOvermind()
+  const { actions,  reaction } = useOvermind()
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
 
