@@ -490,7 +490,8 @@ const ViewAddTodoForm: FC<{ addingTodo: AddingTodo }> = ({
 }
 
 function ViewInlineTodoForm({ fields }: { fields: TodoFormFields }) {
-  const { actions } = useOvermind()
+  const { state, actions } = useOvermind()
+  const projects = state.projectList
   return (
     <div className="flex">
       <div className="ph1 pv2 flex-grow-1">
@@ -501,6 +502,14 @@ function ViewInlineTodoForm({ fields }: { fields: TodoFormFields }) {
           value={fields.title}
           onChange={e => actions.updateTodoForm({ title: e.target.value })}
         />
+        <select className="pa1 w-100">
+          <option value="">Inbox</option>
+          {projects.map(project => (
+            <option value={ProjectId.toString(project.id)}>
+              {project.title}
+            </option>
+          ))}
+        </select>
         <div className="flex pv1">
           <Button action={() => actions.saveInlineTodoFormClicked()}>
             Save
@@ -519,7 +528,12 @@ const ViewTodoItem: FC<{
   menuOpen: boolean
   projectId: ProjectId | null
   projectTitle: string
-}> = memo(function ViewTodoItem({ todo, menuOpen , projectId, projectTitle}) {
+}> = memo(function ViewTodoItem({
+  todo,
+  menuOpen,
+  projectId,
+  projectTitle,
+}) {
   const { actions } = useOvermind()
 
   function openTodoMenu() {
@@ -554,7 +568,9 @@ const ViewTodoItem: FC<{
         className="ph1 pv1"
         // onClick={() => actions.editTodoClicked(todo.id)}
       >
-        <div className="f7 bg-light-pink bn bw1 br-pill ph1 lh-copy">{projectTitle}</div>
+        <div className="f7 bg-light-pink bn bw1 br-pill ph1 lh-copy">
+          {projectTitle}
+        </div>
       </div>
       <div className="relative">
         <Button action={() => openTodoMenu()}>...</Button>
