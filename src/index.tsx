@@ -18,6 +18,7 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
+import pick from 'ramda/es/pick'
 
 const { memo, useEffect, useState } = React
 
@@ -255,8 +256,12 @@ function cacheStoreState(state: State) {
 
 const debouncedCacheStoreState = debounce(cacheStoreState, 1000)
 
-function getCachedState() {
-  return JSON.parse(localStorage.getItem('todoist-clone-model') || '{}')
+function getCachedState(): State {
+  const parsedState = JSON.parse(
+    localStorage.getItem('todoist-clone-model') || '{}',
+  )
+  // @ts-ignore
+  return pick(Object.keys(defaultState), parsedState)
 }
 
 const cachedState: State = getCachedState()
