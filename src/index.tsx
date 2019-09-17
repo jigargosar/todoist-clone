@@ -3,12 +3,8 @@ import { ButtonHTMLAttributes, FC } from 'react'
 import { render } from 'react-dom'
 import 'tachyons'
 import './index.css'
-import times from 'ramda/es/times'
-import { Action, createOvermind, Derive, IConfig, json } from 'overmind'
+import { Action, createOvermind, IConfig, json } from 'overmind'
 import { createHook, Provider } from 'overmind-react'
-
-import equals from 'ramda/es/equals'
-import reject from 'ramda/es/reject'
 import clone from 'ramda/es/clone'
 import materialColorHash from 'material-color-hash'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -18,233 +14,31 @@ import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import pick from 'ramda/es/pick'
+import {
+  AddingTodo,
+  createAddingTodo,
+  createEditingTodo,
+  defaultState,
+  EditingTodo,
+  getTodoContextMenuAnchorElDomId,
+  InlineTodoForm,
+  maybeEditingTodo,
+  maybeEditingTodoFor,
+  Project,
+  ProjectId,
+  ProjectList,
+  State,
+  Todo,
+  TodoFormFields,
+  TodoId,
+  TodoList,
+} from './state'
 
 const { memo, useEffect, useState } = React
 
 const nanoid = require('nanoid')
 const faker = require('faker')
 const debounce = require('lodash.debounce')
-
-type ProjectId = {
-  readonly tag: 'ProjectId'
-  readonly value: string
-}
-
-const ProjectId = {
-  gen(): ProjectId {
-    return { tag: 'ProjectId', value: nanoid() }
-  },
-  toString(projectId: ProjectId) {
-    return projectId.value
-  },
-  toStringOrEmpty(projectId: ProjectId | null) {
-    return projectId === null ? '' : projectId.value
-  },
-  fromString(str: string): ProjectId | null {
-    if (str.trim() === '') return null
-    return { tag: 'ProjectId', value: str.trim() }
-  },
-  eq(a: ProjectId) {
-    return function eq(b: ProjectId) {
-      return equals(a, b)
-    }
-  },
-}
-
-type Project = {
-  id: ProjectId
-  title: string
-}
-
-const Project = {
-  idEq(id: ProjectId) {
-    return function idEq(project: Project) {
-      return ProjectId.eq(id)(project.id)
-    }
-  },
-  createFake(): Project {
-    return {
-      id: ProjectId.gen(),
-      title: faker.hacker.ingverb() + ' ' + faker.hacker.noun(),
-    }
-  },
-}
-type ProjectList = Project[]
-
-const ProjectList = {
-  findById(projectId: ProjectId) {
-    return function findById(projectList: ProjectList) {
-      return projectList.find(Project.idEq(projectId))
-    }
-  },
-  findTitleByIdOrInbox(projectId: ProjectId | null) {
-    return function findTitleByIdOrInbox(projectList: ProjectList) {
-      if (!projectId) {
-        return 'Inbox'
-      }
-
-      const project = ProjectList.findById(projectId)(projectList)
-      if (project) {
-        return project.title
-      } else {
-        return 'Inbox'
-      }
-    }
-  },
-  // findIndexById(projectId: ProjectId) {
-  //   return function findIndexById(projectList: ProjectList) {
-  //     return projectList.findIndex(Project.idEq(projectId))
-  //   }
-  // },
-  append(project: Project) {
-    return function append(projectList: ProjectList) {
-      return [...projectList, project]
-    }
-  },
-  withoutId(projectId: ProjectId) {
-    return function withoutId(projectList: ProjectList) {
-      return reject(Project.idEq(projectId))(projectList)
-    }
-  },
-}
-
-type TodoId = { tag: 'TodoId'; value: string }
-
-const TodoId = {
-  gen(): TodoId {
-    return { tag: 'TodoId', value: nanoid() }
-  },
-  toString(todoId: TodoId) {
-    return todoId.value
-  },
-
-  eq(a: TodoId) {
-    return function eq(b: TodoId) {
-      return equals(a, b)
-    }
-  },
-}
-
-type Todo = {
-  id: TodoId
-  title: string
-  isDone: boolean
-  projectId: ProjectId | null
-}
-
-const Todo = {
-  idEq(id: TodoId) {
-    return function idEq(todo: Todo) {
-      return TodoId.eq(id)(todo.id)
-    }
-  },
-  createFake(): Todo {
-    return {
-      id: TodoId.gen(),
-      title: faker.hacker.phrase(),
-      isDone: false,
-      projectId: null,
-    }
-  },
-}
-
-type TodoList = Todo[]
-
-const TodoList = {
-  findById(todoId: TodoId) {
-    return function findById(todoList: TodoList) {
-      return todoList.find(Todo.idEq(todoId))
-    }
-  },
-  // findIndexById(todoId: TodoId) {
-  //   return function findIndexById(todoList: TodoList) {
-  //     return todoList.findIndex(Todo.idEq(todoId))
-  //   }
-  // },
-  append(todo: Todo) {
-    return function append(todoList: TodoList) {
-      return [...todoList, todo]
-    }
-  },
-  withoutId(todoId: TodoId) {
-    return function withoutId(todoList: TodoList) {
-      return reject(Todo.idEq(todoId))(todoList)
-    }
-  },
-}
-
-type TodoFormFields = { title: string; projectId: ProjectId | null }
-type EditingTodo = { tag: 'EditingTodo'; id: TodoId } & TodoFormFields
-
-function createEditingTodo(todo: Todo): EditingTodo {
-  return {
-    tag: 'EditingTodo',
-    id: todo.id,
-    title: todo.title,
-    projectId: todo.projectId,
-  }
-}
-
-type AddingTodo = { tag: 'AddingTodo' } & TodoFormFields
-
-function createAddingTodo(): AddingTodo {
-  return { tag: 'AddingTodo', title: '', projectId: null }
-}
-
-type InlineTodoForm = AddingTodo | EditingTodo | null
-
-function maybeEditingTodo(form: InlineTodoForm): EditingTodo | null {
-  return form && form.tag === 'EditingTodo' ? form : null
-}
-
-function maybeEditingTodoFor(
-  todoId: TodoId,
-  form: InlineTodoForm,
-): EditingTodo | null {
-  const editingTodo = maybeEditingTodo(form)
-  return editingTodo && TodoId.eq(editingTodo.id)(todoId)
-    ? editingTodo
-    : null
-}
-
-type TodoMenu = { todoId: TodoId }
-
-function isTodoMenuOpenFor(
-  todoId: TodoId,
-  todoMenu: TodoMenu | null,
-): boolean {
-  return !!todoMenu && TodoId.eq(todoMenu.todoId)(todoId)
-}
-
-type State = {
-  todoMenu: TodoMenu | null
-  todoList: Todo[]
-  inlineTodoForm: AddingTodo | EditingTodo | null
-  projectList: Project[]
-  isTodoMenuOpenFor: Derive<State, (todoId: TodoId) => boolean>
-  todoMenuAnchorElId: Derive<State, string>
-}
-
-const initialTodos: Todo[] = times(Todo.createFake, 10)
-const initialProjects: Project[] = times(Project.createFake, 5)
-
-const defaultState: State = {
-  todoMenu: null,
-  todoList: initialTodos,
-  inlineTodoForm: null,
-  projectList: initialProjects,
-  isTodoMenuOpenFor: state => {
-    const todoMenu = state.todoMenu
-    return function(todoId) {
-      return isTodoMenuOpenFor(todoId, state.todoMenu || todoMenu)
-    }
-  },
-  todoMenuAnchorElId: state => {
-    return state.todoMenu && state.todoMenu.todoId
-      ? getTodoContextMenuAnchorElDomId(state.todoMenu.todoId)
-      : ''
-  },
-}
 
 // Actions: TodoContextMenu
 const openTodoMenu: Action<TodoId> = ({ state }, todoId: TodoId) => {
@@ -617,10 +411,6 @@ function ViewInlineTodoForm({ fields }: { fields: TodoFormFields }) {
       </div>
     </div>
   )
-}
-
-function getTodoContextMenuAnchorElDomId(todoId: TodoId) {
-  return TodoId.toString(todoId) + '__context-menu-anchor'
 }
 
 const ViewTodoItem: FC<{
