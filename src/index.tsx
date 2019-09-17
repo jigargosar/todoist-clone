@@ -602,7 +602,7 @@ const ViewTodoItem: FC<{
         </div>
       </div>
       <div className="relative">
-        <Button action={() => openTodoMenu()}>...</Button>
+        <Button className="b f3" action={() => openTodoMenu()}>...</Button>
         {menuOpen && <ViewTodoItemContextMenu todoId={todo.id} />}
       </div>
     </div>
