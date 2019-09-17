@@ -222,7 +222,7 @@ type State = {
   inlineTodoForm: AddingTodo | EditingTodo | null
   projectList: Project[]
   isTodoPopupOpenFor: Derive<State, (todoId: TodoId) => boolean>
-  todoContextMenuAnchorElDomId: Derive<State, string>
+  todoMenuAnchorElId: Derive<State, string>
 }
 
 const initialTodos: Todo[] = times(Todo.createFake, 10)
@@ -239,7 +239,7 @@ const defaultState: State = {
       return isTodoPopupOpenFor(todoId, state.todoPopup || todoPopup)
     }
   },
-  todoContextMenuAnchorElDomId: state => {
+  todoMenuAnchorElId: state => {
     return state.todoPopup && state.todoPopup.todoId
       ? getTodoContextMenuAnchorElDomId(state.todoPopup.todoId)
       : ''
@@ -550,14 +550,14 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
 function ViewTodoItemContextMenu() {
   const {
     actions,
-    state: { todoContextMenuAnchorElDomId },
+    state: { todoMenuAnchorElId },
   } = useOvermind()
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
 
   useEffect(() => {
-    setAnchorEl(document.getElementById(todoContextMenuAnchorElDomId))
-  }, [todoContextMenuAnchorElDomId])
+    setAnchorEl(document.getElementById(todoMenuAnchorElId))
+  }, [todoMenuAnchorElId])
 
   const itemAction = (action: TodoContextMenuAction) => () =>
     actions.todoMenu.itemClicked(action)
