@@ -299,12 +299,12 @@ const updateTodoForm: Action<Partial<TodoFormFields>> = (
 const saveEditingTodo: Action = ({ state }) => {
   const editingTodo = maybeEditingTodo(state.inlineTodoForm)
   if (!editingTodo) return
-  state.inlineTodoForm = null
   const maybeTodo = TodoList.findById(editingTodo.id)(state.todoList)
   if (maybeTodo) {
     maybeTodo.title = editingTodo.title
     maybeTodo.projectId = clone(editingTodo.projectId)
   }
+  state.inlineTodoForm = null
 }
 
 const saveAddingTodo: Action = ({ state }) => {
