@@ -14,11 +14,12 @@ import faker from 'faker'
 import times from 'ramda/es/times'
 import debounce from 'lodash.debounce'
 import { Action, createOvermind, IConfig } from 'overmind'
-
 import { createHook, Provider } from 'overmind-react'
+
 import equals from 'ramda/es/equals'
 import reject from 'ramda/es/reject'
 import clone from 'ramda/es/clone'
+import materialColorHash from 'material-color-hash'
 
 type ProjectId = {
   readonly tag: 'ProjectId'
@@ -452,18 +453,18 @@ const ProjectItem: FC<{ project: Project }> = memo(function ProjectItem({
 })
 
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
-  const { state } = useOvermind()
+  const { state: { inlineTodoForm, projectList, todoPopup } } = useOvermind()
 
   return (
     <>
       {todoList.map(todo => {
         const projectId = todo.projectId
         const projectTitle = ProjectList.findTitleByIdOrInbox(projectId)(
-          state.projectList,
+          projectList,
         )
         const maybeEditingTodo = maybeEditingTodoFor(
           todo.id,
-          state.inlineTodoForm,
+          inlineTodoForm,
         )
         if (maybeEditingTodo) {
           return (
@@ -473,7 +474,18 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
             />
           )
         }
-        const menuOpen = isTodoPopupOpenFor(todo.id, state.todoPopup)
+        const menuOpen = isTodoPopupOpenFor(todo.id, todoPopup)
+        if(menuOpen){
+          return (
+            <ViewTodoItem
+              key={TodoId.toString(todo.id)+"___menu-open"}
+              todo={todo}
+              menuOpen={menuOpen}
+              projectId={projectId}
+              projectTitle={projectTitle}
+            />
+          )
+        }
         return (
           <ViewTodoItem
             key={TodoId.toString(todo.id)}
@@ -611,7 +623,7 @@ const ViewTodoItem: FC<{
   )
 })
 
-import materialColorHash from 'material-color-hash'
+
 
 function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
   const { actions } = useOvermind()
