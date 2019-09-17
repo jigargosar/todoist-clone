@@ -27,6 +27,7 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
+import prop from 'ramda/es/prop'
 
 type ProjectId = {
   readonly tag: 'ProjectId'
@@ -261,10 +262,13 @@ const cachedState: State = getCachedState()
 const openTodoMenu: Action<TodoId> = ({ state }, todoId: TodoId) => {
   state.todoPopup = { todoId }
 }
-const closeTodoMenu: Action<TodoId> = ({ state }, todoId) => {
+const closeTodoMenuFor: Action<TodoId> = ({ state }, todoId) => {
   if (isTodoPopupOpenFor(todoId, state.todoPopup)) {
     state.todoPopup = null
   }
+}
+const closeTodoMenu: Action = ({ state }) => {
+  state.todoPopup = null
 }
 const setDone: Action<{ todoId: TodoId; isDone: boolean }> = (
   { state },
@@ -290,6 +294,29 @@ const editTodoClicked: Action<TodoId> = (ctx, todoId) => {
     state.inlineTodoForm = createEditingTodo(maybeTodo)
   }
 }
+
+function shouldNeverBeCalled(nopes: never) {
+  return nopes
+}
+
+const todoContextMenuItemClicked: Action<'Edit' | 'Delete'> = (
+  { state: { todoPopup }, actions },
+  actionType,
+) => {
+  const todoId = todoPopup && todoPopup.todoId
+  if (!todoId) return
+  actions.closeTodoMenu()
+  switch (actionType) {
+    case 'Edit':
+      actions.editTodoClicked(todoId)
+      return
+    case 'Delete':
+      actions.deleteTodo(todoId)
+      return
+  }
+  return shouldNeverBeCalled(actionType)
+}
+
 const addTodoClicked: Action = ctx => {
   const { state } = ctx
   saveEditingTodo(ctx)
@@ -354,7 +381,9 @@ const saveInlineTodoFormClicked: Action = ctx => {
 
 const actions = {
   openTodoMenu,
+  closeTodoMenuFor,
   closeTodoMenu,
+  todoContextMenuItemClicked,
   setDone,
   deleteTodo,
   editTodoClicked,
@@ -477,9 +506,7 @@ const ProjectItem: FC<{ project: Project }> = function ProjectItem({
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
   const {
     state: { inlineTodoForm, projectList, isTodoPopupOpenFor, todoPopup },
-    actions,
   } = useOvermind()
-  const contextMenuOpenFor = !!todoPopup && todoPopup.todoId
 
   return (
     <>
@@ -519,36 +546,32 @@ function ViewTodoItemContextMenu() {
     actions,
   } = useOvermind()
   const contextMenuOpenFor = !!todoPopup && todoPopup.todoId
-  return !!contextMenuOpenFor ? (
-    <Menu
-      anchorEl={document.getElementById(
-        todoItemContentMenuAnchorElDomId(contextMenuOpenFor),
-      )}
-      open={
-        !!document.getElementById(
-          todoItemContentMenuAnchorElDomId(contextMenuOpenFor),
-        )
-      }
-      keepMounted={false}
-      onClose={() => actions.closeTodoMenu(contextMenuOpenFor)}
-    >
-      {todoContextMenuItemsMeta(actions, contextMenuOpenFor).map(
-        ([action, label]) => {
-          return (
-            <MenuItem
-              key={label}
-              onClick={() => {
-                action()
-                actions.closeTodoMenu(contextMenuOpenFor)
-              }}
-            >
-              {label}
-            </MenuItem>
-          )
-        },
-      )}
-    </Menu>
-  ) : null
+  if (contextMenuOpenFor) {
+    const anchorEl = document.getElementById(
+      todoItemContentMenuAnchorElDomId(contextMenuOpenFor),
+    )
+    return (
+      <Menu
+        anchorEl={anchorEl}
+        open={!!anchorEl}
+        keepMounted={false}
+        onClose={() => actions.closeTodoMenu()}
+      >
+        <MenuItem
+          onClick={() => actions.todoContextMenuItemClicked('Edit')}
+        >
+          Edit
+        </MenuItem>
+        <MenuItem
+          onClick={() => actions.todoContextMenuItemClicked('Delete')}
+        >
+          Delete
+        </MenuItem>
+      </Menu>
+    )
+  } else {
+    return null
+  }
 }
 
 function ViewEditTodoForm({ editingTodo }: { editingTodo: EditingTodo }) {
