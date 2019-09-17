@@ -274,7 +274,7 @@ const todoContextMenuItemClicked: Action<TodoContextMenuAction> = (
 ) => {
   const todoId = todoPopup && todoPopup.todoId
   if (!todoId) return
-  actions.closeTodoMenu()
+  actions.todoMenu.close()
   switch (actionType) {
     case 'Edit':
       actions.editTodoClicked(todoId)
@@ -378,9 +378,6 @@ const saveInlineTodoFormClicked: Action = ctx => {
 }
 
 const actions = {
-  openTodoMenu,
-  closeTodoMenu,
-  todoContextMenuItemClicked,
   todoMenu: {
     open: openTodoMenu,
     close: closeTodoMenu,
@@ -564,13 +561,13 @@ function ViewTodoItemContextMenu() {
   }, [todoContextMenuAnchorElDomId])
 
   const itemAction = (action: TodoContextMenuAction) => () =>
-    actions.todoContextMenuItemClicked(action)
+    actions.todoMenu.itemClicked(action)
   return (
     <Menu
       anchorEl={anchorEl}
       open={!!anchorEl}
       keepMounted={true}
-      onClose={() => actions.closeTodoMenu()}
+      onClose={() => actions.todoMenu.close()}
     >
       <MenuItem onClick={itemAction('Edit')}>Edit</MenuItem>
       <MenuItem onClick={itemAction('Delete')}>Delete</MenuItem>
@@ -648,7 +645,7 @@ const ViewTodoItem: FC<{
   const todoId = todo.id
 
   function openTodoMenu() {
-    actions.openTodoMenu(todoId)
+    actions.todoMenu.open(todoId)
   }
 
   function setDone(isDone: boolean) {
@@ -675,10 +672,7 @@ const ViewTodoItem: FC<{
       >
         {todo.title}
       </div>
-      <div
-        className="ph1 pv1"
-        // onClick={() => actions.editTodoClicked(todo.id)}
-      >
+      <div className="ph1 pv1">
         <div
           className="f7 bn bw1 br-pill ph1 ttc lh-copy truncate"
           style={materialColorHash(projectTitle, 700)}
@@ -694,7 +688,6 @@ const ViewTodoItem: FC<{
         >
           <MoreHorizIcon fontSize="small" />
         </IconButton>
-        {/*{menuOpen && <ViewTodoItemContextMenu todoId={todo.id} />}*/}
       </div>
     </div>
   )
