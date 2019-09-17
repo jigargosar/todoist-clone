@@ -508,34 +508,47 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
           />
         )
       })}
-      {!!contextMenuOpenFor && (
-        <Menu
-          anchorEl={document.getElementById(
-            todoItemContentMenuAnchorElDomId(contextMenuOpenFor),
-          )}
-          open={true}
-          keepMounted={false}
-          onClose={() => actions.closeTodoMenu(contextMenuOpenFor)}
-        >
-          {todoContextMenuItemsMeta(actions, contextMenuOpenFor).map(
-            ([action, label]) => {
-              return (
-                <MenuItem
-                  key={label}
-                  onClick={() => {
-                    action()
-                    actions.closeTodoMenu(contextMenuOpenFor)
-                  }}
-                >
-                  {label}
-                </MenuItem>
-              )
-            },
-          )}
-        </Menu>
-      )}
+      <ViewTodoItemContextMenu />
     </>
   )
+}
+
+function ViewTodoItemContextMenu() {
+  const {
+    state: { todoPopup },
+    actions,
+  } = useOvermind()
+  const contextMenuOpenFor = !!todoPopup && todoPopup.todoId
+  return !!contextMenuOpenFor ? (
+    <Menu
+      anchorEl={document.getElementById(
+        todoItemContentMenuAnchorElDomId(contextMenuOpenFor),
+      )}
+      open={
+        !!document.getElementById(
+          todoItemContentMenuAnchorElDomId(contextMenuOpenFor),
+        )
+      }
+      keepMounted={false}
+      onClose={() => actions.closeTodoMenu(contextMenuOpenFor)}
+    >
+      {todoContextMenuItemsMeta(actions, contextMenuOpenFor).map(
+        ([action, label]) => {
+          return (
+            <MenuItem
+              key={label}
+              onClick={() => {
+                action()
+                actions.closeTodoMenu(contextMenuOpenFor)
+              }}
+            >
+              {label}
+            </MenuItem>
+          )
+        },
+      )}
+    </Menu>
+  ) : null
 }
 
 function ViewEditTodoForm({ editingTodo }: { editingTodo: EditingTodo }) {
@@ -668,50 +681,50 @@ function todoContextMenuItemsMeta(actions: Actions, todoId: TodoId) {
   return items
 }
 
-function ViewTodoItemContextMenu({ todoId }: { todoId: TodoId }) {
-  const { actions } = useOvermind()
-
-  const rootRef: RefObject<HTMLDivElement> = useRef(null)
-
-  useEffect(() => {
-    return () => actions.closeTodoMenu(todoId)
-  })
-
-  function viewItem([action, label]: [() => void, string], idx: number) {
-    return (
-      <Button
-        className="button-reset input-reset bn bg-inherit  ph2 pv1 pointer db w-100 tl"
-        autoFocus={idx === 0}
-        action={action}
-        key={label}
-      >
-        {label}
-      </Button>
-    )
-  }
-
-  const items = todoContextMenuItemsMeta(actions, todoId)
-
-  return (
-    <div
-      ref={rootRef}
-      className="absolute right-0 top-2 bg-white shadow-1 z-1"
-      style={{ width: 200 }}
-      onBlur={e => {
-        if (
-          e.relatedTarget === null ||
-          (e.relatedTarget instanceof Node &&
-            rootRef.current &&
-            !rootRef.current.contains(e.relatedTarget))
-        ) {
-          actions.closeTodoMenu(todoId)
-        }
-      }}
-    >
-      {items.map(viewItem)}
-    </div>
-  )
-}
+// function ViewTodoItemContextMenu({ todoId }: { todoId: TodoId }) {
+//   const { actions } = useOvermind()
+//
+//   const rootRef: RefObject<HTMLDivElement> = useRef(null)
+//
+//   useEffect(() => {
+//     return () => actions.closeTodoMenu(todoId)
+//   })
+//
+//   function viewItem([action, label]: [() => void, string], idx: number) {
+//     return (
+//       <Button
+//         className="button-reset input-reset bn bg-inherit  ph2 pv1 pointer db w-100 tl"
+//         autoFocus={idx === 0}
+//         action={action}
+//         key={label}
+//       >
+//         {label}
+//       </Button>
+//     )
+//   }
+//
+//   const items = todoContextMenuItemsMeta(actions, todoId)
+//
+//   return (
+//     <div
+//       ref={rootRef}
+//       className="absolute right-0 top-2 bg-white shadow-1 z-1"
+//       style={{ width: 200 }}
+//       onBlur={e => {
+//         if (
+//           e.relatedTarget === null ||
+//           (e.relatedTarget instanceof Node &&
+//             rootRef.current &&
+//             !rootRef.current.contains(e.relatedTarget))
+//         ) {
+//           actions.closeTodoMenu(todoId)
+//         }
+//       }}
+//     >
+//       {items.map(viewItem)}
+//     </div>
+//   )
+// }
 
 const Button: FC<
   { action: () => void; className?: string } & ButtonHTMLAttributes<
