@@ -20,11 +20,13 @@ import equals from 'ramda/es/equals'
 import reject from 'ramda/es/reject'
 import clone from 'ramda/es/clone'
 import materialColorHash from 'material-color-hash'
-import { ResolveState } from 'overmind/lib/internalTypes'
+import { ResolveActions, ResolveState } from 'overmind/lib/internalTypes'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import IconButton from '@material-ui/core/IconButton'
 import DeleteIcon from '@material-ui/icons/Delete'
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
+import Menu from '@material-ui/core/Menu'
+import MenuItem from '@material-ui/core/MenuItem'
 
 type ProjectId = {
   readonly tag: 'ProjectId'
@@ -350,25 +352,29 @@ const saveInlineTodoFormClicked: Action = ctx => {
   ctx.state.inlineTodoForm = null
 }
 
+const actions = {
+  openTodoMenu,
+  closeTodoMenu,
+  setDone,
+  deleteTodo,
+  editTodoClicked,
+  updateTodoForm,
+  cancelInlineTodoFormClicked,
+  addTodoClicked,
+  saveInlineTodoFormClicked,
+  deleteProject,
+  addFakeTodoClicked,
+  addFakeProjectClicked,
+}
+
+type Actions = ResolveActions<typeof actions>
+
 const config = {
   state: {
     ...defaultState,
     ...cachedState,
   },
-  actions: {
-    openTodoMenu,
-    closeTodoMenu,
-    setDone,
-    deleteTodo,
-    editTodoClicked,
-    updateTodoForm,
-    cancelInlineTodoFormClicked,
-    addTodoClicked,
-    saveInlineTodoFormClicked,
-    deleteProject,
-    addFakeTodoClicked,
-    addFakeProjectClicked,
-  },
+  actions,
   effects: {},
 }
 declare module 'overmind' {
@@ -470,8 +476,10 @@ const ProjectItem: FC<{ project: Project }> = function ProjectItem({
 
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
   const {
-    state: { inlineTodoForm, projectList, isTodoPopupOpenFor },
+    state: { inlineTodoForm, projectList, isTodoPopupOpenFor, todoPopup },
+    actions,
   } = useOvermind()
+  const contextMenuOpenFor = !!todoPopup && todoPopup.todoId
 
   return (
     <>
@@ -500,6 +508,32 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
           />
         )
       })}
+      {!!contextMenuOpenFor && (
+        <Menu
+          anchorEl={document.getElementById(
+            todoItemContentMenuAnchorElDomId(contextMenuOpenFor),
+          )}
+          open={true}
+          keepMounted={false}
+          onClose={() => actions.closeTodoMenu(contextMenuOpenFor)}
+        >
+          {todoContextMenuItemsMeta(actions, contextMenuOpenFor).map(
+            ([action, label]) => {
+              return (
+                <MenuItem
+                  key={label}
+                  onClick={() => {
+                    action()
+                    actions.closeTodoMenu(contextMenuOpenFor)
+                  }}
+                >
+                  {label}
+                </MenuItem>
+              )
+            },
+          )}
+        </Menu>
+      )}
     </>
   )
 }
@@ -559,6 +593,10 @@ function ViewInlineTodoForm({ fields }: { fields: TodoFormFields }) {
   )
 }
 
+function todoItemContentMenuAnchorElDomId(todoId: TodoId) {
+  return TodoId.toString(todoId) + '__context-menu-anchor'
+}
+
 const ViewTodoItem: FC<{
   todo: Todo
   menuOpen: boolean
@@ -567,13 +605,15 @@ const ViewTodoItem: FC<{
 }> = memo(function ViewTodoItem({ todo, menuOpen, projectTitle }) {
   const { actions } = useOvermind()
 
+  const todoId = todo.id
+
   function openTodoMenu() {
-    actions.openTodoMenu(todo.id)
+    actions.openTodoMenu(todoId)
   }
 
   function setDone(isDone: boolean) {
     actions.setDone({
-      todoId: todo.id,
+      todoId: todoId,
       isDone,
     })
   }
@@ -591,7 +631,7 @@ const ViewTodoItem: FC<{
       </div>
       <div
         className="ph1 pv1 flex-grow-1 lh-title"
-        onClick={() => actions.editTodoClicked(todo.id)}
+        onClick={() => actions.editTodoClicked(todoId)}
       >
         {todo.title}
       </div>
@@ -607,14 +647,26 @@ const ViewTodoItem: FC<{
         </div>
       </div>
       <div className="relative">
-        <IconButton size="small" onClick={() => openTodoMenu()}>
+        <IconButton
+          id={todoItemContentMenuAnchorElDomId(todoId)}
+          size="small"
+          onClick={() => openTodoMenu()}
+        >
           <MoreHorizIcon fontSize="small" />
         </IconButton>
-        {menuOpen && <ViewTodoItemContextMenu todoId={todo.id} />}
+        {/*{menuOpen && <ViewTodoItemContextMenu todoId={todo.id} />}*/}
       </div>
     </div>
   )
 })
+
+function todoContextMenuItemsMeta(actions: Actions, todoId: TodoId) {
+  const items: [() => void, string][] = [
+    [() => actions.editTodoClicked(todoId), 'Edit'],
+    [() => actions.deleteTodo(todoId), 'Delete'],
+  ]
+  return items
+}
 
 function ViewTodoItemContextMenu({ todoId }: { todoId: TodoId }) {
   const { actions } = useOvermind()
@@ -638,10 +690,7 @@ function ViewTodoItemContextMenu({ todoId }: { todoId: TodoId }) {
     )
   }
 
-  const items: [() => void, string][] = [
-    [() => actions.editTodoClicked(todoId), 'Edit'],
-    [() => actions.deleteTodo(todoId), 'Delete'],
-  ]
+  const items = todoContextMenuItemsMeta(actions, todoId)
 
   return (
     <div
