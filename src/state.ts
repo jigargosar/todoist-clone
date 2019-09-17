@@ -196,22 +196,15 @@ export type State = {
   todoList: Todo[]
   inlineTodoForm: AddingTodo | EditingTodo | null
   projectList: Project[]
-  isTodoMenuOpenFor: Derive<State, (todoId: TodoId) => boolean>
   todoMenuAnchorElId: Derive<State, string>
 }
 const initialTodos: Todo[] = times(Todo.createFake, 10)
 const initialProjects: Project[] = times(Project.createFake, 5)
 export const defaultState: State = {
-  todoMenu: null,
   todoList: initialTodos,
   inlineTodoForm: null,
   projectList: initialProjects,
-  isTodoMenuOpenFor: state => {
-    const todoMenu = state.todoMenu
-    return function(todoId) {
-      return isTodoMenuOpenFor(todoId, state.todoMenu || todoMenu)
-    }
-  },
+  todoMenu: null,
   todoMenuAnchorElId: state => {
     return state.todoMenu && state.todoMenu.todoId
       ? getTodoMenuAnchorDomIdFor(state.todoMenu.todoId)

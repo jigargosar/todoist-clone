@@ -294,7 +294,7 @@ const ProjectItem: FC<{ project: Project }> = function ProjectItem({
 
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
   const {
-    state: { inlineTodoForm, projectList, isTodoMenuOpenFor },
+    state: { inlineTodoForm, projectList },
   } = useOvermind()
 
   return (
@@ -318,8 +318,6 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
           <ViewTodoItem
             key={TodoId.toString(id)}
             todo={todo}
-            menuOpen={isTodoMenuOpenFor(id)}
-            projectId={projectId}
             projectTitle={projectTitle}
           />
         )
@@ -413,8 +411,6 @@ function ViewInlineTodoForm({ fields }: { fields: TodoFormFields }) {
 
 const ViewTodoItem: FC<{
   todo: Todo
-  menuOpen: boolean
-  projectId: ProjectId | null
   projectTitle: string
 }> = memo(function ViewTodoItem({ todo, projectTitle }) {
   const { actions } = useOvermind()
