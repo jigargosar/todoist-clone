@@ -3,7 +3,7 @@ import { ButtonHTMLAttributes, FC } from 'react'
 import { render } from 'react-dom'
 import 'tachyons'
 import './index.css'
-import { createOvermind, IConfig, json } from 'overmind'
+import { Config, createOvermind, IConfig, json } from 'overmind'
 import { createHook, Provider } from 'overmind-react'
 import materialColorHash from 'material-color-hash'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -14,6 +14,7 @@ import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import {
   AddingTodo,
+  debouncedCacheStoreState,
   EditingTodo,
   getTodoMenuAnchorDomIdFor,
   maybeAddingTodo,
@@ -26,21 +27,11 @@ import {
   TodoId,
 } from './overmind/state'
 import { TodoMenuAction } from './overmind/todo-menu/actions'
-import * as todoMenu from './overmind/todo-menu'
-import * as root from './overmind'
-import { debouncedCacheStoreState } from './overmind'
-import { merge, namespaced } from 'overmind/config'
+import { config } from './overmind'
 
 const { memo, useEffect, useState } = React
 
-const config = merge(root, namespaced({ todoMenu }))
-
-declare module 'overmind' {
-  // noinspection JSUnusedGlobalSymbols
-  interface Config extends IConfig<typeof config> {}
-}
-
-const useOvermind = createHook<typeof config>()
+const useOvermind = createHook<Config>()
 
 const overmind = createOvermind(config)
 

@@ -194,7 +194,7 @@ export type State = {
 }
 const initialTodos: Todo[] = times(Todo.createFake, 10)
 const initialProjects: Project[] = times(Project.createFake, 5)
-export const defaultState: State = {
+const defaultState: State = {
   todoList: initialTodos,
   inlineTodoForm: null,
   projectList: initialProjects,
@@ -212,4 +212,28 @@ export function getTodoMenuAnchorDomIdFor(todoId: TodoId) {
 
 export function maybeAddingTodo(form: InlineTodoForm): AddingTodo | null {
   return form && form.tag === 'AddingTodo' ? form : null
+}
+
+
+import pick from 'ramda/es/pick'
+
+const debounce = require('lodash.debounce')
+
+function cacheStoreState(state: State) {
+  const serializedModel = JSON.stringify(state)
+  if (serializedModel) {
+    localStorage.setItem('todoist-clone-model', serializedModel)
+  }
+}
+export const debouncedCacheStoreState = debounce(cacheStoreState, 1000)
+function getCachedState() {
+  const parsedState = JSON.parse(
+    localStorage.getItem('todoist-clone-model') || '{}',
+  )
+  return pick(Object.keys(defaultState), parsedState)
+}
+
+export const state=  {
+  ...defaultState,
+  ...getCachedState(),
 }

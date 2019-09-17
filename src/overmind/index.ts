@@ -1,29 +1,12 @@
-import * as actions from './actions'
-import { defaultState, State } from './state'
-import pick from 'ramda/es/pick'
+import * as root from './root'
 
-const debounce = require('lodash.debounce')
+import { merge, namespaced } from 'overmind/config'
+import * as todoMenu from './todo-menu'
+import { IConfig } from 'overmind'
 
-function cacheStoreState(state: State) {
-  const serializedModel = JSON.stringify(state)
-  if (serializedModel) {
-    localStorage.setItem('todoist-clone-model', serializedModel)
-  }
-}
-export const debouncedCacheStoreState = debounce(cacheStoreState, 1000)
-function getCachedState() {
-  const parsedState = JSON.parse(
-    localStorage.getItem('todoist-clone-model') || '{}',
-  )
-  return pick(Object.keys(defaultState), parsedState)
-}
+export const config = merge(root, namespaced({ todoMenu }))
 
-const state=  {
-...defaultState,
-...getCachedState(),
-}
-
-export  {
-  state,
-  actions
+declare module 'overmind' {
+  // noinspection JSUnusedGlobalSymbols
+  export interface Config extends IConfig<typeof config> {}
 }
