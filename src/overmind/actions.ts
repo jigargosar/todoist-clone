@@ -1,4 +1,4 @@
-import { Action } from 'overmind'
+
 import {
   createAddingTodo,
   createEditingTodo,
@@ -13,6 +13,7 @@ import {
   TodoList,
 } from './state'
 import clone from 'ramda/es/clone'
+import { Action } from './index'
 
 
 

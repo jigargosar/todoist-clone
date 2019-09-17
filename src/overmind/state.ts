@@ -1,7 +1,7 @@
 import equals from 'ramda/es/equals'
 import times from 'ramda/es/times'
 import reject from 'ramda/es/reject'
-import { Derive } from 'overmind'
+
 
 const nanoid = require('nanoid')
 const faker = require('faker')
@@ -214,6 +214,7 @@ export function maybeAddingTodo(form: InlineTodoForm): AddingTodo | null {
 }
 
 import pick from 'ramda/es/pick'
+import { Derive } from './index'
 
 const debounce = require('lodash.debounce')
 

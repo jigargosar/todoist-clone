@@ -1,7 +1,8 @@
 import * as actions from './actions'
 import * as effects from './effects'
 import { state } from './state'
-import { json, OnInitialize } from 'overmind'
+import { json} from 'overmind'
+import { OnInitialize } from './index'
 
 const onInitialize: OnInitialize = async (
   { state, actions, effects },

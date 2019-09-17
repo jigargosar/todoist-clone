@@ -1,6 +1,7 @@
-import { Action } from 'overmind'
+
 import { TodoId } from '../state'
 import { shouldNeverBeCalled } from '../../utils'
+import { Action } from '../index'
 
 export const open: Action<TodoId> = ({ state }, todoId: TodoId) => {
   state.todoMenu = { todoId }
