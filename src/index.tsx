@@ -1,4 +1,11 @@
-import React, { ButtonHTMLAttributes, FC, memo, RefObject, useEffect, useRef } from 'react'
+import React, {
+  ButtonHTMLAttributes,
+  FC,
+  memo,
+  RefObject,
+  useEffect,
+  useRef,
+} from 'react'
 import { render } from 'react-dom'
 import 'tachyons'
 import './index.css'
@@ -461,27 +468,25 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
   return (
     <>
       {todoList.map(todo => {
-        const projectId = todo.projectId
+        const { id, projectId } = todo
+
         const projectTitle = ProjectList.findTitleByIdOrInbox(projectId)(
           projectList,
         )
-        const maybeEditingTodo = maybeEditingTodoFor(
-          todo.id,
-          inlineTodoForm,
-        )
-        if (maybeEditingTodo) {
+        const editingTodo = maybeEditingTodoFor(id, inlineTodoForm)
+        if (editingTodo) {
           return (
             <ViewEditTodoForm
-              key={TodoId.toString(todo.id)}
-              editingTodo={maybeEditingTodo}
+              key={TodoId.toString(id)}
+              editingTodo={editingTodo}
             />
           )
         }
         return (
           <ViewTodoItem
-            key={TodoId.toString(todo.id)}
+            key={TodoId.toString(id)}
             todo={todo}
-            menuOpen={isTodoPopupOpenFor(todo.id)}
+            menuOpen={isTodoPopupOpenFor(id)}
             projectId={projectId}
             projectTitle={projectTitle}
           />
@@ -608,6 +613,7 @@ const ViewTodoItem: FC<{
     </div>
   )
 })
+
 function ViewTodoItemContextMenu({ todoId }: { todoId: TodoId }) {
   const { actions } = useOvermind()
 
