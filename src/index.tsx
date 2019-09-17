@@ -3,8 +3,8 @@ import { ButtonHTMLAttributes, FC } from 'react'
 import { render } from 'react-dom'
 import 'tachyons'
 import './index.css'
-import { Config, createOvermind, IConfig, json } from 'overmind'
-import { createHook, Provider } from 'overmind-react'
+import { createOvermind, json } from 'overmind'
+import { Provider } from 'overmind-react'
 import materialColorHash from 'material-color-hash'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import IconButton from '@material-ui/core/IconButton'
@@ -27,11 +27,9 @@ import {
   TodoId,
 } from './overmind/state'
 import { TodoMenuAction } from './overmind/todo-menu/actions'
-import { config } from './overmind'
+import { config, useOvermind } from './overmind'
 
 const { memo, useEffect, useState } = React
-
-const useOvermind = createHook<Config>()
 
 const overmind = createOvermind(config)
 
