@@ -36,8 +36,6 @@ import {
 
 const { memo, useEffect, useState } = React
 
-const nanoid = require('nanoid')
-const faker = require('faker')
 const debounce = require('lodash.debounce')
 
 // Actions: TodoContextMenu
