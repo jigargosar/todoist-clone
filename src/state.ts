@@ -214,11 +214,11 @@ export const defaultState: State = {
   },
   todoMenuAnchorElId: state => {
     return state.todoMenu && state.todoMenu.todoId
-      ? getTodoContextMenuAnchorElDomId(state.todoMenu.todoId)
+      ? getTodoMenuAnchorElDomId(state.todoMenu.todoId)
       : ''
   },
 }
 
-export function getTodoContextMenuAnchorElDomId(todoId: TodoId) {
+export function getTodoMenuAnchorElDomId(todoId: TodoId) {
   return TodoId.toString(todoId) + '__context-menu-anchor'
 }
