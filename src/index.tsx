@@ -548,9 +548,9 @@ function ViewTodoItemContextMenu() {
 
   useEffect(() =>
     reaction(
-      ({ todoPopup }) => [todoPopup],
+      ({ todoPopup }) => todoPopup,
       ({ todoPopup }) => {
-        const contextMenuOpenFor = !!todoPopup && todoPopup.todoId
+        const contextMenuOpenFor = (todoPopup || { todoId: null }).todoId
         const anchorEl = contextMenuOpenFor
           ? document.getElementById(
               todoItemContextMenuAnchorElDomId(contextMenuOpenFor),
