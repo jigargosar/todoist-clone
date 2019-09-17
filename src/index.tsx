@@ -63,7 +63,9 @@ function AppContent() {
         <ViewAddTodoForm addingTodo={addingTodo} />
       ) : (
         <>
-          <Button onClick={() => actions.addTodoClicked()}>Add Task</Button>
+          <Button onClick={() => actions.addTodoClicked()}>
+            Add Task
+          </Button>
           <Button onClick={() => actions.addFakeTodoClicked()}>
             Add Fake Task
           </Button>
@@ -273,16 +275,15 @@ const ViewTodoItem: FC<{
   )
 })
 
-const Button: FC<
-  { onClick: () => void; className?: string } & ButtonHTMLAttributes<
-    HTMLButtonElement
-  >
-> = ({ onClick, className, children, ...other }) => (
+const Button: FC<ButtonHTMLAttributes<HTMLButtonElement>> = ({
+  className,
+  children,
+  ...other
+}) => (
   <button
     className={`button-reset input-reset bn bg-inherit ph2 pv1 pointer blue${
       className ? className : ''
     }`}
-    onClick={onClick}
     {...other}
   >
     {children}
