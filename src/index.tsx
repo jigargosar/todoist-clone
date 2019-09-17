@@ -5,6 +5,7 @@ import React, {
   RefObject,
   useEffect,
   useRef,
+  useState,
 } from 'react'
 import { render } from 'react-dom'
 import 'tachyons'
@@ -544,34 +545,43 @@ function ViewTodoItemContextMenu() {
   const {
     state: { todoPopup },
     actions,
+    reaction,
   } = useOvermind()
-  const contextMenuOpenFor = !!todoPopup && todoPopup.todoId
-  if (contextMenuOpenFor) {
-    const anchorEl = document.getElementById(
-      todoItemContentMenuAnchorElDomId(contextMenuOpenFor),
-    )
-    return (
-      <Menu
-        anchorEl={anchorEl}
-        open={!!anchorEl}
-        keepMounted={false}
-        onClose={() => actions.closeTodoMenu()}
+
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+
+  useEffect(() =>
+    reaction(
+      ({ todoPopup }) => todoPopup,
+      () => {
+        const contextMenuOpenFor = !!todoPopup && todoPopup.todoId
+        const anchorEl = contextMenuOpenFor
+          ? document.getElementById(
+              todoItemContextMenuAnchorElDomId(contextMenuOpenFor),
+            )
+          : null
+        setAnchorEl(anchorEl)
+      },
+    ),
+  )
+
+  return (
+    <Menu
+      anchorEl={anchorEl}
+      open={!!anchorEl}
+      keepMounted={true}
+      onClose={() => actions.closeTodoMenu()}
+    >
+      <MenuItem onClick={() => actions.todoContextMenuItemClicked('Edit')}>
+        Edit
+      </MenuItem>
+      <MenuItem
+        onClick={() => actions.todoContextMenuItemClicked('Delete')}
       >
-        <MenuItem
-          onClick={() => actions.todoContextMenuItemClicked('Edit')}
-        >
-          Edit
-        </MenuItem>
-        <MenuItem
-          onClick={() => actions.todoContextMenuItemClicked('Delete')}
-        >
-          Delete
-        </MenuItem>
-      </Menu>
-    )
-  } else {
-    return null
-  }
+        Delete
+      </MenuItem>
+    </Menu>
+  )
 }
 
 function ViewEditTodoForm({ editingTodo }: { editingTodo: EditingTodo }) {
@@ -629,7 +639,7 @@ function ViewInlineTodoForm({ fields }: { fields: TodoFormFields }) {
   )
 }
 
-function todoItemContentMenuAnchorElDomId(todoId: TodoId) {
+function todoItemContextMenuAnchorElDomId(todoId: TodoId) {
   return TodoId.toString(todoId) + '__context-menu-anchor'
 }
 
@@ -684,7 +694,7 @@ const ViewTodoItem: FC<{
       </div>
       <div className="relative">
         <IconButton
-          id={todoItemContentMenuAnchorElDomId(todoId)}
+          id={todoItemContextMenuAnchorElDomId(todoId)}
           size="small"
           onClick={() => openTodoMenu()}
         >
