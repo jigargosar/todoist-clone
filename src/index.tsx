@@ -619,13 +619,13 @@ const ViewTodoItem: FC<{
       </div>
       <div className="relative">
         <Button action={() => openTodoMenu()}>...</Button>
-        {menuOpen && <OpenedTodoMenu todoId={todo.id} />}
+        {menuOpen && <ViewTodoItemContextMenu todoId={todo.id} />}
       </div>
     </div>
   )
 })
 
-function OpenedTodoMenu({ todoId }: { todoId: TodoId }) {
+function ViewTodoItemContextMenu({ todoId }: { todoId: TodoId }) {
   const { actions } = useOvermind()
 
   const rootRef: RefObject<HTMLDivElement> = useRef(null)
