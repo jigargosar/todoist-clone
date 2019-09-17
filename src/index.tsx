@@ -550,13 +550,16 @@ function ViewTodoItemContextMenu() {
     reaction(
       ({ todoPopup }) => todoPopup,
       ({ todoPopup }) => {
-        const contextMenuOpenFor = (todoPopup || { todoId: null }).todoId
-        const anchorEl = contextMenuOpenFor
-          ? document.getElementById(
-              todoItemContextMenuAnchorElDomId(contextMenuOpenFor),
-            )
-          : null
-        setAnchorEl(anchorEl)
+        if (!todoPopup) {
+          setAnchorEl(null)
+          return
+        }
+
+        setAnchorEl(
+          document.getElementById(
+            todoItemContextMenuAnchorElDomId(todoPopup.todoId),
+          ),
+        )
       },
       { nested: true, immediate: true },
     ),
