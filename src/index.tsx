@@ -160,7 +160,7 @@ function ViewTodoItemContextMenu() {
   }, [todoMenuAnchorElId])
 
   const itemAction = (action: TodoMenuAction) => () =>
-      actions.todoMenuItemClicked(action)
+    actions.todoMenuItemClicked(action)
   return (
     <Menu
       anchorEl={anchorEl}
