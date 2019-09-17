@@ -33,36 +33,11 @@ import {
   TodoId,
   TodoList,
 } from './state'
+import { close, open, TodoContextMenuAction, itemClicked } from './actions/todo-menu'
 
 const { memo, useEffect, useState } = React
 
 const debounce = require('lodash.debounce')
-
-// Actions: TodoContextMenu
-const openTodoMenu: Action<TodoId> = ({ state }, todoId: TodoId) => {
-  state.todoMenu = { todoId }
-}
-const closeTodoMenu: Action = ({ state }) => {
-  state.todoMenu = null
-}
-type TodoContextMenuAction = 'Edit' | 'Delete'
-const todoContextMenuItemClicked: Action<TodoContextMenuAction> = (
-  { state: { todoMenu }, actions },
-  actionType,
-) => {
-  const todoId = todoMenu && todoMenu.todoId
-  if (!todoId) return
-  actions.todoMenu.close()
-  switch (actionType) {
-    case 'Edit':
-      actions.editTodoClicked(todoId)
-      return
-    case 'Delete':
-      actions.deleteTodo(todoId)
-      return
-  }
-  return shouldNeverBeCalled(actionType)
-}
 
 const setDone: Action<{ todoId: TodoId; isDone: boolean }> = (
   { state },
@@ -87,10 +62,6 @@ const editTodoClicked: Action<TodoId> = (ctx, todoId) => {
     saveInlineTodoFormClicked(ctx)
     state.inlineTodoForm = createEditingTodo(maybeTodo)
   }
-}
-
-function shouldNeverBeCalled(nopes: never) {
-  return nopes
 }
 
 const addTodoClicked: Action = ctx => {
@@ -157,9 +128,9 @@ const saveInlineTodoFormClicked: Action = ctx => {
 
 const actions = {
   todoMenu: {
-    open: openTodoMenu,
-    close: closeTodoMenu,
-    itemClicked: todoContextMenuItemClicked,
+    open: open,
+    close: close,
+    itemClicked: itemClicked,
   },
   setDone,
   deleteTodo,
