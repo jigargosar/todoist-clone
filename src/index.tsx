@@ -28,7 +28,10 @@ const ProjectId = {
   toString(projectId: ProjectId) {
     return projectId.value
   },
-
+  fromString(str: string): ProjectId | null {
+    if (str.trim() === '') return null
+    return { tag: 'ProjectId', value: str.trim() }
+  },
   eq(a: ProjectId) {
     return function eq(b: ProjectId) {
       return equals(a, b)
@@ -502,10 +505,25 @@ function ViewInlineTodoForm({ fields }: { fields: TodoFormFields }) {
           value={fields.title}
           onChange={e => actions.updateTodoForm({ title: e.target.value })}
         />
-        <select className="pa1 w-100">
-          <option value="">Inbox</option>
+        <select
+          className="pa1 w-100"
+          onSelect={e =>
+            actions.updateTodoForm({
+              projectId: ProjectId.fromString(e.currentTarget.value),
+            })
+          }
+        >
+          <option value="" selected={fields.projectId === null}>
+            Inbox
+          </option>
           {projects.map(project => (
-            <option value={ProjectId.toString(project.id)}>
+            <option
+              value={ProjectId.toString(project.id)}
+              selected={
+                !!fields.projectId &&
+                ProjectId.eq(fields.projectId)(project.id)
+              }
+            >
               {project.title}
             </option>
           ))}
