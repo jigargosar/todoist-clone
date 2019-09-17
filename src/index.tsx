@@ -34,6 +34,9 @@ const ProjectId = {
   toString(projectId: ProjectId) {
     return projectId.value
   },
+  toStringOrEmpty(projectId: ProjectId | null) {
+    return projectId === null ? '' : projectId.value
+  },
   fromString(str: string): ProjectId | null {
     if (str.trim() === '') return null
     return { tag: 'ProjectId', value: str.trim() }
@@ -521,16 +524,12 @@ function ViewInlineTodoForm({ fields }: { fields: TodoFormFields }) {
         />
         <select
           className="pa1 w-100"
-          value={
-            fields.projectId === null
-              ? ''
-              : ProjectId.toString(fields.projectId)
-          }
-          onChange={e => {
-            return actions.updateTodoForm({
+          value={ProjectId.toStringOrEmpty(fields.projectId)}
+          onChange={e =>
+            actions.updateTodoForm({
               projectId: ProjectId.fromString(e.target.value),
             })
-          }}
+          }
         >
           <option value="">Inbox</option>
           {projects.map(project => (
