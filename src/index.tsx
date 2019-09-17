@@ -54,7 +54,7 @@ function AppContent() {
     <div className="pl2 lh-copy" style={{ maxWidth: 500 }}>
       <div className="f4 pv1">ProjectList</div>
       <ViewProjectList projectList={state.projectList} />
-      <Button action={() => actions.addFakeProjectClicked()}>
+      <Button onClick={() => actions.addFakeProjectClicked()}>
         Add Fake Project
       </Button>
       <div className="f4 pv1">TodoList</div>
@@ -63,8 +63,8 @@ function AppContent() {
         <ViewAddTodoForm addingTodo={addingTodo} />
       ) : (
         <>
-          <Button action={() => actions.addTodoClicked()}>Add Task</Button>
-          <Button action={() => actions.addFakeTodoClicked()}>
+          <Button onClick={() => actions.addTodoClicked()}>Add Task</Button>
+          <Button onClick={() => actions.addFakeTodoClicked()}>
             Add Fake Task
           </Button>
         </>
@@ -215,10 +215,10 @@ function ViewInlineTodoForm({ fields }: { fields: TodoFormFields }) {
           ))}
         </select>
         <div className="flex pv1">
-          <Button action={() => actions.saveInlineTodoFormClicked()}>
+          <Button onClick={() => actions.saveInlineTodoFormClicked()}>
             Save
           </Button>
-          <Button action={() => actions.cancelInlineTodoFormClicked()}>
+          <Button onClick={() => actions.cancelInlineTodoFormClicked()}>
             Cancel
           </Button>
         </div>
@@ -233,8 +233,6 @@ const ViewTodoItem: FC<{
 }> = memo(function ViewTodoItem({ todo, projectTitle }) {
   const { actions } = useOvermind()
 
-  const todoId = todo.id
-
   return (
     <div className="flex">
       <div className="ph1 pv2">
@@ -244,13 +242,13 @@ const ViewTodoItem: FC<{
           checked={todo.isDone}
           style={{ width: 24, height: 24 }}
           onChange={e =>
-            actions.setDone({ todoId, isDone: e.target.checked })
+            actions.setDone({ todoId: todo.id, isDone: e.target.checked })
           }
         />
       </div>
       <div
         className="ph1 pv1 flex-grow-1 lh-title"
-        onClick={() => actions.editTodoClicked(todoId)}
+        onClick={() => actions.editTodoClicked(todo.id)}
       >
         {todo.title}
       </div>
@@ -264,9 +262,9 @@ const ViewTodoItem: FC<{
       </div>
       <div className="relative">
         <IconButton
-          id={getTodoMenuAnchorDomIdFor(todoId)}
+          id={getTodoMenuAnchorDomIdFor(todo.id)}
           size="small"
-          onClick={() => actions.todoMenuOpen(todoId)}
+          onClick={() => actions.todoMenuOpen(todo.id)}
         >
           <MoreHorizIcon fontSize="small" />
         </IconButton>
@@ -276,15 +274,15 @@ const ViewTodoItem: FC<{
 })
 
 const Button: FC<
-  { action: () => void; className?: string } & ButtonHTMLAttributes<
+  { onClick: () => void; className?: string } & ButtonHTMLAttributes<
     HTMLButtonElement
   >
-> = ({ action, className, children, ...other }) => (
+> = ({ onClick, className, children, ...other }) => (
   <button
     className={`button-reset input-reset bn bg-inherit ph2 pv1 pointer blue${
       className ? className : ''
     }`}
-    onClick={action}
+    onClick={onClick}
     {...other}
   >
     {children}
