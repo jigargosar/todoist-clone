@@ -50,9 +50,7 @@ function AppContent() {
     <div className="pl2 lh-copy" style={{ maxWidth: 500 }}>
       <div className="f4 pv1">ProjectList</div>
       <ViewProjectList projectList={state.projectList} />
-      <Btn onClick={() => actions.addFakeProjectClicked()}>
-        Add Fake Project
-      </Btn>
+
       <div className="f4 pv1">TodoList</div>
       <ViewTodoList todoList={state.todoList} />
     </div>
@@ -60,7 +58,7 @@ function AppContent() {
 }
 
 function ViewProjectList({ projectList }: { projectList: Project[] }) {
-  const {} = useOvermind()
+  const { actions } = useOvermind()
 
   return (
     <>
@@ -72,6 +70,9 @@ function ViewProjectList({ projectList }: { projectList: Project[] }) {
           />
         )
       })}
+      <Btn onClick={() => actions.addFakeProjectClicked()}>
+        Add Fake Project
+      </Btn>
     </>
   )
 }
