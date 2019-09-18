@@ -2,6 +2,7 @@ import equals from 'ramda/es/equals'
 import times from 'ramda/es/times'
 import reject from 'ramda/es/reject'
 import { Derive } from './index'
+import { DueAt } from './state/DueAt'
 
 const nanoid = require('nanoid')
 const faker = require('faker')
@@ -104,6 +105,7 @@ export type Todo = {
   title: string
   isDone: boolean
   projectId: ProjectId | null
+  dueAt: DueAt
 }
 export const Todo = {
   idEq(id: TodoId) {
@@ -117,6 +119,7 @@ export const Todo = {
       title: faker.hacker.phrase(),
       isDone: false,
       projectId: null,
+      dueAt: DueAt.notSet(),
     }
   },
 }
