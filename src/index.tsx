@@ -159,8 +159,8 @@ function ViewTodoItemContextMenu() {
     reaction(
       state => state.currentTodoMenuAnchorDomId,
       state => {
-        // @ts-ignore
         setAnchorEl(
+          // @ts-ignore
           document.getElementById(state.currentTodoMenuAnchorDomId),
         )
       },
