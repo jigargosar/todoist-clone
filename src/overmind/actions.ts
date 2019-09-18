@@ -107,9 +107,10 @@ export type TodoItemSchedulePopupAction = 'Foo' | 'Bar'
 
 export const todoItemSchedulePopupItemClicked: Action<
   TodoItemSchedulePopupAction
-> = ({ state }, action) => {
+> = ({ state, actions }, action) => {
   const todoId = state.todoItemSchedulePopup
   if (!todoId) return
+  actions.closeTodoItemSchedulePopup()
   switch (action) {
     case 'Foo':
       return
