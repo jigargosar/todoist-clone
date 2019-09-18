@@ -7,7 +7,7 @@ import { createOvermind } from 'overmind'
 import { Provider } from 'overmind-react'
 import materialColorHash from 'material-color-hash'
 import CssBaseline from '@material-ui/core/CssBaseline'
-import IconButton from '@material-ui/core/IconButton'
+import IconButton, { IconButtonProps } from '@material-ui/core/IconButton'
 import DeleteIcon from '@material-ui/icons/Delete'
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
 import ScheduleIcon from '@material-ui/icons/Schedule'
@@ -32,6 +32,7 @@ import { config, useOvermind } from './overmind'
 import MUIButton, { ButtonProps } from '@material-ui/core/Button'
 import { ContextAction, DueAtPayload } from './overmind/actions'
 import { DueAt } from './overmind/state/DueAt'
+import SvgIcon from '@material-ui/icons/Delete'
 
 const { memo, useEffect, useState } = React
 
@@ -333,19 +334,25 @@ function ViewTodoItemDueAt({
 
   return (
     <div>
-      <IconButton
-        size="small"
+      <IconBtn
         id={scheduleTriggerFor(todoId)}
         onClick={() => actions.openSchedule(todoId)}
-      >
-        <ScheduleIcon fontSize="small" />
-      </IconButton>
+        icon={ScheduleIcon}
+      ></IconBtn>
     </div>
   )
 }
 
 function Btn(props: ButtonProps) {
   return <MUIButton size="small" color="primary" {...props} />
+}
+
+function IconBtn(props: IconButtonProps & { icon: typeof SvgIcon }) {
+  return (
+    <IconButton size="small" {...props}>
+      <props.icon fontSize="small" />
+    </IconButton>
+  )
 }
 
 render(<App />, document.getElementById('root'))
