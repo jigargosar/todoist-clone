@@ -303,14 +303,8 @@ function ViewTodoItemSchedule({ todoId }: { todoId: TodoId }) {
     [],
   )
 
-  const close = () => {
-    setAnchorEl(null)
-    actions.closePopup()
-  }
-
   const setDueAt = (dueAt: DueAtPayload) => () => {
     actions.closeScheduleWithDueAt({ dueAt })
-    close()
   }
 
   return (
@@ -318,10 +312,7 @@ function ViewTodoItemSchedule({ todoId }: { todoId: TodoId }) {
       <IconButton
         size="small"
         id={getScheduleTrigger(todoId)}
-        onClick={e => {
-          setAnchorEl(e.currentTarget)
-          actions.openSchedule(todoId)
-        }}
+        onClick={() => actions.openSchedule(todoId)}
       >
         <ScheduleIcon fontSize="small" />
       </IconButton>
@@ -329,7 +320,7 @@ function ViewTodoItemSchedule({ todoId }: { todoId: TodoId }) {
         anchorEl={anchorEl}
         open={!!anchorEl}
         keepMounted={true}
-        onClose={() => close()}
+        onClose={() => actions.closePopup()}
       >
         <MenuItem onClick={setDueAt('Yesterday')}>Yesterday</MenuItem>
         <MenuItem onClick={setDueAt('Today')}>Today</MenuItem>
