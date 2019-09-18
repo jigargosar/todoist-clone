@@ -25,6 +25,7 @@ import {
   Todo,
   TodoFormFields,
   TodoId,
+  schedulePopupAnchorDomIdForTodoItem,
 } from './overmind/state'
 import { TodoMenuAction } from './overmind/todoMenu/actions'
 import { config, useOvermind } from './overmind'
@@ -267,8 +268,9 @@ const ViewTodoItem: FC<{
       </div>
       <div>
         <IconButton
+          id={schedulePopupAnchorDomIdForTodoItem(todo.id)}
           size="small"
-        // onClick={() => actions.todoMenuOpen(todo.id)}
+          onClick={() => actions.todoItemScheduleClicked(todo.id)}
         >
           <ScheduleIcon fontSize="small" />
         </IconButton>
