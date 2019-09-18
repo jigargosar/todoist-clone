@@ -113,3 +113,15 @@ export const setDueAt: Action<
   }
   shouldNeverBeCalled(dueAt)
 }
+
+export const openSchedule: Action<TodoId> = ({ state }, todoId) => {
+  state.popup = { tag: 'Schedule', todoId }
+}
+
+export const openTodoContext: Action<TodoId> = ({ state }, todoId) => {
+  state.popup = { tag: 'Context', todoId }
+}
+
+export const closePopup: Action = ({ state }) => {
+  state.popup = { tag: 'Closed' }
+}

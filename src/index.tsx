@@ -304,7 +304,7 @@ function ViewTodoItemSchedule({ todoId }: { todoId: TodoId }) {
 
   const close = () => {
     setAnchorEl(null)
-    actions.popup.closePopup()
+    actions.closePopup()
   }
 
   const setDueAt = (dueAt: DueAtPayload) => () => {
@@ -319,7 +319,7 @@ function ViewTodoItemSchedule({ todoId }: { todoId: TodoId }) {
         id={TodoId.toString(todoId) + '__todo-item-schedule-trigger'}
         onClick={e => {
           setAnchorEl(e.currentTarget)
-          actions.popup.openSchedule(todoId)
+          actions.openSchedule(todoId)
         }}
       >
         <ScheduleIcon fontSize="small" />
