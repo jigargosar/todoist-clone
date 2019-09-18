@@ -15,8 +15,8 @@ import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import {
   AddingTodo,
-  EditingTodo,
-  getScheduleTrigger,
+  EditingTodo, contextTriggerFor,
+  scheduleTriggerFor,
   maybeAddingTodo,
   maybeEditingTodoFor,
   Project,
@@ -160,7 +160,7 @@ function ViewTodoContextPopup() {
       state => {
         setAnchorEl(
           // @ts-ignore
-          document.getElementById(state.currentTodoMenuAnchorDomId),
+          document.getElementById(state.contextTrigger),
         )
       },
       { immediate: true },
@@ -189,12 +189,12 @@ function ViewSchedulePopup() {
   useEffect(
     () =>
       reaction(
-        state => state.scheduleTriggerId,
+        state => state.scheduleTrigger,
         state => {
           setAnchorEl(
             document.getElementById(
               // @ts-ignore
-              state.scheduleTriggerId,
+              state.scheduleTrigger,
             ),
           )
         },
@@ -310,7 +310,7 @@ const ViewTodoItem: FC<{
       <ViewTodoItemSchedule todoId={todo.id} />
       <div className="relative">
         <IconButton
-          id={todoMenuAnchorDomIdFor(todo.id)}
+          id={contextTriggerFor(todo.id)}
           size="small"
           onClick={() => actions.todoMenu.open(todo.id)}
         >
@@ -328,7 +328,7 @@ function ViewTodoItemSchedule({ todoId }: { todoId: TodoId }) {
     <div>
       <IconButton
         size="small"
-        id={getScheduleTrigger(todoId)}
+        id={scheduleTriggerFor(todoId)}
         onClick={() => actions.openSchedule(todoId)}
       >
         <ScheduleIcon fontSize="small" />

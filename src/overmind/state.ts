@@ -199,21 +199,21 @@ export type Popup =
   | { tag: 'Context'; todoId: TodoId }
   | { tag: 'Closed' }
 
-export function getScheduleTrigger(todoId: TodoId) {
+export function scheduleTriggerFor(todoId: TodoId) {
   return TodoId.toString(todoId) + '__schedule-trigger'
 }
 
-export function getContextTrigger(todoId: TodoId) {
+export function contextTriggerFor(todoId: TodoId) {
   return TodoId.toString(todoId) + '__context-trigger'
 }
 
 export type State = {
   popup: Popup
-  scheduleTriggerId: Derive<State, string>
-  contextTriggerId: Derive<State, string>
+  scheduleTrigger: Derive<State, string>
+  contextTrigger: Derive<State, string>
   todoItemSchedulePopup: TodoId | null
   todoMenu: TodoMenu | null
-  currentTodoMenuAnchorDomId: Derive<State, string>
+
   todoList: Todo[]
   inlineTodoForm: AddingTodo | EditingTodo | null
   projectList: Project[]
@@ -223,17 +223,12 @@ const initialProjects: Project[] = times(Project.createFake, 5)
 
 export const state: State = {
   popup: { tag: 'Closed' },
-  scheduleTriggerId: ({ popup }) =>
-    popup.tag === 'Schedule' ? getScheduleTrigger(popup.todoId) : '',
-  contextTriggerId: ({ popup }) =>
-    popup.tag === 'Context' ? getContextTrigger(popup.todoId) : '',
+  scheduleTrigger: ({ popup }) =>
+    popup.tag === 'Schedule' ? scheduleTriggerFor(popup.todoId) : '',
+  contextTrigger: ({ popup }) =>
+    popup.tag === 'Context' ? contextTriggerFor(popup.todoId) : '',
   todoItemSchedulePopup: null,
   todoMenu: null,
-  currentTodoMenuAnchorDomId: state => {
-    return state.todoMenu && state.todoMenu.todoId
-      ? todoMenuAnchorDomIdFor(state.todoMenu.todoId)
-      : ''
-  },
   todoList: initialTodos,
   inlineTodoForm: null,
   projectList: initialProjects,
