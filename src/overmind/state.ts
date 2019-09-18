@@ -32,7 +32,7 @@ export const ProjectId = {
   },
 }
 export type Project = {
-  id: ProjectId
+  readonly id: ProjectId
   title: string
 }
 export const Project = {
