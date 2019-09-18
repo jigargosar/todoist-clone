@@ -21,11 +21,16 @@ const openContext: Action<TodoId> = ({ state }, todoId) => {
   state.popup.popup = { tag: 'Context', todoId }
 }
 
+const close: Action = ({ state }) => {
+  state.popup.popup = null
+}
+
 const config = {
   state,
   actions: {
     openSchedule,
     openContext,
+    close,
   },
 }
 

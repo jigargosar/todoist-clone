@@ -285,9 +285,14 @@ function ViewTodoItemSchedule({ todoId }: { todoId: TodoId }) {
   const { actions } = useOvermind()
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
 
+  const close = () => {
+    setAnchorEl(null)
+    actions.popup.close()
+  }
+
   const setDueAt = (dueAt: DueAtPayload) => () => {
     actions.setDueAt({ dueAt, todoId })
-    setAnchorEl(null)
+    close()
   }
 
   return (
@@ -296,6 +301,7 @@ function ViewTodoItemSchedule({ todoId }: { todoId: TodoId }) {
         size="small"
         onClick={e => {
           setAnchorEl(e.currentTarget)
+          actions.popup.openSchedule(todoId)
         }}
       >
         <ScheduleIcon fontSize="small" />
@@ -304,9 +310,7 @@ function ViewTodoItemSchedule({ todoId }: { todoId: TodoId }) {
         anchorEl={anchorEl}
         open={!!anchorEl}
         keepMounted={true}
-        onClose={() => {
-          setAnchorEl(null)
-        }}
+        onClose={() => close()}
       >
         <MenuItem onClick={setDueAt('Yesterday')}>Yesterday</MenuItem>
         <MenuItem onClick={setDueAt('Today')}>Today</MenuItem>
