@@ -309,7 +309,7 @@ function ViewTodoItemSchedule({ todoId }: { todoId: TodoId }) {
   }
 
   const setDueAt = (dueAt: DueAtPayload) => () => {
-    actions.setDueAt({ dueAt })
+    actions.closeSchedulePopupWithDueAt({ dueAt })
     close()
   }
 

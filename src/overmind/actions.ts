@@ -98,9 +98,12 @@ export type DueAtPayload =
   | 'Today'
   | 'Tomorrow'
 
-export const setDueAt: Action<
-  {dueAt:DueAtPayload}
-> = ({ state, actions }, {dueAt}) => {
+export const closeSchedulePopupWithDueAt: Action<{
+  dueAt: DueAtPayload
+}> = ({ state, actions }, { dueAt }) => {
+  const { popup } = state
+  if (popup.tag !== 'Schedule') return
+  const todoId = popup.todoId
   switch (dueAt) {
     case 'No Due Date':
       return
