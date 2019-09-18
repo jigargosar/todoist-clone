@@ -143,13 +143,13 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
         </>
       )}
 
-      <ViewTodoItemContextMenu />
+      <ViewTodoContextPopup />
       <ViewSchedulePopup />
     </>
   )
 }
 
-function ViewTodoItemContextMenu() {
+function ViewTodoContextPopup() {
   const { actions, reaction } = useOvermind()
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
