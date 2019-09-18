@@ -188,12 +188,6 @@ export function maybeAddingTodo(form: InlineTodoForm): AddingTodo | null {
   return form && form.tag === 'AddingTodo' ? form : null
 }
 
-export function todoMenuAnchorDomIdFor(todoId: TodoId) {
-  return TodoId.toString(todoId) + '__context-menu-anchor'
-}
-
-type TodoMenu = { todoId: TodoId }
-
 export type Popup =
   | { tag: 'Schedule'; todoId: TodoId }
   | { tag: 'Context'; todoId: TodoId }
@@ -212,7 +206,6 @@ export type State = {
   scheduleTrigger: Derive<State, string>
   contextTrigger: Derive<State, string>
   todoItemSchedulePopup: TodoId | null
-  todoMenu: TodoMenu | null
 
   todoList: Todo[]
   inlineTodoForm: AddingTodo | EditingTodo | null
@@ -228,7 +221,7 @@ export const state: State = {
   contextTrigger: ({ popup }) =>
     popup.tag === 'Context' ? contextTriggerFor(popup.todoId) : '',
   todoItemSchedulePopup: null,
-  todoMenu: null,
+
   todoList: initialTodos,
   inlineTodoForm: null,
   projectList: initialProjects,
