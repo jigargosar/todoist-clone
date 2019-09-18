@@ -1,6 +1,8 @@
 import equals from 'ramda/es/equals'
 import times from 'ramda/es/times'
 import reject from 'ramda/es/reject'
+import pick from 'ramda/es/pick'
+import { Derive } from './index'
 
 const nanoid = require('nanoid')
 const faker = require('faker')
@@ -212,9 +214,6 @@ export function getTodoMenuAnchorDomIdFor(todoId: TodoId) {
 export function maybeAddingTodo(form: InlineTodoForm): AddingTodo | null {
   return form && form.tag === 'AddingTodo' ? form : null
 }
-
-import pick from 'ramda/es/pick'
-import { Derive } from './index'
 
 const debounce = require('lodash.debounce')
 
