@@ -15,23 +15,22 @@ import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import {
   AddingTodo,
-  EditingTodo,
   contextTriggerFor,
-  scheduleTriggerFor,
+  EditingTodo,
   maybeAddingTodo,
   maybeEditingTodoFor,
   Project,
   ProjectId,
   ProjectList,
+  scheduleTriggerFor,
   Todo,
   TodoFormFields,
   TodoId,
-  todoMenuAnchorDomIdFor,
 } from './overmind/state'
-import { TodoMenuAction } from './overmind/todoMenu/actions'
+
 import { config, useOvermind } from './overmind'
 import MUIButton, { ButtonProps } from '@material-ui/core/Button'
-import { DueAtPayload } from './overmind/actions'
+import { ContextAction, DueAtPayload } from './overmind/actions'
 
 const { memo, useEffect, useState } = React
 
@@ -168,18 +167,18 @@ function ViewTodoContextPopup() {
     ),
   )
 
-  const itemAction = (action: TodoMenuAction) => () => {
-    actions.todoMenu.itemClicked(action)
+  const contextAction = (action: ContextAction) => () => {
+    actions.closeContextPopupWith(action)
   }
   return (
     <Menu
       anchorEl={anchorEl}
       open={!!anchorEl}
       keepMounted={true}
-      onClose={() => actions.todoMenu.close()}
+      onClose={() => actions.closePopup()}
     >
-      <MenuItem onClick={itemAction('Edit')}>Edit</MenuItem>
-      <MenuItem onClick={itemAction('Delete')}>Delete</MenuItem>
+      <MenuItem onClick={contextAction('Edit')}>Edit</MenuItem>
+      <MenuItem onClick={contextAction('Delete')}>Delete</MenuItem>
     </Menu>
   )
 }
@@ -313,7 +312,7 @@ const ViewTodoItem: FC<{
         <IconButton
           id={contextTriggerFor(todo.id)}
           size="small"
-          onClick={() => actions.todoMenu.open(todo.id)}
+          onClick={() => actions.openContext(todo.id)}
         >
           <MoreHorizIcon fontSize="small" />
         </IconButton>

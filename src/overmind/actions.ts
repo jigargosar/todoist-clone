@@ -122,10 +122,30 @@ export const openSchedule: Action<TodoId> = ({ state }, todoId) => {
   state.popup = { tag: 'Schedule', todoId }
 }
 
-export const openTodoContext: Action<TodoId> = ({ state }, todoId) => {
+export const openContext: Action<TodoId> = ({ state }, todoId) => {
   state.popup = { tag: 'Context', todoId }
 }
 
 export const closePopup: Action = ({ state }) => {
   state.popup = { tag: 'Closed' }
+}
+
+export type ContextAction = 'Edit' | 'Delete'
+
+export const closeContextPopupWith: Action<ContextAction> = (
+  { state: { popup }, actions },
+  actionType,
+) => {
+  if (popup.tag !== 'Context') return
+  actions.closePopup()
+  const todoId = popup.todoId
+  switch (actionType) {
+    case 'Edit':
+      actions.editTodoClicked(todoId)
+      return
+    case 'Delete':
+      actions.deleteTodo(todoId)
+      return
+  }
+  return shouldNeverBeCalled(actionType)
 }
