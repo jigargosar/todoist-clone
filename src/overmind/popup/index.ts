@@ -1,6 +1,6 @@
 import { TodoId } from '../state'
-import { Action, Config } from '../index'
-import { Derive, IContext } from 'overmind'
+import { Action } from '../index'
+import { Derive } from 'overmind'
 import { ResolveState } from 'overmind/es/internalTypes'
 
 export type Popup =
