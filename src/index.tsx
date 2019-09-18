@@ -315,6 +315,7 @@ const ViewTodoItem: FC<{
           <ScheduleIcon fontSize="small" />
         </IconButton>
       </div>
+      <ViewSchedulePopupIconBtn todoId={todo.id} />
       <div className="relative">
         <IconButton
           id={todoMenuAnchorDomIdFor(todo.id)}
@@ -327,6 +328,19 @@ const ViewTodoItem: FC<{
     </div>
   )
 })
+
+function ViewSchedulePopupIconBtn({ todoId }: { todoId: TodoId }) {
+  const { actions } = useOvermind()
+  return (
+    <IconButton
+      id={schedulePopupAnchorDomIdForTodoItem(todoId)}
+      size="small"
+      onClick={() => actions.todoItemScheduleClicked(todoId)}
+    >
+      <ScheduleIcon fontSize="small" />
+    </IconButton>
+  )
+}
 
 function Btn(props: ButtonProps) {
   return <MUIButton size="small" color="primary" {...props} />
