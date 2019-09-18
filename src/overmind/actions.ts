@@ -99,8 +99,8 @@ export type DueAtPayload =
   | 'Tomorrow'
 
 export const setDueAt: Action<
-  {dueAt:DueAtPayload, todoId:TodoId}
-> = ({ state, actions }, {dueAt, todoId}) => {
+  {dueAt:DueAtPayload}
+> = ({ state, actions }, {dueAt}) => {
   switch (dueAt) {
     case 'No Due Date':
       return

@@ -1,61 +1,23 @@
-import { Todo, TodoId } from '../state'
-import { Action, OnInitialize } from '../index'
-import { Derive } from 'overmind'
-import { ResolveState } from 'overmind/es/internalTypes'
-import equals from 'ramda/es/equals'
+import { TodoId } from '../state'
+import { Action } from '../index'
 
-export type Popup =
-  | { tag: 'Schedule'; todoId: TodoId }
-  | { tag: 'Context'; todoId: TodoId }
-  | { tag: 'Closed' }
-
-export type State = {
-  popup: Popup
-  scheduleTriggerId: Derive<State, string>
+const openSchedule: Action<TodoId> = ({ state }, todoId) => {
+  state.popup = { tag: 'Schedule', todoId }
 }
 
-const state: State = {
-  popup: { tag: 'Closed' },
-  scheduleTriggerId: state => {
-    // @ts-ignore
-    console.log(state.popup.todoId)
-    // @ts-ignore
-    return state.popup.tag === 'Schedule'
-      ? TodoId.toString(
-          // @ts-ignore
-          state.popup.todoId,
-        ) + '__todo-item-schedule-trigger'
-      : ''
-  },
+const openContext: Action<TodoId> = ({ state }, todoId) => {
+  state.popup = { tag: 'Context', todoId }
 }
 
-const openSchedule: Action<TodoId> = ({ actions }, todoId) => {
-  actions.popup.internal.set({ tag: 'Schedule', todoId })
+const closePopup: Action = ({ state }) => {
+  state.popup = { tag: 'Closed' }
 }
 
-const openContext: Action<TodoId> = ({ actions }, todoId) => {
-  actions.popup.internal.set({ tag: 'Context', todoId })
-}
-
-const closePopup: Action = ({ actions }) => {
-  actions.popup.internal.set({ tag: 'Closed' })
-}
-
-const setPopup: Action<Popup> = ({ state }, popup) => {
-  state.popup.popup = popup
-}
-
-const onInitialize: OnInitialize = ({ state }) => {
-  console.log(state.popup.popup)
-}
 const config = {
-  state,
-  onInitialize,
   actions: {
     openSchedule,
     openContext,
-    close: closePopup,
-    internal: { set: setPopup },
+    closePopup,
   },
 }
 

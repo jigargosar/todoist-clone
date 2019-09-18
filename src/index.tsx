@@ -282,28 +282,18 @@ const ViewTodoItem: FC<{
 })
 
 function ViewTodoItemSchedule({ todoId }: { todoId: TodoId }) {
-  const { actions, reaction, state } = useOvermind()
+  const { actions, reaction } = useOvermind()
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
-  console.log('state.popup.scheduleTriggerId',state.popup.popup)
 
   useEffect(
     () =>
       reaction(
-        state => state.popup.scheduleTriggerId,
+        state => state.scheduleTriggerId,
         state => {
-          // if (
-          //   !state.popup.popup ||
-          //   state.popup.popup.tag !== 'Schedule' ||
-          //   !TodoId.eq(state.popup.popup.todoId)(todoId)
-          // ) {
-          //   return
-          // }
           setAnchorEl(
             document.getElementById(
-              // TodoId.toString(state.popup.popup.todoId) +
-              //'__todo-item-schedule-trigger',
               // @ts-ignore
-              state.popup.scheduleTriggerId,
+              state.scheduleTriggerId,
             ),
           )
         },
@@ -314,11 +304,11 @@ function ViewTodoItemSchedule({ todoId }: { todoId: TodoId }) {
 
   const close = () => {
     setAnchorEl(null)
-    actions.popup.close()
+    actions.popup.closePopup()
   }
 
   const setDueAt = (dueAt: DueAtPayload) => () => {
-    actions.setDueAt({ dueAt, todoId })
+    actions.setDueAt({ dueAt })
     close()
   }
 

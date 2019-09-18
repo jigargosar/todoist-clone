@@ -194,7 +194,16 @@ export function todoMenuAnchorDomIdFor(todoId: TodoId) {
 
 type TodoMenu = { todoId: TodoId }
 
+export type Popup =
+  | { tag: 'Schedule'; todoId: TodoId }
+  | { tag: 'Context'; todoId: TodoId }
+  | { tag: 'Closed' }
+
+
+
 export type State = {
+  popup: Popup
+  scheduleTriggerId: Derive<State, string>
   todoItemSchedulePopup: TodoId | null
   todoMenu: TodoMenu | null
   currentTodoMenuAnchorDomId: Derive<State, string>
@@ -206,6 +215,18 @@ const initialTodos: Todo[] = times(Todo.createFake, 10)
 const initialProjects: Project[] = times(Project.createFake, 5)
 
 export const state: State = {
+  popup: { tag: 'Closed' },
+  scheduleTriggerId: state => {
+    // @ts-ignore
+    console.log(state.popup.todoId)
+    // @ts-ignore
+    return state.popup.tag === 'Schedule'
+      ? TodoId.toString(
+      // @ts-ignore
+      state.popup.todoId,
+    ) + '__todo-item-schedule-trigger'
+      : ''
+  },
   todoItemSchedulePopup: null,
   todoMenu: null,
   currentTodoMenuAnchorDomId: state => {
