@@ -15,7 +15,7 @@ import MenuItem from '@material-ui/core/MenuItem'
 import {
   AddingTodo,
   EditingTodo,
-  getTodoMenuAnchorDomIdFor,
+  todoMenuAnchorDomIdFor,
   maybeAddingTodo,
   maybeEditingTodoFor,
   Project,
@@ -161,10 +161,10 @@ function ViewTodoItemContextMenu() {
 
   useEffect(() =>
     reaction(
-      state => state.todoMenuAnchorElId,
+      state => state.currentTodoMenuAnchorDomId,
       state => {
         // @ts-ignore
-        setAnchorEl(document.getElementById(state.todoMenuAnchorElId))
+        setAnchorEl(document.getElementById(state.currentTodoMenuAnchorDomId))
       },
       { immediate: true },
     ),
@@ -273,7 +273,7 @@ const ViewTodoItem: FC<{
       </div>
       <div className="relative">
         <IconButton
-          id={getTodoMenuAnchorDomIdFor(todo.id)}
+          id={todoMenuAnchorDomIdFor(todo.id)}
           size="small"
           onClick={() => actions.todoMenuOpen(todo.id)}
         >

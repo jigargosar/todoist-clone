@@ -190,7 +190,7 @@ export type State = {
   todoList: Todo[]
   inlineTodoForm: AddingTodo | EditingTodo | null
   projectList: Project[]
-  todoMenuAnchorElId: Derive<State, string>
+  currentTodoMenuAnchorDomId: Derive<State, string>
 }
 const initialTodos: Todo[] = times(Todo.createFake, 10)
 const initialProjects: Project[] = times(Project.createFake, 5)
@@ -200,14 +200,14 @@ const defaultState: State = {
   todoList: initialTodos,
   inlineTodoForm: null,
   projectList: initialProjects,
-  todoMenuAnchorElId: state => {
+  currentTodoMenuAnchorDomId: state => {
     return state.todoMenu && state.todoMenu.todoId
-      ? getTodoMenuAnchorDomIdFor(state.todoMenu.todoId)
+      ? todoMenuAnchorDomIdFor(state.todoMenu.todoId)
       : ''
   },
 }
 
-export function getTodoMenuAnchorDomIdFor(todoId: TodoId) {
+export function todoMenuAnchorDomIdFor(todoId: TodoId) {
   return TodoId.toString(todoId) + '__context-menu-anchor'
 }
 
