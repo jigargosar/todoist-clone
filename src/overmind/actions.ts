@@ -97,15 +97,16 @@ export const todoItemScheduleClicked: Action<TodoId> = (
   { state },
   todoId,
 ) => {
-  state.todoItemSchedulePopup = todoId
+  state.todoItemSchedulePopup = clone(todoId)
 }
 export const closeTodoItemSchedulePopup: Action = ({ state }) => {
   state.todoItemSchedulePopup = null
 }
-type TodoItemScheduleMenuAction = 'Foo' | 'Bar'
+
+export type TodoItemSchedulePopupAction = 'Foo' | 'Bar'
 
 export const todoItemSchedulePopupItemClicked: Action<
-  TodoItemScheduleMenuAction
+  TodoItemSchedulePopupAction
 > = ({ state }, action) => {
   const todoId = state.todoItemSchedulePopup
   if (!todoId) return

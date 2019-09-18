@@ -30,6 +30,7 @@ import {
 import { TodoMenuAction } from './overmind/todoMenu/actions'
 import { config, useOvermind } from './overmind'
 import MUIButton, { ButtonProps } from '@material-ui/core/Button'
+import { TodoItemSchedulePopupAction } from './overmind/actions'
 
 const { memo, useEffect, useState } = React
 
@@ -200,8 +201,8 @@ function ViewTodoItemSchedulePopup() {
     ),
   )
 
-  const itemAction = (action: TodoMenuAction) => () => {
-    // actions.todoMenuItemClicked(action)
+  const itemAction = (action: TodoItemSchedulePopupAction) => () => {
+    actions.todoItemSchedulePopupItemClicked(action)
   }
   return (
     <Menu
@@ -210,8 +211,8 @@ function ViewTodoItemSchedulePopup() {
       keepMounted={true}
       onClose={() => actions.closeTodoItemSchedulePopup()}
     >
-      <MenuItem onClick={itemAction('Edit')}>Edit</MenuItem>
-      <MenuItem onClick={itemAction('Delete')}>Delete</MenuItem>
+      <MenuItem onClick={itemAction('Foo')}>Foo</MenuItem>
+      <MenuItem onClick={itemAction('Bar')}>Bar</MenuItem>
     </Menu>
   )
 }
