@@ -32,8 +32,11 @@ const todoMenuItemClicked: Action<TodoMenuAction> = (
   }
   return shouldNeverBeCalled(actionType)
 }
-export const todoMenu = {
+
+export const actions = {
   open: todoMenuOpen,
   close: todoMenuClose,
   onClick: todoMenuItemClicked,
 }
+
+export default actions
