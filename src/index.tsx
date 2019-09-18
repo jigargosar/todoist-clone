@@ -211,8 +211,9 @@ function ViewTodoItemSchedulePopup() {
       keepMounted={true}
       onClose={() => actions.closeTodoItemSchedulePopup()}
     >
-      <MenuItem onClick={itemAction('Foo')}>Foo</MenuItem>
-      <MenuItem onClick={itemAction('Bar')}>Bar</MenuItem>
+      <MenuItem onClick={itemAction('Yesterday')}>Yesterday</MenuItem>
+      <MenuItem onClick={itemAction('Today')}>Today</MenuItem>
+      <MenuItem onClick={itemAction('Tomorrow')}>Tomorrow</MenuItem>
     </Menu>
   )
 }

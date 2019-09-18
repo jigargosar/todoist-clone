@@ -103,7 +103,7 @@ export const closeTodoItemSchedulePopup: Action = ({ state }) => {
   state.todoItemSchedulePopup = null
 }
 
-export type TodoItemSchedulePopupAction = 'Foo' | 'Bar'
+export type TodoItemSchedulePopupAction = 'Yesterday'| 'Today' | 'Tomorrow'
 
 export const todoItemSchedulePopupItemClicked: Action<
   TodoItemSchedulePopupAction
@@ -112,9 +112,11 @@ export const todoItemSchedulePopupItemClicked: Action<
   if (!todoId) return
   actions.closeTodoItemSchedulePopup()
   switch (action) {
-    case 'Foo':
+    case 'Yesterday':
       return
-    case 'Bar':
+    case 'Today':
+      return
+    case 'Tomorrow':
       return
   }
   shouldNeverBeCalled(action)
