@@ -16,6 +16,7 @@ import MenuItem from '@material-ui/core/MenuItem'
 import {
   AddingTodo,
   EditingTodo,
+  getScheduleTrigger,
   maybeAddingTodo,
   maybeEditingTodoFor,
   Project,
@@ -316,7 +317,7 @@ function ViewTodoItemSchedule({ todoId }: { todoId: TodoId }) {
     <div>
       <IconButton
         size="small"
-        id={TodoId.toString(todoId) + '__todo-item-schedule-trigger'}
+        id={getScheduleTrigger(todoId)}
         onClick={e => {
           setAnchorEl(e.currentTarget)
           actions.openSchedule(todoId)

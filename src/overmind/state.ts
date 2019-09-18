@@ -199,11 +199,18 @@ export type Popup =
   | { tag: 'Context'; todoId: TodoId }
   | { tag: 'Closed' }
 
+export function getScheduleTrigger(todoId: TodoId) {
+  return TodoId.toString(todoId) + '__schedule-trigger'
+}
 
+export function getContextTrigger(todoId: TodoId) {
+  return TodoId.toString(todoId) + '__context-trigger'
+}
 
 export type State = {
   popup: Popup
   scheduleTriggerId: Derive<State, string>
+  contextTriggerId: Derive<State, string>
   todoItemSchedulePopup: TodoId | null
   todoMenu: TodoMenu | null
   currentTodoMenuAnchorDomId: Derive<State, string>
@@ -216,17 +223,10 @@ const initialProjects: Project[] = times(Project.createFake, 5)
 
 export const state: State = {
   popup: { tag: 'Closed' },
-  scheduleTriggerId: state => {
-    // @ts-ignore
-    console.log(state.popup.todoId)
-    // @ts-ignore
-    return state.popup.tag === 'Schedule'
-      ? TodoId.toString(
-      // @ts-ignore
-      state.popup.todoId,
-    ) + '__todo-item-schedule-trigger'
-      : ''
-  },
+  scheduleTriggerId: ({ popup }) =>
+    popup.tag === 'Schedule' ? getScheduleTrigger(popup.todoId) : '',
+  contextTriggerId: ({ popup }) =>
+    popup.tag === 'Context' ? getContextTrigger(popup.todoId) : '',
   todoItemSchedulePopup: null,
   todoMenu: null,
   currentTodoMenuAnchorDomId: state => {
