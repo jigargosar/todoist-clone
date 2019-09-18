@@ -282,8 +282,32 @@ const ViewTodoItem: FC<{
 })
 
 function ViewTodoItemSchedule({ todoId }: { todoId: TodoId }) {
-  const { actions } = useOvermind()
+  const { actions, reaction, state } = useOvermind()
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+
+  useEffect(
+    () =>
+      reaction(
+        state => state.popup.popup,
+        state => {
+          if (
+            !state.popup.popup ||
+            state.popup.popup.tag !== 'Schedule' ||
+            !TodoId.eq(state.popup.popup.todoId)(todoId)
+          ) {
+            return
+          }
+          setAnchorEl(
+            document.getElementById(
+              TodoId.toString(state.popup.popup.todoId) +
+                '__todo-item-schedule-trigger',
+            ),
+          )
+        },
+        { immediate: true },
+      ),
+    [],
+  )
 
   const close = () => {
     setAnchorEl(null)

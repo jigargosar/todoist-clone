@@ -1,7 +1,8 @@
-import { TodoId } from '../state'
+import { Todo, TodoId } from '../state'
 import { Action } from '../index'
 import { Derive } from 'overmind'
 import { ResolveState } from 'overmind/es/internalTypes'
+import equals from 'ramda/es/equals'
 
 export type Popup =
   | { tag: 'Schedule'; todoId: TodoId }
@@ -10,6 +11,8 @@ export type Popup =
 export type State = {
   popup: Popup | null
   isScheduleOpen: Derive<State, boolean>
+  isScheduleOpenFor: Derive<State, (todoId: TodoId) => boolean>
+  scheduleTriggerId: Derive<State, string>
   isContextOpen: Derive<State, boolean>
 }
 
@@ -22,6 +25,17 @@ function isOpen(tag: string) {
 const state: State = {
   popup: null,
   isScheduleOpen: isOpen('Schedule'),
+  isScheduleOpenFor: state => {
+    const { popup } = state
+    return (todoId: TodoId) => equals(popup, { tag: 'Schedule', todoId })
+  },
+  scheduleTriggerId: state => {
+    console.log(state)
+    return state.popup && state.popup.tag === 'Schedule'
+      ? TodoId.toString(state.popup.todoId) +
+          '__todo-item-schedule-trigger'
+      : ''
+  },
   isContextOpen: isOpen('Context'),
 }
 
