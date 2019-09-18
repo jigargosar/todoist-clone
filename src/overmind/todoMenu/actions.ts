@@ -2,14 +2,11 @@ import { TodoId } from '../state'
 import { shouldNeverBeCalled } from '../../utils'
 import { Action } from '../index'
 
- const todoMenuOpen: Action<TodoId> = (
-  { state },
-  todoId: TodoId,
-) => {
+const todoMenuOpen: Action<TodoId> = ({ state }, todoId: TodoId) => {
   state.todoMenu = { todoId }
 }
 
- const todoMenuClose: Action = ({ state }) => {
+const todoMenuClose: Action = ({ state }) => {
   state.todoMenu = null
 }
 
