@@ -16,6 +16,7 @@ const onInitialize: OnInitialize = async (
   { state, actions, effects },
   overmind,
 ) => {
+  Object.assign(state, effects.getCachedState())
   overmind.addFlushListener((_mutation, _paths, _flushId, _isAsync) => {
     effects.debouncedCacheStoreState(json(overmind.state))
   })

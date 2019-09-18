@@ -1,7 +1,6 @@
 import equals from 'ramda/es/equals'
 import times from 'ramda/es/times'
 import reject from 'ramda/es/reject'
-import pick from 'ramda/es/pick'
 import { Derive } from './index'
 
 const nanoid = require('nanoid')
@@ -202,7 +201,7 @@ export type State = {
 const initialTodos: Todo[] = times(Todo.createFake, 10)
 const initialProjects: Project[] = times(Project.createFake, 5)
 
-const defaultState: State = {
+export const state: State = {
   todoMenu: null,
   todoList: initialTodos,
   inlineTodoForm: null,
@@ -212,17 +211,4 @@ const defaultState: State = {
       ? todoMenuAnchorDomIdFor(state.todoMenu.todoId)
       : ''
   },
-}
-
-
-function getCachedState() {
-  const parsedState = JSON.parse(
-    localStorage.getItem('todoist-clone-model') || '{}',
-  )
-  return pick(Object.keys(defaultState), parsedState)
-}
-
-export const state = {
-  ...defaultState,
-  ...getCachedState(),
 }
