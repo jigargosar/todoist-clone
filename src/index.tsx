@@ -168,19 +168,20 @@ function ViewTodoItemContextMenu() {
   )
 
   const itemAction = (action: TodoMenuAction) => () =>
-    actions.todoMenuItemClicked(action)
+    actions.todoMenu.onClick(action)
   return (
     <Menu
       anchorEl={anchorEl}
       open={!!anchorEl}
       keepMounted={true}
-      onClose={() => actions.todoMenuClose()}
+      onClose={() => actions.todoMenu.close()}
     >
       <MenuItem onClick={itemAction('Edit')}>Edit</MenuItem>
       <MenuItem onClick={itemAction('Delete')}>Delete</MenuItem>
     </Menu>
   )
 }
+
 function ViewTodoItemSchedulePopup() {
   const { actions, reaction } = useOvermind()
 
@@ -317,7 +318,7 @@ const ViewTodoItem: FC<{
         <IconButton
           id={todoMenuAnchorDomIdFor(todo.id)}
           size="small"
-          onClick={() => actions.todoMenuOpen(todo.id)}
+          onClick={() => actions.todoMenu.open(todo.id)}
         >
           <MoreHorizIcon fontSize="small" />
         </IconButton>
