@@ -299,6 +299,7 @@ function ViewTodoItemSchedule({ todoId }: { todoId: TodoId }) {
     <div>
       <IconButton
         size="small"
+        id={TodoId.toString(todoId) + '__todo-item-schedule-trigger'}
         onClick={e => {
           setAnchorEl(e.currentTarget)
           actions.popup.openSchedule(todoId)
