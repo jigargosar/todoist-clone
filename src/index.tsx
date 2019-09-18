@@ -30,7 +30,7 @@ import {
 import { TodoMenuAction } from './overmind/todoMenu/actions'
 import { config, useOvermind } from './overmind'
 import MUIButton, { ButtonProps } from '@material-ui/core/Button'
-import { TodoItemSchedulePopupAction } from './overmind/actions'
+import { TodoItemSchedulePopupDueAt } from './overmind/actions'
 
 const { memo, useEffect, useState } = React
 
@@ -201,8 +201,8 @@ function ViewTodoItemSchedulePopup() {
     ),
   )
 
-  const itemAction = (action: TodoItemSchedulePopupAction) => () => {
-    actions.todoItemSchedulePopupItemClicked(action)
+  const setDueAt = (action: TodoItemSchedulePopupDueAt) => () => {
+    actions.todoItemSchedulePopupDueAtSelected(action)
   }
   return (
     <Menu
@@ -211,9 +211,9 @@ function ViewTodoItemSchedulePopup() {
       keepMounted={true}
       onClose={() => actions.closeTodoItemSchedulePopup()}
     >
-      <MenuItem onClick={itemAction('Yesterday')}>Yesterday</MenuItem>
-      <MenuItem onClick={itemAction('Today')}>Today</MenuItem>
-      <MenuItem onClick={itemAction('Tomorrow')}>Tomorrow</MenuItem>
+      <MenuItem onClick={setDueAt('Yesterday')}>Yesterday</MenuItem>
+      <MenuItem onClick={setDueAt('Today')}>Today</MenuItem>
+      <MenuItem onClick={setDueAt('Tomorrow')}>Tomorrow</MenuItem>
     </Menu>
   )
 }

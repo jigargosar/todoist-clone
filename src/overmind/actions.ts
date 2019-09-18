@@ -103,15 +103,21 @@ export const closeTodoItemSchedulePopup: Action = ({ state }) => {
   state.todoItemSchedulePopup = null
 }
 
-export type TodoItemSchedulePopupAction = 'Yesterday'| 'Today' | 'Tomorrow'
+export type TodoItemSchedulePopupDueAt =
+  | 'No Due Date'
+  | 'Yesterday'
+  | 'Today'
+  | 'Tomorrow'
 
-export const todoItemSchedulePopupItemClicked: Action<
-  TodoItemSchedulePopupAction
+export const todoItemSchedulePopupDueAtSelected: Action<
+  TodoItemSchedulePopupDueAt
 > = ({ state, actions }, action) => {
   const todoId = state.todoItemSchedulePopup
   if (!todoId) return
   actions.closeTodoItemSchedulePopup()
   switch (action) {
+    case 'No Due Date':
+      return
     case 'Yesterday':
       return
     case 'Today':
