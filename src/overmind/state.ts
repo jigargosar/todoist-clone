@@ -85,7 +85,7 @@ export const ProjectList = {
     }
   },
 }
-export type TodoId = { tag: 'TodoId'; value: string }
+export type TodoId = { readonly tag: 'TodoId'; readonly value: string }
 export const TodoId = {
   gen(): TodoId {
     return { tag: 'TodoId', value: nanoid() }
