@@ -16,8 +16,6 @@ import { Action } from './index'
 
 export * from './todoMenu/actions'
 
-
-
 export const setDone: Action<{ todoId: TodoId; isDone: boolean }> = (
   { state },
   { todoId, isDone },
@@ -49,12 +47,10 @@ export const addTodoClicked: Action = ctx => {
 export const addFakeTodoClicked: Action = ({ state }) => {
   const todo = Todo.createFake()
   state.todoList = TodoList.append(todo)(state.todoList)
-  // state.todoList.push(todo)
 }
 export const addFakeProjectClicked: Action = ({ state }) => {
   const project = Project.createFake()
   state.projectList = ProjectList.append(project)(state.projectList)
-  // state.projectList.push(project)
 }
 export const updateTodoForm: Action<Partial<TodoFormFields>> = (
   { state },
