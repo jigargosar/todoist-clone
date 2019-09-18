@@ -215,15 +215,6 @@ export function maybeAddingTodo(form: InlineTodoForm): AddingTodo | null {
   return form && form.tag === 'AddingTodo' ? form : null
 }
 
-const debounce = require('lodash.debounce')
-
-function cacheStoreState(state: State) {
-  const serializedModel = JSON.stringify(state)
-  if (serializedModel) {
-    localStorage.setItem('todoist-clone-model', serializedModel)
-  }
-}
-export const debouncedCacheStoreState = debounce(cacheStoreState, 1000)
 function getCachedState() {
   const parsedState = JSON.parse(
     localStorage.getItem('todoist-clone-model') || '{}',
