@@ -13,6 +13,7 @@ import {
 } from './state'
 import clone from 'ramda/es/clone'
 import { Action } from './index'
+import { shouldNeverBeCalled } from '../utils'
 
 export * from './todoMenu/actions'
 
@@ -98,6 +99,21 @@ export const todoItemScheduleClicked: Action<TodoId> = (
 ) => {
   state.todoItemSchedulePopup = todoId
 }
-export const closeTodoItemSchedulePopup: Action<TodoId> = ({ state }) => {
+export const closeTodoItemSchedulePopup: Action = ({ state }) => {
   state.todoItemSchedulePopup = null
+}
+type TodoItemScheduleMenuAction = 'Foo' | 'Bar'
+
+export const todoItemSchedulePopupItemClicked: Action<
+  TodoItemScheduleMenuAction
+> = ({ state }, action) => {
+  const todoId = state.todoItemSchedulePopup
+  if (!todoId) return
+  switch (action) {
+    case 'Foo':
+      return
+    case 'Bar':
+      return
+  }
+  shouldNeverBeCalled(action)
 }

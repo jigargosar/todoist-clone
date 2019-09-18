@@ -143,6 +143,7 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
       )}
 
       <ViewTodoItemContextMenu />
+      <ViewTodoItemSchedulePopup />
     </>
   )
 }
@@ -173,6 +174,41 @@ function ViewTodoItemContextMenu() {
       open={!!anchorEl}
       keepMounted={true}
       onClose={() => actions.todoMenuClose()}
+    >
+      <MenuItem onClick={itemAction('Edit')}>Edit</MenuItem>
+      <MenuItem onClick={itemAction('Delete')}>Delete</MenuItem>
+    </Menu>
+  )
+}
+function ViewTodoItemSchedulePopup() {
+  const { actions, reaction } = useOvermind()
+
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+
+  useEffect(() =>
+    reaction(
+      state => state.currentTodoItemSchedulePopupAnchorDomId,
+      state => {
+        setAnchorEl(
+          document.getElementById(
+            // @ts-ignore
+            state.currentTodoItemSchedulePopupAnchorDomId,
+          ),
+        )
+      },
+      { immediate: true },
+    ),
+  )
+
+  const itemAction = (action: TodoMenuAction) => () => {
+    // actions.todoMenuItemClicked(action)
+  }
+  return (
+    <Menu
+      anchorEl={anchorEl}
+      open={!!anchorEl}
+      keepMounted={true}
+      onClose={() => actions.closeTodoItemSchedulePopup()}
     >
       <MenuItem onClick={itemAction('Edit')}>Edit</MenuItem>
       <MenuItem onClick={itemAction('Delete')}>Delete</MenuItem>
