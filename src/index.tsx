@@ -133,13 +133,7 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
         <ViewAddTodoForm addingTodo={addingTodo} />
       ) : (
         <>
-          <Btn
-            size="small"
-            color="primary"
-            onClick={() => actions.addTodoClicked()}
-          >
-            Add Task
-          </Btn>
+          <Btn onClick={() => actions.addTodoClicked()}>Add Task</Btn>
           <Btn onClick={() => actions.addFakeTodoClicked()}>
             Add Fake Task
           </Btn>
