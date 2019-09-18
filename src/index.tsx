@@ -334,11 +334,15 @@ function ViewTodoItemDueAt({
 
   return (
     <div>
-      {DueAt.notSet() ?<IconBtn
-        id={scheduleTriggerFor(todoId)}
-        onClick={() => actions.openSchedule(todoId)}
-        icon={ScheduleIcon}
-      /}>
+      {DueAt.noDue() ? (
+        <IconBtn
+          id={scheduleTriggerFor(todoId)}
+          onClick={() => actions.openSchedule(todoId)}
+          icon={ScheduleIcon}
+        />
+      ) : (
+        ''
+      )}
     </div>
   )
 }

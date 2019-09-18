@@ -119,7 +119,7 @@ export const Todo = {
       title: faker.hacker.phrase(),
       isDone: false,
       projectId: null,
-      dueAt: DueAt.notSet(),
+      dueAt: DueAt.noDue(),
     }
   },
 }
