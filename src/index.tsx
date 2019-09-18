@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { FC, forwardRef } from 'react'
+import { FC } from 'react'
 import { render } from 'react-dom'
 import 'tachyons'
 import './index.css'
@@ -16,16 +16,16 @@ import MenuItem from '@material-ui/core/MenuItem'
 import {
   AddingTodo,
   EditingTodo,
-  todoMenuAnchorDomIdFor,
   maybeAddingTodo,
   maybeEditingTodoFor,
   Project,
   ProjectId,
   ProjectList,
+  schedulePopupAnchorDomIdForTodoItem,
   Todo,
   TodoFormFields,
   TodoId,
-  schedulePopupAnchorDomIdForTodoItem,
+  todoMenuAnchorDomIdFor,
 } from './overmind/state'
 import { TodoMenuAction } from './overmind/todoMenu/actions'
 import { config, useOvermind } from './overmind'
@@ -47,7 +47,7 @@ function App() {
 }
 
 function AppContent() {
-  const { state, actions } = useOvermind()
+  const { state } = useOvermind()
 
   return (
     <div className="pl2 lh-copy" style={{ maxWidth: 500 }}>
@@ -167,8 +167,9 @@ function ViewTodoItemContextMenu() {
     ),
   )
 
-  const itemAction = (action: TodoMenuAction) => () =>
+  const itemAction = (action: TodoMenuAction) => () => {
     actions.todoMenu.onClick(action)
+  }
   return (
     <Menu
       anchorEl={anchorEl}
