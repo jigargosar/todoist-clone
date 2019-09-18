@@ -182,6 +182,13 @@ export function maybeEditingTodoFor(
     ? editingTodo
     : null
 }
+export function maybeAddingTodo(form: InlineTodoForm): AddingTodo | null {
+  return form && form.tag === 'AddingTodo' ? form : null
+}
+
+export function todoMenuAnchorDomIdFor(todoId: TodoId) {
+  return TodoId.toString(todoId) + '__context-menu-anchor'
+}
 
 type TodoMenu = { todoId: TodoId }
 
@@ -207,13 +214,6 @@ const defaultState: State = {
   },
 }
 
-export function todoMenuAnchorDomIdFor(todoId: TodoId) {
-  return TodoId.toString(todoId) + '__context-menu-anchor'
-}
-
-export function maybeAddingTodo(form: InlineTodoForm): AddingTodo | null {
-  return form && form.tag === 'AddingTodo' ? form : null
-}
 
 function getCachedState() {
   const parsedState = JSON.parse(
