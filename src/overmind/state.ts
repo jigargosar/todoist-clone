@@ -101,7 +101,7 @@ export const TodoId = {
   },
 }
 export type Todo = {
-  id: TodoId
+  readonly id: TodoId
   title: string
   isDone: boolean
   projectId: ProjectId | null
