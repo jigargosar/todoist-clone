@@ -33,17 +33,13 @@ const { memo, useEffect, useState } = React
 
 const overmind = createOvermind(config)
 
-const AppProvider: FC = ({ children }) => {
-  return <Provider value={overmind}>{children}</Provider>
-}
-
 function App() {
   return (
-    <AppProvider>
+    <Provider value={overmind}>
       <CssBaseline />
 
       <AppContent />
-    </AppProvider>
+    </Provider>
   )
 }
 
@@ -164,7 +160,9 @@ function ViewTodoItemContextMenu() {
       state => state.currentTodoMenuAnchorDomId,
       state => {
         // @ts-ignore
-        setAnchorEl(document.getElementById(state.currentTodoMenuAnchorDomId))
+        setAnchorEl(
+          document.getElementById(state.currentTodoMenuAnchorDomId),
+        )
       },
       { immediate: true },
     ),
