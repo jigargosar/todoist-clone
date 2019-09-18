@@ -31,6 +31,7 @@ import {
 import { config, useOvermind } from './overmind'
 import MUIButton, { ButtonProps } from '@material-ui/core/Button'
 import { ContextAction, DueAtPayload } from './overmind/actions'
+import { DueAt } from './overmind/state/DueAt'
 
 const { memo, useEffect, useState } = React
 
@@ -307,7 +308,7 @@ const ViewTodoItem: FC<{
           {projectTitle}
         </div>
       </div>
-      <ViewTodoItemSchedule todoId={todo.id} />
+      <ViewTodoItemDueAt todoId={todo.id} dueAt={todo.dueAt} />
       <div className="relative">
         <IconButton
           id={contextTriggerFor(todo.id)}
@@ -321,7 +322,13 @@ const ViewTodoItem: FC<{
   )
 })
 
-function ViewTodoItemSchedule({ todoId }: { todoId: TodoId }) {
+function ViewTodoItemDueAt({
+  todoId,
+  dueAt,
+}: {
+  todoId: TodoId
+  dueAt: DueAt
+}) {
   const { actions } = useOvermind()
 
   return (
