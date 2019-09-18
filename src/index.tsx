@@ -306,15 +306,6 @@ const ViewTodoItem: FC<{
           {projectTitle}
         </div>
       </div>
-      <div>
-        <IconButton
-          id={schedulePopupAnchorDomIdForTodoItem(todo.id)}
-          size="small"
-          onClick={() => actions.todoItemScheduleClicked(todo.id)}
-        >
-          <ScheduleIcon fontSize="small" />
-        </IconButton>
-      </div>
       <ViewTodoItemSchedule todoId={todo.id} />
       <div className="relative">
         <IconButton
