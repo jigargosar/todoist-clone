@@ -1,6 +1,6 @@
 import { TodoId } from '../state'
-import { Action } from '../index'
-import { Derive } from 'overmind'
+import { Action, Config } from '../index'
+import { Derive, IContext } from 'overmind'
 import { ResolveState } from 'overmind/es/internalTypes'
 
 export type Popup =
@@ -35,8 +35,9 @@ const openContext: Action<TodoId> = ({ state: rootState }, todoId) => {
   state.popup = { tag: 'Context', todoId }
 }
 
-const close: Action = ({ state }) => {
-  state.popup.popup = null
+const close: Action = ({ state: rootState }) => {
+  const state = rootState.popup
+  state.popup = null
 }
 
 const config = {
