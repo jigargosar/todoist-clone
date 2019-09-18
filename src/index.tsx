@@ -10,6 +10,7 @@ import CssBaseline from '@material-ui/core/CssBaseline'
 import IconButton from '@material-ui/core/IconButton'
 import DeleteIcon from '@material-ui/icons/Delete'
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
+import ScheduleIcon from '@material-ui/icons/Schedule'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import {
@@ -263,6 +264,14 @@ const ViewTodoItem: FC<{
         >
           {projectTitle}
         </div>
+      </div>
+      <div>
+        <IconButton
+          size="small"
+        // onClick={() => actions.todoMenuOpen(todo.id)}
+        >
+          <ScheduleIcon fontSize="small" />
+        </IconButton>
       </div>
       <div className="relative">
         <IconButton
