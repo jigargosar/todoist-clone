@@ -283,6 +283,22 @@ const ViewTodoItem: FC<{
 })
 
 function ViewTodoItemSchedule({ todoId }: { todoId: TodoId }) {
+  const { actions } = useOvermind()
+
+  return (
+    <div>
+      <IconButton
+        size="small"
+        id={getScheduleTrigger(todoId)}
+        onClick={() => actions.openSchedule(todoId)}
+      >
+        <ScheduleIcon fontSize="small" />
+      </IconButton>
+    </div>
+  )
+}
+
+function ViewSchedulePopup() {
   const { actions, reaction } = useOvermind()
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
 
@@ -308,25 +324,16 @@ function ViewTodoItemSchedule({ todoId }: { todoId: TodoId }) {
   }
 
   return (
-    <div>
-      <IconButton
-        size="small"
-        id={getScheduleTrigger(todoId)}
-        onClick={() => actions.openSchedule(todoId)}
-      >
-        <ScheduleIcon fontSize="small" />
-      </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        open={!!anchorEl}
-        keepMounted={true}
-        onClose={() => actions.closePopup()}
-      >
-        <MenuItem onClick={setDueAt('Yesterday')}>Yesterday</MenuItem>
-        <MenuItem onClick={setDueAt('Today')}>Today</MenuItem>
-        <MenuItem onClick={setDueAt('Tomorrow')}>Tomorrow</MenuItem>
-      </Menu>
-    </div>
+    <Menu
+      anchorEl={anchorEl}
+      open={!!anchorEl}
+      keepMounted={true}
+      onClose={() => actions.closePopup()}
+    >
+      <MenuItem onClick={setDueAt('Yesterday')}>Yesterday</MenuItem>
+      <MenuItem onClick={setDueAt('Today')}>Today</MenuItem>
+      <MenuItem onClick={setDueAt('Tomorrow')}>Tomorrow</MenuItem>
+    </Menu>
   )
 }
 
