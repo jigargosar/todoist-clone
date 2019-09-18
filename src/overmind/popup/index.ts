@@ -1,5 +1,5 @@
 import { Todo, TodoId } from '../state'
-import { Action } from '../index'
+import { Action, OnInitialize } from '../index'
 import { Derive } from 'overmind'
 import { ResolveState } from 'overmind/es/internalTypes'
 import equals from 'ramda/es/equals'
@@ -7,36 +7,26 @@ import equals from 'ramda/es/equals'
 export type Popup =
   | { tag: 'Schedule'; todoId: TodoId }
   | { tag: 'Context'; todoId: TodoId }
+  | { tag: 'Closed' }
 
 export type State = {
-  popup: Popup | null
-  isScheduleOpen: Derive<State, boolean>
-  isScheduleOpenFor: Derive<State, (todoId: TodoId) => boolean>
+  popup: Popup
   scheduleTriggerId: Derive<State, string>
-  isContextOpen: Derive<State, boolean>
-}
-
-function isOpen(tag: string) {
-  return function(state: ResolveState<State>) {
-    return !!state.popup && state.popup.tag === tag
-  }
 }
 
 const state: State = {
-  popup: null,
-  isScheduleOpen: isOpen('Schedule'),
-  isScheduleOpenFor: state => {
-    const { popup } = state
-    return (todoId: TodoId) => equals(popup, { tag: 'Schedule', todoId })
-  },
+  popup: { tag: 'Closed' },
   scheduleTriggerId: state => {
-    console.log(state)
-    return state.popup && state.popup.tag === 'Schedule'
-      ? TodoId.toString(state.popup.todoId) +
-          '__todo-item-schedule-trigger'
+    // @ts-ignore
+    console.log(state.popup.todoId)
+    // @ts-ignore
+    return state.popup.tag === 'Schedule'
+      ? TodoId.toString(
+          // @ts-ignore
+          state.popup.todoId,
+        ) + '__todo-item-schedule-trigger'
       : ''
   },
-  isContextOpen: isOpen('Context'),
 }
 
 const openSchedule: Action<TodoId> = ({ actions }, todoId) => {
@@ -48,15 +38,19 @@ const openContext: Action<TodoId> = ({ actions }, todoId) => {
 }
 
 const close: Action = ({ actions }) => {
-  actions.popup.internal.set(null)
+  actions.popup.internal.set({ tag: 'Closed' })
 }
 
-const setPopup: Action<Popup | null> = ({ state }, popup) => {
+const setPopup: Action<Popup> = ({ state }, popup) => {
   state.popup.popup = popup
 }
 
+const onInitialize: OnInitialize = ({ state }) => {
+  console.log(state.popup.popup)
+}
 const config = {
   state,
+  onInitialize,
   actions: {
     openSchedule,
     openContext,
