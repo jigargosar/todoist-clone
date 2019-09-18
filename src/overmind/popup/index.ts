@@ -37,7 +37,7 @@ const openContext: Action<TodoId> = ({ actions }, todoId) => {
   actions.popup.internal.set({ tag: 'Context', todoId })
 }
 
-const close: Action = ({ actions }) => {
+const closePopup: Action = ({ actions }) => {
   actions.popup.internal.set({ tag: 'Closed' })
 }
 
@@ -54,7 +54,7 @@ const config = {
   actions: {
     openSchedule,
     openContext,
-    close,
+    close: closePopup,
     internal: { set: setPopup },
   },
 }
