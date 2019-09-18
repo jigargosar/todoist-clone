@@ -11,6 +11,7 @@ import {
   json,
 } from 'overmind'
 import { createHook } from 'overmind-react'
+import { merge } from 'overmind/config'
 
 const onInitialize: OnInitialize = async (
   { state, actions, effects },
@@ -21,8 +22,11 @@ const onInitialize: OnInitialize = async (
     effects.debouncedCacheStoreState(json(overmind.state))
   })
 }
-
-export const config = { onInitialize, state, actions, effects }
+import * as tmActions from './todoMenu/actions'
+export const config = merge(
+  { onInitialize, state, actions, effects },
+  { actions: { todoMenu: tmActions.todoMenu } },
+)
 
 // declare module 'overmind' {
 //   // noinspection JSUnusedGlobalSymbols

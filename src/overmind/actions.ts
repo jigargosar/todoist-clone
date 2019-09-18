@@ -15,8 +15,6 @@ import clone from 'ramda/es/clone'
 import { Action } from './index'
 import { shouldNeverBeCalled } from '../utils'
 
-export * from './todoMenu/actions'
-
 export const setDone: Action<{ todoId: TodoId; isDone: boolean }> = (
   { state },
   { todoId, isDone },
