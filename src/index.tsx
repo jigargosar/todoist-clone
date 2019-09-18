@@ -168,7 +168,7 @@ function ViewTodoItemContextMenu() {
   )
 
   const itemAction = (action: TodoMenuAction) => () => {
-    actions.todoMenu.onClick(action)
+    actions.todoMenu.itemClicked(action)
   }
   return (
     <Menu

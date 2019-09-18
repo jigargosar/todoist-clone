@@ -2,17 +2,17 @@ import { TodoId } from '../state'
 import { shouldNeverBeCalled } from '../../utils'
 import { Action } from '../index'
 
-const todoMenuOpen: Action<TodoId> = ({ state }, todoId: TodoId) => {
+const open: Action<TodoId> = ({ state }, todoId: TodoId) => {
   state.todoMenu = { todoId }
 }
 
-const todoMenuClose: Action = ({ state }) => {
+const close: Action = ({ state }) => {
   state.todoMenu = null
 }
 
 export type TodoMenuAction = 'Edit' | 'Delete'
 
-const todoMenuItemClicked: Action<TodoMenuAction> = (
+const itemClicked: Action<TodoMenuAction> = (
   { state: { todoMenu }, actions },
   actionType,
 ) => {
@@ -31,9 +31,9 @@ const todoMenuItemClicked: Action<TodoMenuAction> = (
 }
 
 const actions = {
-  open: todoMenuOpen,
-  close: todoMenuClose,
-  onClick: todoMenuItemClicked,
+  open,
+  close,
+  itemClicked,
 }
 
 export default actions
