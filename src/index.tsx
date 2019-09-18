@@ -21,7 +21,6 @@ import {
   Project,
   ProjectId,
   ProjectList,
-  schedulePopupAnchorDomIdForTodoItem,
   Todo,
   TodoFormFields,
   TodoId,
@@ -144,7 +143,6 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
       )}
 
       <ViewTodoItemContextMenu />
-      <ViewTodoItemSchedulePopup />
     </>
   )
 }
@@ -179,43 +177,6 @@ function ViewTodoItemContextMenu() {
     >
       <MenuItem onClick={itemAction('Edit')}>Edit</MenuItem>
       <MenuItem onClick={itemAction('Delete')}>Delete</MenuItem>
-    </Menu>
-  )
-}
-
-function ViewTodoItemSchedulePopup() {
-  const { actions, reaction } = useOvermind()
-
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
-
-  useEffect(() =>
-    reaction(
-      state => state.currentTodoItemSchedulePopupAnchorDomId,
-      state => {
-        setAnchorEl(
-          document.getElementById(
-            // @ts-ignore
-            state.currentTodoItemSchedulePopupAnchorDomId,
-          ),
-        )
-      },
-      { immediate: true },
-    ),
-  )
-
-  const setDueAt = (action: TodoItemSchedulePopupDueAt) => () => {
-    actions.todoItemSchedulePopupDueAtSelected(action)
-  }
-  return (
-    <Menu
-      anchorEl={anchorEl}
-      open={!!anchorEl}
-      keepMounted={true}
-      onClose={() => actions.closeTodoItemSchedulePopup()}
-    >
-      <MenuItem onClick={setDueAt('Yesterday')}>Yesterday</MenuItem>
-      <MenuItem onClick={setDueAt('Today')}>Today</MenuItem>
-      <MenuItem onClick={setDueAt('Tomorrow')}>Tomorrow</MenuItem>
     </Menu>
   )
 }
@@ -322,15 +283,34 @@ const ViewTodoItem: FC<{
 
 function ViewTodoItemSchedule({ todoId }: { todoId: TodoId }) {
   const { actions } = useOvermind()
+  const setDueAt = (action: TodoItemSchedulePopupDueAt) => () => {
+    actions.todoItemSchedulePopupDueAtSelected(action)
+  }
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
   return (
     <div>
       <IconButton
-        id={schedulePopupAnchorDomIdForTodoItem(todoId)}
         size="small"
-        onClick={() => actions.todoItemScheduleClicked(todoId)}
+        onClick={e => {
+          actions.todoItemScheduleClicked(todoId)
+          setAnchorEl(e.currentTarget)
+        }}
       >
         <ScheduleIcon fontSize="small" />
       </IconButton>
+      <Menu
+        anchorEl={anchorEl}
+        open={!!anchorEl}
+        keepMounted={true}
+        onClose={() => {
+          setAnchorEl(null)
+          actions.closeTodoItemSchedulePopup()
+        }}
+      >
+        <MenuItem onClick={setDueAt('Yesterday')}>Yesterday</MenuItem>
+        <MenuItem onClick={setDueAt('Today')}>Today</MenuItem>
+        <MenuItem onClick={setDueAt('Tomorrow')}>Tomorrow</MenuItem>
+      </Menu>
     </div>
   )
 }
