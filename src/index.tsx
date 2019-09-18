@@ -15,7 +15,8 @@ import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import {
   AddingTodo,
-  EditingTodo, contextTriggerFor,
+  EditingTodo,
+  contextTriggerFor,
   scheduleTriggerFor,
   maybeAddingTodo,
   maybeEditingTodoFor,
@@ -156,7 +157,7 @@ function ViewTodoContextPopup() {
 
   useEffect(() =>
     reaction(
-      state => state.currentTodoMenuAnchorDomId,
+      state => state.contextTrigger,
       state => {
         setAnchorEl(
           // @ts-ignore
