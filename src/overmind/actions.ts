@@ -91,29 +91,17 @@ export const saveInlineTodoFormClicked: Action = ctx => {
   saveAddingTodo(ctx)
   ctx.state.inlineTodoForm = null
 }
-export const todoItemScheduleClicked: Action<TodoId> = (
-  { state },
-  todoId,
-) => {
-  state.todoItemSchedulePopup = clone(todoId)
-}
-export const closeTodoItemSchedulePopup: Action = ({ state }) => {
-  state.todoItemSchedulePopup = null
-}
 
-export type TodoItemSchedulePopupDueAt =
+export type DueAtPayload =
   | 'No Due Date'
   | 'Yesterday'
   | 'Today'
   | 'Tomorrow'
 
-export const todoItemSchedulePopupDueAtSelected: Action<
-  TodoItemSchedulePopupDueAt
-> = ({ state, actions }, action) => {
-  const todoId = state.todoItemSchedulePopup
-  if (!todoId) return
-  actions.closeTodoItemSchedulePopup()
-  switch (action) {
+export const setDueAt: Action<
+  {dueAt:DueAtPayload, todoId:TodoId}
+> = ({ state, actions }, {dueAt, todoId}) => {
+  switch (dueAt) {
     case 'No Due Date':
       return
     case 'Yesterday':
@@ -123,5 +111,5 @@ export const todoItemSchedulePopupDueAtSelected: Action<
     case 'Tomorrow':
       return
   }
-  shouldNeverBeCalled(action)
+  shouldNeverBeCalled(dueAt)
 }

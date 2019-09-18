@@ -23,9 +23,10 @@ const onInitialize: OnInitialize = async (
   })
 }
 import todoMenu from './todoMenu'
+import popup from './popup'
 export const config = merge(
   { onInitialize, state, actions, effects },
-  namespaced({ todoMenu }),
+  namespaced({ todoMenu , popup}),
 )
 
 // declare module 'overmind' {

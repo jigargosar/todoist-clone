@@ -29,7 +29,7 @@ import {
 import { TodoMenuAction } from './overmind/todoMenu/actions'
 import { config, useOvermind } from './overmind'
 import MUIButton, { ButtonProps } from '@material-ui/core/Button'
-import { TodoItemSchedulePopupDueAt } from './overmind/actions'
+import { DueAtPayload } from './overmind/actions'
 
 const { memo, useEffect, useState } = React
 
@@ -283,16 +283,18 @@ const ViewTodoItem: FC<{
 
 function ViewTodoItemSchedule({ todoId }: { todoId: TodoId }) {
   const { actions } = useOvermind()
-  const setDueAt = (action: TodoItemSchedulePopupDueAt) => () => {
-    actions.todoItemSchedulePopupDueAtSelected(action)
-  }
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+
+  const setDueAt = (dueAt: DueAtPayload) => () => {
+    actions.setDueAt({ dueAt, todoId })
+    setAnchorEl(null)
+  }
+
   return (
     <div>
       <IconButton
         size="small"
         onClick={e => {
-          actions.todoItemScheduleClicked(todoId)
           setAnchorEl(e.currentTarget)
         }}
       >
@@ -304,7 +306,6 @@ function ViewTodoItemSchedule({ todoId }: { todoId: TodoId }) {
         keepMounted={true}
         onClose={() => {
           setAnchorEl(null)
-          actions.closeTodoItemSchedulePopup()
         }}
       >
         <MenuItem onClick={setDueAt('Yesterday')}>Yesterday</MenuItem>

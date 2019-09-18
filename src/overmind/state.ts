@@ -191,15 +191,11 @@ export function maybeAddingTodo(form: InlineTodoForm): AddingTodo | null {
 export function todoMenuAnchorDomIdFor(todoId: TodoId) {
   return TodoId.toString(todoId) + '__context-menu-anchor'
 }
-export function schedulePopupAnchorDomIdForTodoItem(todoId: TodoId) {
-  return TodoId.toString(todoId) + '__todo-item-schedule-popup-anchor'
-}
 
 type TodoMenu = { todoId: TodoId }
 
 export type State = {
   todoItemSchedulePopup: TodoId | null
-  currentTodoItemSchedulePopupAnchorDomId: Derive<State, string>
   todoMenu: TodoMenu | null
   currentTodoMenuAnchorDomId: Derive<State, string>
   todoList: Todo[]
@@ -211,11 +207,6 @@ const initialProjects: Project[] = times(Project.createFake, 5)
 
 export const state: State = {
   todoItemSchedulePopup: null,
-  currentTodoItemSchedulePopupAnchorDomId: state => {
-    return state.todoItemSchedulePopup
-      ? schedulePopupAnchorDomIdForTodoItem(state.todoItemSchedulePopup)
-      : ''
-  },
   todoMenu: null,
   currentTodoMenuAnchorDomId: state => {
     return state.todoMenu && state.todoMenu.todoId
