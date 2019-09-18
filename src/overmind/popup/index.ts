@@ -25,19 +25,20 @@ const state: State = {
   isContextOpen: isOpen('Context'),
 }
 
-const openSchedule: Action<TodoId> = ({ state: rootState }, todoId) => {
-  const state = rootState.popup
-  state.popup = { tag: 'Schedule', todoId }
+const openSchedule: Action<TodoId> = ({ actions }, todoId) => {
+  actions.popup.internal.set({ tag: 'Schedule', todoId })
 }
 
-const openContext: Action<TodoId> = ({ state: rootState }, todoId) => {
-  const state = rootState.popup
-  state.popup = { tag: 'Context', todoId }
+const openContext: Action<TodoId> = ({ actions }, todoId) => {
+  actions.popup.internal.set({ tag: 'Context', todoId })
 }
 
-const close: Action = ({ state: rootState }) => {
-  const state = rootState.popup
-  state.popup = null
+const close: Action = ({ actions }) => {
+  actions.popup.internal.set(null)
+}
+
+const setPopup: Action<Popup | null> = ({ state }, popup) => {
+  state.popup.popup = popup
 }
 
 const config = {
@@ -46,6 +47,7 @@ const config = {
     openSchedule,
     openContext,
     close,
+    internal: { set: setPopup },
   },
 }
 
