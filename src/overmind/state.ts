@@ -195,6 +195,7 @@ export function todoMenuAnchorDomIdFor(todoId: TodoId) {
 type TodoMenu = { todoId: TodoId }
 
 export type State = {
+  todoItemSchedulePopup: TodoId | null
   todoMenu: TodoMenu | null
   todoList: Todo[]
   inlineTodoForm: AddingTodo | EditingTodo | null
@@ -205,6 +206,7 @@ const initialTodos: Todo[] = times(Todo.createFake, 10)
 const initialProjects: Project[] = times(Project.createFake, 5)
 
 export const state: State = {
+  todoItemSchedulePopup: null,
   todoMenu: null,
   todoList: initialTodos,
   inlineTodoForm: null,

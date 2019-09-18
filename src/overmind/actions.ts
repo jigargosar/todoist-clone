@@ -92,3 +92,12 @@ export const saveInlineTodoFormClicked: Action = ctx => {
   saveAddingTodo(ctx)
   ctx.state.inlineTodoForm = null
 }
+export const todoItemScheduleClicked: Action<TodoId> = (
+  { state },
+  todoId,
+) => {
+  state.todoItemSchedulePopup = todoId
+}
+export const closeTodoItemSchedulePopup: Action<TodoId> = ({ state }) => {
+  state.todoItemSchedulePopup = null
+}
