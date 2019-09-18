@@ -1,5 +1,6 @@
 import { TodoId } from '../state'
 import { Action } from '../index'
+import { Derive } from 'overmind'
 
 export type Popup =
   | { tag: 'Schedule'; todoId: TodoId }
@@ -7,10 +8,14 @@ export type Popup =
 
 export type State = {
   popup: Popup | null
+  isScheduleOpen: Derive<State, boolean>
 }
 
 const state: State = {
   popup: null,
+  isScheduleOpen: state => {
+    return !!state.popup && state.popup.tag === 'Schedule'
+  },
 }
 
 const openSchedule: Action<TodoId> = ({ state }, todoId) => {
