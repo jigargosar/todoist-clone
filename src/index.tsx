@@ -108,27 +108,26 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
   return (
     <>
       {todoList.map(todo => {
-        const { id, projectId } = todo
-
-        const projectTitle = ProjectList.findTitleByIdOrInbox(projectId)(
-          projectList,
-        )
-        const editingTodo = maybeEditingTodoFor(id, inlineTodoForm)
+        const editingTodo = maybeEditingTodoFor(todo.id, inlineTodoForm)
         if (editingTodo) {
           return (
             <ViewEditTodoForm
-              key={TodoId.toString(id)}
+              key={TodoId.toString(todo.id)}
               editingTodo={editingTodo}
             />
           )
+        } else {
+          const projectTitle = ProjectList.findTitleByIdOrInbox(
+            todo.projectId,
+          )(projectList)
+          return (
+            <ViewTodoItem
+              key={TodoId.toString(todo.id)}
+              todo={todo}
+              projectTitle={projectTitle}
+            />
+          )
         }
-        return (
-          <ViewTodoItem
-            key={TodoId.toString(id)}
-            todo={todo}
-            projectTitle={projectTitle}
-          />
-        )
       })}
       {addingTodo ? (
         <ViewAddTodoForm addingTodo={addingTodo} />
