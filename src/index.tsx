@@ -46,7 +46,6 @@ function App() {
 function AppContent() {
   const { state, actions } = useOvermind()
 
-  const addingTodo = maybeAddingTodo(state.inlineTodoForm)
   return (
     <div className="pl2 lh-copy" style={{ maxWidth: 500 }}>
       <div className="f4 pv1">ProjectList</div>
@@ -56,22 +55,6 @@ function AppContent() {
       </Btn>
       <div className="f4 pv1">TodoList</div>
       <ViewTodoList todoList={state.todoList} />
-      {addingTodo ? (
-        <ViewAddTodoForm addingTodo={addingTodo} />
-      ) : (
-        <>
-          <Btn
-            size="small"
-            color="primary"
-            onClick={() => actions.addTodoClicked()}
-          >
-            Add Task
-          </Btn>
-          <Btn onClick={() => actions.addFakeTodoClicked()}>
-            Add Fake Task
-          </Btn>
-        </>
-      )}
     </div>
   )
 }
@@ -93,9 +76,9 @@ function ViewProjectList({ projectList }: { projectList: Project[] }) {
   )
 }
 
-const ViewProjectItem: FC<{ project: Project }> = function ViewProjectItem({
-  project,
-}) {
+const ViewProjectItem: FC<{
+  project: Project
+}> = function ViewProjectItem({ project }) {
   const { actions } = useOvermind()
   return (
     <div className="flex">
@@ -118,8 +101,9 @@ const ViewProjectItem: FC<{ project: Project }> = function ViewProjectItem({
 function ViewTodoList({ todoList }: { todoList: Todo[] }) {
   const {
     state: { inlineTodoForm, projectList },
+    actions,
   } = useOvermind()
-
+  const addingTodo = maybeAddingTodo(inlineTodoForm)
   return (
     <>
       {todoList.map(todo => {
@@ -145,6 +129,23 @@ function ViewTodoList({ todoList }: { todoList: Todo[] }) {
           />
         )
       })}
+      {addingTodo ? (
+        <ViewAddTodoForm addingTodo={addingTodo} />
+      ) : (
+        <>
+          <Btn
+            size="small"
+            color="primary"
+            onClick={() => actions.addTodoClicked()}
+          >
+            Add Task
+          </Btn>
+          <Btn onClick={() => actions.addFakeTodoClicked()}>
+            Add Fake Task
+          </Btn>
+        </>
+      )}
+
       <ViewTodoItemContextMenu />
     </>
   )
