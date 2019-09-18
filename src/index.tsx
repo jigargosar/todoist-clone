@@ -83,7 +83,7 @@ function ViewProjectList({ projectList }: { projectList: Project[] }) {
     <>
       {projectList.map(project => {
         return (
-          <ProjectItem
+          <ViewProjectItem
             key={ProjectId.toString(project.id)}
             project={project}
           />
@@ -93,7 +93,7 @@ function ViewProjectList({ projectList }: { projectList: Project[] }) {
   )
 }
 
-const ProjectItem: FC<{ project: Project }> = function ProjectItem({
+const ViewProjectItem: FC<{ project: Project }> = function ViewProjectItem({
   project,
 }) {
   const { actions } = useOvermind()
