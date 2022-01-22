@@ -19,7 +19,7 @@
     "is-hotkey": "^0.1.4",
     "lodash.debounce": "^4.0.8",
     "material-color-hash": "^0.1.6",
-    "nanoid": "^2.0.3",
+    "nanoid": "^3.1.31",
     "overmind": "^19.1.1",
     "overmind-react": "^20.1.1",
     "ow": "^0.13.2",
